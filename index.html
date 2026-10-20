@@ -103,7 +103,11 @@
             const releasesContainer = document.getElementById('releases-container');
             const newsContainer = document.getElementById('news-container');
 
-            const { data, error } = await db.from('discography').select('*').order('created_at', { ascending: false }).limit(4);
+            // Consulta vinculando la tabla artists para traer el nombre real de la banda
+            const { data, error } = await db.from('discography')
+                .select('*, artists(name)')
+                .order('created_at', { ascending: false })
+                .limit(4);
 
             if (error || !data || data.length === 0) {
                 releasesContainer.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1;">No se encontraron registros en el catálogo.</p>`;
@@ -113,11 +117,12 @@
             // Cargar Lanzamientos Recientes
             releasesContainer.innerHTML = '';
             data.forEach(item => {
+                const bandName = item.artists ? item.artists.name : 'Artista Desconocido';
                 const card = document.createElement('div');
                 card.className = 'release-card';
                 card.innerHTML = `
                     <div>
-                        <div class="band-name">${item.band_name}</div>
+                        <div class="band-name">${bandName}</div>
                         <div class="album-name">${item.album_title} (${item.release_year || 'N/A'})</div>
                     </div>
                     ${item.terabox_link ? `<a href="${item.terabox_link}" target="_blank" class="terabox-btn" style="text-align:center;">Descargar</a>` : '<span style="font-size:0.8rem; color:var(--text-muted);">Sin enlace</span>'}
@@ -125,18 +130,17 @@
                 releasesContainer.appendChild(card);
             });
 
-            // Cargar Noticias Dinámicas
-            // Cargar Noticias Dinámicas (Mostrando únicamente el artista / banda)
+            // Cargar Noticias Dinámicas con el nombre real
             if (data.length > 0) {
                 const primerRegistro = data[0];
+                const bandName = primerRegistro.artists ? primerRegistro.artists.name : 'Artista Desconocido';
                 const fecha = new Date(primerRegistro.created_at).toISOString().split('T')[0].replace(/-/g, '.');
 
                 newsContainer.innerHTML = `
                     <div class="news-item">
                         <span class="news-date">${fecha}</span>
                         <span class="news-tag">NUEVO INGRESO</span>
-                        <span class="news-text">Incorporado al archivo: <strong>${primerRegistro.band_name}</strong> — ${primerRegistro.album_title}</span>
-                        <span class="news-text">Nueva banda agregada: <strong>${primerRegistro.band_name}</strong></span>
+                        <span class="news-text">Nueva banda agregada: <strong>${bandName}</strong></span>
                     </div>
                     <div class="news-item">
                         <span class="news-date">2026.10.19</span>
@@ -146,7 +150,7 @@
                 `;
 
                 // Actualizar sección destacada con el último disco subido
-                document.getElementById('featured-title').innerText = `${primerRegistro.band_name.toUpperCase()}`;
+                document.getElementById('featured-title').innerText = `${bandName.toUpperCase()}`;
                 document.getElementById('featured-desc').innerText = `Último ingreso en el catálogo: "${primerRegistro.album_title}" (${primerRegistro.release_year || 'N/A'}). Resguardado con lista de temas comprobada.`;
             }
         }
