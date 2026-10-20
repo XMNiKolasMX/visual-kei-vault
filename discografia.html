@@ -92,34 +92,6 @@
             font-size: 0.75rem;
             text-transform: uppercase;
         }
-        .btn-terabox {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: #141414;
-    border: 1px solid #333;
-    color: #e0e0e0;
-    padding: 0.5rem 1rem;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.btn-terabox:hover {
-    background: #222;
-    border-color: #666;
-    color: #fff;
-}
-
-.no-terabox {
-    color: #555;
-    font-size: 0.75rem;
-    font-style: italic;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
         .btn-delete {
             background: transparent;
             border: 1px solid #721c24;
@@ -132,8 +104,33 @@
         .btn-delete:hover {
             background: #721c24;
             color: #fff;
-
-            
+        }
+        /* Botón de descarga TeraBox estilizado */
+        .btn-terabox {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #141414;
+            border: 1px solid #333;
+            color: #e0e0e0;
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .btn-terabox:hover {
+            background: #222;
+            border-color: #666;
+            color: #fff;
+        }
+        .no-terabox {
+            color: #555;
+            font-size: 0.75rem;
+            font-style: italic;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
     </style>
 </head>
@@ -257,9 +254,11 @@
 
             albums.forEach(album => {
                 const tracks = Array.isArray(album.tracklist) ? album.tracklist.join('<br>') : 'Lista de canciones no disponible.';
+                
+                // Botón TeraBox estilizado
                 const teraboxBtn = album.terabox_link 
-                    ? `<a href="${album.terabox_link}" target="_blank" class="btn-action" style="text-decoration:none; font-size:0.75rem; padding: 0.4rem 0.8rem;">Descargar vía TeraBox</a>`
-                    : '<span style="color:#666; font-size:0.75rem;">Sin enlace de descarga</span>';
+                    ? `<a href="${album.terabox_link}" target="_blank" class="btn-terabox">📥 Descargar vía TeraBox</a>`
+                    : '<span class="no-terabox">Sin enlace de descarga</span>';
 
                 const coverImg = album.cover_image 
                     ? `<img src="${album.cover_image}" class="album-cover" alt="${album.album_title}">` 
