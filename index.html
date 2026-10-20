@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISUAL KEI VAULT // ARCHIVO</title>
+    <link rel="stylesheet" href="css/main.css">
+    <!-- Cliente Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <header>
+        <h1 class="glitch-title">VISUAL KEI VAULT</h1>
+        <p class="header-subtitle">Proyecto de Archivo Sonoro y Discográfico 1980–1999</p>
+        <nav>
+            <a href="index.html" class="active">Inicio</a>
+            <a href="artistas.html">Artistas</a>
+            <a href="nosotros.html">El Proyecto</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- SECCIÓN 1: ÚLTIMAS ACTUALIZACIONES -->
+        <section style="margin-bottom: 4rem;">
+            <div class="section-header">
+                <h2 class="section-title">Últimas Actualizaciones</h2>
+                <a href="artistas.html" class="btn-view-all">Ver Todo</a>
+            </div>
+
+            <div id="news-container" class="news-list">
+                <div class="news-item">
+                    <span class="news-date">2026.10.19</span>
+                    <span class="news-tag">BOLETÍN</span>
+                    <span class="news-text">Sincronización de registros y enlaces de descarga activa.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: MATERIAL DESTACADO -->
+        <section class="featured-release">
+            <div class="featured-cover">
+                <span class="featured-cover-text">COLECCIÓN ESPECIAL</span>
+            </div>
+            <div class="featured-info">
+                <div class="release-label">DEMOS & MATERIAL INDEPENDIENTE</div>
+                <h2 id="featured-title">RESCATE DISCOGRÁFICO</h2>
+                <p id="featured-desc">
+                    Digitalización y resguardo de ediciones limitadas, maquetas de estudio y discografías de audio pertenecientes al circuito subterráneo.
+                </p>
+                <a href="artistas.html" class="terabox-btn" style="padding: 12px 28px;">Explorar Archivo</a>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: INCORPORACIONES RECIENTES -->
+        <section style="margin-bottom: 4rem;">
+            <div class="section-header">
+                <h2 class="section-title">Incorporaciones Recientes</h2>
+            </div>
+
+            <div id="releases-container" class="releases-grid">
+                <p style="color: var(--text-muted); grid-column: 1/-1;">Cargando registros del catálogo...</p>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 4: REGISTROS Y FORMATOS DISCOGRÁFICOS -->
+        <section style="background: var(--bg-surface); border: 1px solid var(--border-dark); padding: 2.5rem; margin-bottom: 4rem;">
+            <div class="section-header" style="margin-bottom: 1.5rem;">
+                <h2 class="section-title">Formatos Discográficos</h2>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
+                <div>
+                    <h3 style="font-family: 'Cinzel', serif; color: var(--accent-gold); font-size: 1rem; margin-bottom: 0.5rem; text-transform: uppercase;">Álbumes de Estudio & EPs</h3>
+                    <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.7;">
+                        Lanzamientos oficiales de larga duración y minialbumes preservados en alta fidelidad sonora, clasificados por año y sello discográfico.
+                    </p>
+                </div>
+                <div>
+                    <h3 style="font-family: 'Cinzel', serif; color: var(--accent-gold); font-size: 1rem; margin-bottom: 0.5rem; text-transform: uppercase;">Sencillos & Demos de Colección</h3>
+                    <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.7;">
+                        Maquetas en cassette de distribución limitada, sencillos promocionales e interpretaciones de estudio raras de la era independiente.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 5: PROPÓSITO DEL ARCHIVO -->
+        <section style="background: var(--bg-surface); border: 1px solid var(--border-dark); padding: 2.5rem;">
+            <h2 class="section-title" style="margin-bottom: 1rem;">Propósito del Archivo</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.8;">
+                Recopilación, documentación y resguardo digital de discografías completas en servidores externos, organizadas con metadatos y listas de temas estructuradas para consulta pública.
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 VISUAL KEI VAULT // TODOS LOS DERECHOS RESERVADOS.</p>
+    </footer>
+
+    <!-- Scripts de Supabase -->
+    <script src="js/config.js"></script>
+    <script>
+        async function cargarInicio() {
+            const releasesContainer = document.getElementById('releases-container');
+            const newsContainer = document.getElementById('news-container');
+
+            const { data, error } = await db.from('discography').select('*').order('created_at', { ascending: false }).limit(4);
+
+            if (error || !data || data.length === 0) {
+                releasesContainer.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1;">No se encontraron registros en el catálogo.</p>`;
+                return;
+            }
+
+            // Cargar Lanzamientos Recientes
+            releasesContainer.innerHTML = '';
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'release-card';
+                card.innerHTML = `
+                    <div>
+                        <div class="band-name">${item.band_name}</div>
+                        <div class="album-name">${item.album_title} (${item.release_year || 'N/A'})</div>
+                    </div>
+                    ${item.terabox_link ? `<a href="${item.terabox_link}" target="_blank" class="terabox-btn" style="text-align:center;">Descargar</a>` : '<span style="font-size:0.8rem; color:var(--text-muted);">Sin enlace</span>'}
+                `;
+                releasesContainer.appendChild(card);
+            });
+
+            // Cargar Noticias Dinámicas
+            if (data.length > 0) {
+                const primerRegistro = data[0];
+                const fecha = new Date(primerRegistro.created_at).toISOString().split('T')[0].replace(/-/g, '.');
+                
+                newsContainer.innerHTML = `
+                    <div class="news-item">
+                        <span class="news-date">${fecha}</span>
+                        <span class="news-tag">NUEVO INGRESO</span>
+                        <span class="news-text">Incorporado al archivo: <strong>${primerRegistro.band_name}</strong> — ${primerRegistro.album_title}</span>
+                    </div>
+                    <div class="news-item">
+                        <span class="news-date">2026.10.19</span>
+                        <span class="news-tag">BOLETÍN</span>
+                        <span class="news-text">Sincronización del catálogo e índice de búsquedas completada.</span>
+                    </div>
+                `;
+
+                // Actualizar sección destacada con el último disco subido
+                document.getElementById('featured-title').innerText = `${primerRegistro.band_name.toUpperCase()}`;
+                document.getElementById('featured-desc').innerText = `Último ingreso en el catálogo: "${primerRegistro.album_title}" (${primerRegistro.release_year || 'N/A'}). Resguardado con lista de temas comprobada.`;
+            }
+        }
+
+        window.onload = cargarInicio;
+    </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<div class="panel">
+    <h2>Registrar Nuevo Artista / Álbum</h2>
+    <form id="add-disc-form">
+        <div class="form-grid">
+            <input type="text" id="band_name" placeholder="Nombre de la Banda / Artista" required>
+            <input type="text" id="album_title" placeholder="Título del Álbum / Demo" required>
+            <input type="text" id="release_year" placeholder="Año (Ej: 1995)">
+            <input type="url" id="band_image" placeholder="URL de la Foto del Artista (https://...)">
+            <input type="url" id="terabox_link" placeholder="Enlace TeraBox">
+        </div>
+        <textarea id="tracklist" placeholder="Lista de canciones (separadas por salto de línea)" rows="4" style="width: 100%; margin-bottom: 1rem;"></textarea>
+        <button type="submit" class="btn-action">Guardar Registro en la Base de Datos</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('add-disc-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const tracklistArray = document.getElementById('tracklist').value
+            .split('\n')
+            .map(t => t.trim())
+            .filter(t => t.length > 0);
+
+        const newEntry = {
+            band_name: document.getElementById('band_name').value.trim(),
+            album_title: document.getElementById('album_title').value.trim(),
+            release_year: document.getElementById('release_year').value.trim(),
+            band_image: document.getElementById('band_image').value.trim() || null,
+            terabox_link: document.getElementById('terabox_link').value.trim() || null,
+            tracklist: tracklistArray
+        };
+
+        const { data, error } = await db.from('discography').insert([newEntry]);
+
+        if (error) {
+            alert('Error al guardar: ' + error.message);
+        } else {
+            alert('¡Artista y disco guardados correctamente!');
+            document.getElementById('add-disc-form').reset();
+        }
+    });
+</script>

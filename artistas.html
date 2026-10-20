@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISUAL KEI VAULT // ARTISTAS</title>
+    <link rel="stylesheet" href="css/main.css">
+    <!-- Cliente Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <header>
+        <h1 class="glitch-title">VISUAL KEI VAULT</h1>
+        <p class="header-subtitle">Proyecto de Archivo Sonoro y Discográfico 1980–1999</p>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="artistas.html" class="active">Artistas</a>
+            <a href="nosotros.html">El Proyecto</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="panel">
+            <h2 class="section-title" style="margin-bottom: 1.5rem;">Índice de Artistas</h2>
+            
+            <!-- BUSCADOR EN TIEMPO REAL -->
+            <input type="text" id="search-input" placeholder="🔍 Buscar artista por nombre..." style="margin-bottom: 2rem; width: 100%;">
+
+            <!-- GRILLA DE ARTISTAS -->
+            <div id="artists-grid" class="releases-grid">
+                <p style="color: var(--text-muted); grid-column: 1 / -1; text-align: center;">Cargando artistas del archivo...</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 VISUAL KEI VAULT // TODOS LOS DERECHOS RESERVADOS.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script>
+        async function cargarArtistas() {
+            const grid = document.getElementById('artists-grid');
+            
+            // Consultar artistas desde la base de datos
+            const { data, error } = await db.from('discography').select('band_name, band_image').order('band_name', { ascending: true });
+
+            if (error) {
+                grid.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center;">Error al cargar el índice de artistas.</p>`;
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                grid.innerHTML = `<p style="text-align:center; color:var(--text-muted); grid-column: 1/-1;">No hay artistas registrados en el archivo.</p>`;
+                return;
+            }
+
+            // Filtrar bandas únicas en caso de que existan múltiples discos de la misma banda
+            const artistasUnicos = [];
+            const nombresRegistrados = new Set();
+
+            data.forEach(item => {
+                if (!nombresRegistrados.has(item.band_name)) {
+                    nombresRegistrados.add(item.band_name);
+                    artistasUnicos.push(item);
+                }
+            });
+
+            grid.innerHTML = '';
+            artistasUnicos.forEach(artista => {
+                const card = document.createElement('div');
+                card.className = 'release-card artist-card-item';
+                card.style.textAlign = 'center';
+
+                // Imagen por defecto en caso de no tener URL cargada en la base de datos
+                const imagenUrl = artista.band_image || 'https://via.placeholder.com/300x300/121212/b5a688?text=NO+IMAGE';
+
+                card.innerHTML = `
+                    <div style="width: 100%; aspect-ratio: 1/1; overflow: hidden; border: 1px solid var(--border-dark); margin-bottom: 1rem; background: #000;">
+                        <img src="${imagenUrl}" alt="${artista.band_name}" style="width: 100%; height: 100%; object-fit: cover; filter: grayscale(30%); transition: transform 0.3s ease, filter 0.3s ease;" class="artist-img">
+                    </div>
+                    <div class="band-name" style="margin-bottom: 1.2rem; font-size: 1.2rem;">${artista.band_name}</div>
+                    <a href="discografia.html?banda=${encodeURIComponent(artista.band_name)}" class="terabox-btn" style="display: block; width: 100%;">Ver Discografía</a>
+                `;
+
+                // Efecto hover a la imagen
+                const img = card.querySelector('.artist-img');
+                card.addEventListener('mouseenter', () => {
+                    img.style.transform = 'scale(1.05)';
+                    img.style.filter = 'grayscale(0%)';
+                });
+                card.addEventListener('mouseleave', () => {
+                    img.style.transform = 'scale(1)';
+                    img.style.filter = 'grayscale(30%)';
+                });
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Buscador dinámico de artistas
+        document.getElementById('search-input').addEventListener('keyup', (e) => {
+            const query = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.artist-card-item');
+
+            cards.forEach(card => {
+                const nombreBanda = card.querySelector('.band-name').innerText.toLowerCase();
+                if (nombreBanda.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        window.onload = cargarArtistas;
+    </script>
+</body>
+</html>

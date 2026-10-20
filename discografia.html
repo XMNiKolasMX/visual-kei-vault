@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISUAL KEI VAULT // DISCOGRAFÍA</title>
+    <link rel="stylesheet" href="css/main.css">
+    <!-- Cliente Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <header>
+        <h1 class="glitch-title">VISUAL KEI VAULT</h1>
+        <p class="header-subtitle">Proyecto de Archivo Sonoro y Discográfico 1980–1999</p>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="artistas.html" class="active">Artistas</a>
+            <a href="nosotros.html">El Proyecto</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- CABECERA DEL ARTISTA SELECCIONADO -->
+        <section class="panel" style="text-align: center; margin-bottom: 3rem;">
+            <h2 id="artist-title" class="section-title" style="font-size: 2rem; border: none; margin-bottom: 0.5rem;">Cargando Artista...</h2>
+            <p id="artist-subtitle" style="color: var(--text-muted); font-size: 0.95rem;">Resguardo sonoro y material discográfico del archivo</p>
+            <div style="margin-top: 1.5rem;">
+                <a href="artistas.html" class="btn-view-all">← Volver al Índice de Artistas</a>
+            </div>
+        </section>
+
+        <!-- DISCOGRAFÍA DEL ARTISTA -->
+        <section>
+            <div class="section-header">
+                <h2 class="section-title">Discografía Disponible</h2>
+            </div>
+
+            <div id="albums-grid" class="releases-grid">
+                <p style="color: var(--text-muted); grid-column: 1/-1; text-align: center;">Cargando discografía...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 VISUAL KEI VAULT // TODOS LOS DERECHOS RESERVADOS.</p>
+    </footer>
+
+    <!-- Scripts de Conexión -->
+    <script src="js/config.js"></script>
+    <script>
+        async function cargarDiscografiaArtista() {
+            // Obtener el nombre del artista desde la URL (ej: discografia.html?banda=BUCK-TICK)
+            const urlParams = new URLSearchParams(window.location.search);
+            const nombreBanda = urlParams.get('banda');
+
+            const titleEl = document.getElementById('artist-title');
+            const albumsGrid = document.getElementById('albums-grid');
+
+            if (!nombreBanda) {
+                titleEl.innerText = "ARTISTA NO ESPECIFICADO";
+                albumsGrid.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center;">Selecciona un artista desde el catálogo principal.</p>`;
+                return;
+            }
+
+            titleEl.innerText = nombreBanda.toUpperCase();
+
+            // Buscar todos los discos pertenecientes a esta banda en Supabase
+            const { data, error } = await db
+                .from('discography')
+                .select('*')
+                .ilike('band_name', nombreBanda)
+                .order('release_year', { ascending: true });
+
+            if (error || !data || data.length === 0) {
+                albumsGrid.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center;">No se encontraron lanzamientos registrados para este artista.</p>`;
+                return;
+            }
+
+            albumsGrid.innerHTML = '';
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'release-card';
+
+                // Si tiene tracklist, lo formateamos en lista
+                let tracklistHtml = '';
+                if (item.tracklist && item.tracklist.length > 0) {
+                    tracklistHtml = `<ul class="tracklist-ul" style="margin-bottom: 1.2rem;">` + 
+                        item.tracklist.map(song => `<li>${song}</li>`).join('') + 
+                        `</ul>`;
+                }
+
+                card.innerHTML = `
+                    <div>
+                        <div class="band-name" style="font-size: 1.1rem; color: #fff;">${item.album_title}</div>
+                        <div class="album-name" style="margin-bottom: 1rem;">Año: ${item.release_year || 'N/A'}</div>
+                        ${tracklistHtml}
+                    </div>
+                    ${item.terabox_link 
+                        ? `<a href="${item.terabox_link}" target="_blank" class="terabox-btn" style="text-align:center; display:block;">Descargar Resguardo</a>` 
+                        : '<span style="font-size:0.8rem; color:var(--text-muted); display:block; text-align:center;">Sin Enlace</span>'}
+                `;
+
+                albumsGrid.appendChild(card);
+            });
+        }
+
+        window.onload = cargarDiscografiaArtista;
+    </script>
+</body>
+</html>
