@@ -3,118 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VISUAL KEI VAULT // ARTISTAS</title>
+    <title>VISUAL KEI VAULT // ÍNDICE DE ARTISTAS</title>
     <link rel="stylesheet" href="css/main.css">
-    <!-- Cliente Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <header>
         <h1 class="glitch-title">VISUAL KEI VAULT</h1>
-        <p class="header-subtitle">Proyecto de Archivo Sonoro y Discográfico 1980–1999</p>
+        <p class="header-subtitle">PROYECTO DE ARCHIVO SONORO Y DISCOGRÁFICO 1980–1999</p>
         <nav>
-            <a href="index.html">Inicio</a>
-            <a href="artistas.html" class="active">Artistas</a>
-            <a href="nosotros.html">El Proyecto</a>
+            <a href="index.html">INICIO</a>
+            <a href="artistas.html" class="active">ARTISTAS</a>
+            <a href="nosotros.html">EL PROYECTO</a>
         </nav>
     </header>
 
     <main>
-        <div class="panel">
-            <h2 class="section-title" style="margin-bottom: 1.5rem;">Índice de Artistas</h2>
-            
-            <!-- BUSCADOR EN TIEMPO REAL -->
-            <input type="text" id="search-input" placeholder="🔍 Buscar artista por nombre..." style="margin-bottom: 2rem; width: 100%;">
-
-            <!-- GRILLA DE ARTISTAS -->
-            <div id="artists-grid" class="releases-grid">
-                <p style="color: var(--text-muted); grid-column: 1 / -1; text-align: center;">Cargando artistas del archivo...</p>
+        <section class="panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #222; padding-bottom: 0.5rem;">
+                <h2 class="section-title" style="margin: 0; border: none;">ÍNDICE DE ARTISTAS</h2>
+                
+                <!-- Botón visible SOLO para el administrador -->
+                <button id="admin-add-btn" class="btn-action" style="display: none; font-size: 0.8rem;" onclick="location.href='admin.html'">
+                    + Agregar Artista
+                </button>
             </div>
-        </div>
+
+            <div class="search-box" style="margin-bottom: 2rem;">
+                <input type="text" id="search-input" placeholder="🔍 Buscar artista por nombre..." style="width: 100%; padding: 0.8rem; background: #111; border: 1px solid #222; color: #fff;">
+            </div>
+
+            <div id="artists-grid" class="artist-grid">
+                <p style="color: #888; text-align: center;">Cargando artistas del archivo...</p>
+            </div>
+        </section>
     </main>
 
     <footer>
         <p>© 2026 VISUAL KEI VAULT // TODOS LOS DERECHOS RESERVADOS.</p>
     </footer>
 
-    <!-- Scripts -->
     <script src="js/config.js"></script>
     <script>
-        async function cargarArtistas() {
-            const grid = document.getElementById('artists-grid');
-            
-            // Consultar artistas desde la base de datos
-            const { data, error } = await db.from('discography').select('band_name, band_image').order('band_name', { ascending: true });
+        let allArtists = [];
 
-            if (error) {
-                grid.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1; text-align:center;">Error al cargar el índice de artistas.</p>`;
+        async function init() {
+            // 1. Verificar si el usuario es Administrador para mostrar el botón
+            const { data: { session } } = await db.auth.getSession();
+            if (session) {
+                document.getElementById('admin-add-btn').style.display = 'inline-block';
+            }
+
+            // 2. Cargar artistas desde la tabla 'artists'
+            try {
+                const { data, error } = await db.from('artists').select('*').order('name');
+                if (error) throw error;
+
+                allArtists = data;
+                renderArtists(allArtists);
+            } catch (err) {
+                console.error(err);
+                document.getElementById('artists-grid').innerHTML = `
+                    <p style="color: #ff4d4d; text-align: center; grid-column: 1/-1;">
+                        Error al cargar el índice de artistas. Verifica que la tabla 'artists' tenga políticas de lectura pública en Supabase.
+                    </p>`;
+            }
+        }
+
+        function renderArtists(artists) {
+            const container = document.getElementById('artists-grid');
+            container.innerHTML = '';
+
+            if (artists.length === 0) {
+                container.innerHTML = '<p style="color:#888; text-align:center; grid-column: 1/-1;">No hay artistas registrados aún en el archivo.</p>';
                 return;
             }
 
-            if (!data || data.length === 0) {
-                grid.innerHTML = `<p style="text-align:center; color:var(--text-muted); grid-column: 1/-1;">No hay artistas registrados en el archivo.</p>`;
-                return;
-            }
+            artists.forEach(artist => {
+                const img = artist.image_url || 'https://via.placeholder.com/300x200?text=No+Photo';
+                const desc = artist.description ? artist.description : 'Sin biografía disponible.';
 
-            // Filtrar bandas únicas en caso de que existan múltiples discos de la misma banda
-            const artistasUnicos = [];
-            const nombresRegistrados = new Set();
-
-            data.forEach(item => {
-                if (!nombresRegistrados.has(item.band_name)) {
-                    nombresRegistrados.add(item.band_name);
-                    artistasUnicos.push(item);
-                }
-            });
-
-            grid.innerHTML = '';
-            artistasUnicos.forEach(artista => {
-                const card = document.createElement('div');
-                card.className = 'release-card artist-card-item';
-                card.style.textAlign = 'center';
-
-                // Imagen por defecto en caso de no tener URL cargada en la base de datos
-                const imagenUrl = artista.band_image || 'https://via.placeholder.com/300x300/121212/b5a688?text=NO+IMAGE';
-
-                card.innerHTML = `
-                    <div style="width: 100%; aspect-ratio: 1/1; overflow: hidden; border: 1px solid var(--border-dark); margin-bottom: 1rem; background: #000;">
-                        <img src="${imagenUrl}" alt="${artista.band_name}" style="width: 100%; height: 100%; object-fit: cover; filter: grayscale(30%); transition: transform 0.3s ease, filter 0.3s ease;" class="artist-img">
+                container.innerHTML += `
+                    <div class="artist-card" style="background: #0d0d0d; border: 1px solid #222; padding: 1rem; text-align: center;">
+                        <img src="${img}" alt="${artist.name}" style="width: 100%; height: 180px; object-fit: cover; border: 1px solid #222; margin-bottom: 0.8rem;">
+                        <h3 style="color: #fff; margin-bottom: 0.5rem;">${artist.name}</h3>
+                        <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 1rem;">${desc}</p>
+                        <a href="discografia.html?banda=${encodeURIComponent(artist.id)}" class="btn-action" style="display: block; text-decoration: none; font-size: 0.8rem;">Ver Discografía</a>
                     </div>
-                    <div class="band-name" style="margin-bottom: 1.2rem; font-size: 1.2rem;">${artista.band_name}</div>
-                    <a href="discografia.html?banda=${encodeURIComponent(artista.band_name)}" class="terabox-btn" style="display: block; width: 100%;">Ver Discografía</a>
                 `;
-
-                // Efecto hover a la imagen
-                const img = card.querySelector('.artist-img');
-                card.addEventListener('mouseenter', () => {
-                    img.style.transform = 'scale(1.05)';
-                    img.style.filter = 'grayscale(0%)';
-                });
-                card.addEventListener('mouseleave', () => {
-                    img.style.transform = 'scale(1)';
-                    img.style.filter = 'grayscale(30%)';
-                });
-
-                grid.appendChild(card);
             });
         }
 
-        // Buscador dinámico de artistas
-        document.getElementById('search-input').addEventListener('keyup', (e) => {
-            const query = e.target.value.toLowerCase();
-            const cards = document.querySelectorAll('.artist-card-item');
-
-            cards.forEach(card => {
-                const nombreBanda = card.querySelector('.band-name').innerText.toLowerCase();
-                if (nombreBanda.includes(query)) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
+        // Buscador en tiempo real
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allArtists.filter(a => a.name.toLowerCase().includes(term));
+            renderArtists(filtered);
         });
 
-        window.onload = cargarArtistas;
+        window.onload = init;
     </script>
+</body>
+</html>
 </body>
 </html>
