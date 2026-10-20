@@ -1,489 +1,253 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap');
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISUAL KEI VAULT // PANEL DE ADMINISTRACIÓN</title>
+    <link rel="stylesheet" href="css/main.css">
+    <!-- Cliente Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Estilos específicos para la sección de Admin */
+        .admin-card {
+            max-width: 480px;
+            margin: 4rem auto;
+            background: #0d0d0d;
+            border: 1px solid var(--border-dark, #222);
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+        }
 
-/* ==========================================
-   1. VARIABLES & PALETA OFICIAL DIR EN GREY
-   ========================================== */
-:root {
-    --bg-black: #060606;
-    --bg-surface: #0e0e0e;
-    --bg-card: #121212;
-    --bg-card-hover: #161616;
-    --accent-gold: #b5a688;
-    --accent-gold-light: #d6cbba;
-    --accent-btn: #9e9275;
-    --accent-btn-hover: #ffffff;
-    --text-white: #ffffff;
-    --text-body: #d1d1d1;
-    --text-muted: #777777;
-    --text-dim: #444444;
-    --border-dark: #1f1f1f;
-    --border-accent: #383228;
-    --border-highlight: #b5a688;
-}
+        .admin-form-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
 
-/* ==========================================
-   2. REINICIO GLOBAL & CONFIGURACIÓN BASE
-   ========================================== */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+        .admin-form-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-html {
-    scroll-behavior: smooth;
-}
+        .admin-form-group input,
+        .admin-form-group textarea {
+            width: 100%;
+            background: #141414;
+            border: 1px solid #2a2a2a;
+            color: #e0e0e0;
+            padding: 0.8rem 1rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
 
-body {
-    background-color: var(--bg-black);
-    color: var(--text-body);
-    font-family: 'Inter', 'Noto Sans JP', sans-serif;
-    line-height: 1.7;
-    font-size: 14px;
-    letter-spacing: 0.03em;
-    min-height: 100vh;
-    overflow-x: hidden;
-    /* Fondo con textura de grano/humo sutil */
-    background-image: 
-        radial-gradient(circle at 50% 0%, #161616 0%, #060606 75%),
-        repeating-linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3) 1px, transparent 1px, transparent 2px);
-    background-attachment: fixed;
-}
+        .admin-form-group input:focus,
+        .admin-form-group textarea:focus {
+            outline: none;
+            border-color: #721c24;
+        }
 
-/* Selección de texto elegante */
-::selection {
-    background-color: var(--accent-gold);
-    color: #000000;
-}
+        .admin-header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #222;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
 
-/* Barra de desplazamiento personalizada */
-::-webkit-scrollbar {
-    width: 6px;
-}
-::-webkit-scrollbar-track {
-    background: var(--bg-black);
-}
-::-webkit-scrollbar-thumb {
-    background: #222222;
-    border-radius: 0px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-gold);
-}
+        .btn-danger {
+            background: transparent;
+            border: 1px solid #721c24;
+            color: #f8d7da;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: background 0.3s ease;
+        }
 
-/* ==========================================
-   3. HEADER & NAVEGACIÓN
-   ========================================== */
-header {
-    background: rgba(6, 6, 6, 0.94);
-    border-bottom: 1px solid var(--border-dark);
-    padding: 2.8rem 1.5rem 1.8rem 1.5rem;
-    text-align: center;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    backdrop-filter: blur(12px);
-}
+        .btn-danger:hover {
+            background: #721c24;
+            color: #fff;
+        }
 
-.glitch-title {
-    font-family: 'Cinzel', serif;
-    font-size: 2.3rem;
-    font-weight: 600;
-    color: var(--text-white);
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    margin-bottom: 0.4rem;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-}
+        .error-message {
+            background: rgba(114, 28, 36, 0.2);
+            border: 1px solid #721c24;
+            color: #f8d7da;
+            padding: 0.8rem;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 class="glitch-title">VISUAL KEI VAULT</h1>
+        <p class="header-subtitle">Panel de Control & Acceso Restringido</p>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="artistas.html">Artistas</a>
+            <a href="nosotros.html">El Proyecto</a>
+        </nav>
+    </header>
 
-.header-subtitle {
-    color: var(--accent-gold);
-    font-family: 'Cinzel', serif;
-    font-size: 0.78rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    font-weight: 400;
-    opacity: 0.9;
-}
+    <main>
+        <!-- FORMULARIO DE LOGIN -->
+        <div id="login-section" class="admin-card">
+            <h2 class="section-title" style="margin-bottom: 1.5rem; text-align: center; font-size: 1.2rem;">Acceso Privado</h2>
+            
+            <form id="login-form">
+                <div class="admin-form-group">
+                    <label for="admin-email">Correo Electrónico</label>
+                    <input type="email" id="admin-email" placeholder="admin@vault.com" required>
+                </div>
 
-nav {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 2.5rem;
-    margin-top: 2rem;
-}
+                <div class="admin-form-group">
+                    <label for="admin-password">Contraseña</label>
+                    <input type="password" id="admin-password" placeholder="••••••••" required>
+                </div>
 
-nav a {
-    color: var(--text-muted);
-    font-family: 'Cinzel', serif;
-    font-size: 0.82rem;
-    text-decoration: none;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    transition: all 0.3s ease;
-    padding: 4px 0;
-    position: relative;
-}
+                <button type="submit" class="btn-action" style="width: 100%; margin-top: 1rem;">Autenticar Credenciales</button>
+            </form>
 
-nav a::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 1px;
-    background-color: var(--accent-gold);
-    transition: all 0.3s ease;
-    transform: translateX(-50%);
-}
+            <div id="login-error" class="error-message"></div>
+        </div>
 
-nav a:hover, nav a.active {
-    color: var(--accent-gold-light);
-}
+        <!-- PANEL DE CONTROL (Oculto hasta iniciar sesión) -->
+        <div id="admin-panel" class="panel" style="display: none; max-width: 800px; margin: 3rem auto;">
+            <div class="admin-header-actions">
+                <h2 class="section-title" style="margin-bottom: 0; border: none;">Registrar Nuevo Artista / Disco</h2>
+                <button id="logout-btn" class="btn-danger">Cerrar Sesión</button>
+            </div>
 
-nav a:hover::after, nav a.active::after {
-    width: 100%;
-}
+            <form id="add-disc-form">
+                <div class="admin-form-group">
+                    <label for="band_name">Nombre de la Banda / Artista *</label>
+                    <input type="text" id="band_name" placeholder="Ej: Malice Mizer" required>
+                </div>
 
-/* ==========================================
-   4. ESTRUCTURA DE SECCIONES & ENCABEZADOS
-   ========================================== */
-main {
-    max-width: 1120px;
-    margin: 3.5rem auto;
-    padding: 0 1.5rem;
-}
+                <div class="admin-form-group">
+                    <label for="album_title">Título del Álbum / Demo *</label>
+                    <input type="text" id="album_title" placeholder="Ej: Memoire" required>
+                </div>
 
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    border-bottom: 1px solid var(--border-dark);
-    padding-bottom: 0.9rem;
-    margin-bottom: 2.2rem;
-    position: relative;
-}
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="admin-form-group">
+                        <label for="release_year">Año de Lanzamiento</label>
+                        <input type="text" id="release_year" placeholder="Ej: 1994">
+                    </div>
 
-.section-header::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 60px;
-    height: 1px;
-    background-color: var(--accent-gold);
-}
+                    <div class="admin-form-group">
+                        <label for="band_image">URL Foto del Artista</label>
+                        <input type="url" id="band_image" placeholder="https://i.imgur.com/...">
+                    </div>
+                </div>
 
-.section-title {
-    font-family: 'Cinzel', serif;
-    color: var(--accent-gold);
-    font-size: 1.35rem;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-}
+                <div class="admin-form-group">
+                    <label for="terabox_link">Enlace de TeraBox</label>
+                    <input type="url" id="terabox_link" placeholder="https://terabox.com/s/...">
+                </div>
 
-/* ==========================================
-   5. BOTONES Y ACCIONES ESTÁNDAR
-   ========================================== */
-.btn-view-all, .terabox-btn, button.btn-action {
-    background-color: var(--accent-btn);
-    color: #080808;
-    font-family: 'Cinzel', serif;
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 9px 22px;
-    text-decoration: none;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    border: none;
-    display: inline-block;
-    transition: all 0.25s ease-in-out;
-    cursor: pointer;
-    text-align: center;
-}
+                <div class="admin-form-group">
+                    <label for="tracklist">Lista de Canciones (Una por línea)</label>
+                    <textarea id="tracklist" rows="5" placeholder="1. De Fleur&#10;2. Speed of Despair&#10;3. Baroque"></textarea>
+                </div>
 
-.btn-view-all:hover, .terabox-btn:hover, button.btn-action:hover {
-    background-color: var(--accent-btn-hover);
-    color: #000000;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-}
+                <button type="submit" class="btn-action" style="width: 100%; margin-top: 1rem;">Guardar Registro en Base de Datos</button>
+            </form>
+        </div>
+    </main>
 
-/* ==========================================
-   6. SECCIÓN LATEST NEWS / NOTICIAS
-   ========================================== */
-.news-list {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 4rem;
-}
+    <footer>
+        <p>© 2026 VISUAL KEI VAULT // TODOS LOS DERECHOS RESERVADOS.</p>
+    </footer>
 
-.news-item {
-    display: flex;
-    align-items: center;
-    gap: 1.8rem;
-    padding: 1.25rem 0.5rem;
-    border-bottom: 1px solid var(--border-dark);
-    transition: background-color 0.2s ease, padding-left 0.2s ease;
-}
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script>
+        const loginSection = document.getElementById('login-section');
+        const adminPanel = document.getElementById('admin-panel');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const logoutBtn = document.getElementById('logout-btn');
 
-.news-item:hover {
-    background-color: rgba(255, 255, 255, 0.015);
-    padding-left: 0.8rem;
-}
+        // Verificar sesión activa
+        async function verificarSesion() {
+            const { data: { session } } = await db.auth.getSession();
+            if (session) {
+                loginSection.style.display = 'none';
+                adminPanel.style.display = 'block';
+            } else {
+                loginSection.style.display = 'block';
+                adminPanel.style.display = 'none';
+            }
+        }
 
-.news-date {
-    font-family: 'Inter', monospace;
-    color: var(--accent-gold);
-    font-size: 0.85rem;
-    letter-spacing: 0.1em;
-    min-width: 110px;
-    font-weight: 500;
-}
+        // Iniciar sesión con Supabase
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginError.style.display = 'none';
 
-.news-tag {
-    font-size: 0.68rem;
-    font-family: 'Cinzel', serif;
-    color: var(--text-white);
-    background-color: #141414;
-    padding: 2px 10px;
-    border: 1px solid #2a2a2a;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-}
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value;
 
-.news-text {
-    font-size: 0.9rem;
-    color: var(--text-body);
-    flex-grow: 1;
-}
+            const { data, error } = await db.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
 
-.news-text strong {
-    color: var(--text-white);
-    font-weight: 500;
-}
+            if (error) {
+                loginError.innerText = "Credenciales inválidas o acceso denegado.";
+                loginError.style.display = 'block';
+            } else {
+                verificarSesion();
+            }
+        });
 
-/* ==========================================
-   7. BLOQUE FEATURED RELEASE / BANNER DESTACADO
-   ========================================== */
-.featured-release {
-    display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 3rem;
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-dark);
-    padding: 2.5rem;
-    align-items: center;
-    margin-bottom: 4.5rem;
-    position: relative;
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
-}
+        // Cerrar sesión
+        logoutBtn.addEventListener('click', async () => {
+            await db.auth.signOut();
+            verificarSesion();
+        });
 
-.featured-cover {
-    background-color: #000000;
-    border: 1px solid var(--border-accent);
-    aspect-ratio: 1/1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem;
-    text-align: center;
-}
+        // Guardar registro en Supabase
+        document.getElementById('add-disc-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const tracklistArray = document.getElementById('tracklist').value
+                .split('\n')
+                .map(t => t.trim())
+                .filter(t => t.length > 0);
 
-.featured-cover-text {
-    color: var(--accent-gold);
-    font-family: 'Cinzel', serif;
-    font-size: 0.85rem;
-    letter-spacing: 0.2em;
-    margin-top: 0.5rem;
-}
+            const newEntry = {
+                band_name: document.getElementById('band_name').value.trim(),
+                album_title: document.getElementById('album_title').value.trim(),
+                release_year: document.getElementById('release_year').value.trim(),
+                band_image: document.getElementById('band_image').value.trim() || null,
+                terabox_link: document.getElementById('terabox_link').value.trim() || null,
+                tracklist: tracklistArray
+            };
 
-.featured-info .release-label {
-    font-family: 'Cinzel', serif;
-    color: var(--accent-gold);
-    font-size: 0.78rem;
-    letter-spacing: 0.2em;
-    margin-bottom: 0.6rem;
-    text-transform: uppercase;
-}
+            const { data, error } = await db.from('discography').insert([newEntry]);
 
-.featured-info h2 {
-    font-family: 'Cinzel', serif;
-    font-size: 2.2rem;
-    color: var(--text-white);
-    font-weight: 400;
-    letter-spacing: 0.12em;
-    margin-bottom: 1.2rem;
-    line-height: 1.2;
-}
+            if (error) {
+                alert('Error al guardar: ' + error.message);
+            } else {
+                alert('¡Registro añadido correctamente al archivo!');
+                document.getElementById('add-disc-form').reset();
+            }
+        });
 
-.featured-info p {
-    color: var(--text-muted);
-    font-size: 0.92rem;
-    margin-bottom: 2rem;
-    line-height: 1.8;
-}
-
-/* ==========================================
-   8. GRILLA DE RELEASES / DISCOS
-   ========================================== */
-.releases-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 2rem;
-    margin-bottom: 4.5rem;
-}
-
-.release-card {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-dark);
-    padding: 1.6rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: all 0.3s ease;
-}
-
-.release-card:hover {
-    background-color: var(--bg-card-hover);
-    border-color: var(--border-highlight);
-    transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-}
-
-.release-card .band-name {
-    font-family: 'Cinzel', serif;
-    color: var(--text-white);
-    font-size: 1.15rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    margin-bottom: 0.3rem;
-}
-
-.release-card .album-name {
-    color: var(--accent-gold);
-    font-size: 0.88rem;
-    margin-bottom: 1.5rem;
-}
-
-/* ==========================================
-   9. TABLA DE ARTISTAS & BUSCADOR (artistas.html)
-   ========================================== */
-.panel {
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-dark);
-    padding: 2.2rem;
-    margin-bottom: 3rem;
-}
-
-input[type="text"], input[type="url"] {
-    background-color: #080808;
-    border: 1px solid var(--border-dark);
-    color: var(--text-white);
-    padding: 0.95rem 1.2rem;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-    outline: none;
-    transition: border-color 0.3s ease;
-}
-
-input[type="text"]:focus, input[type="url"]:focus {
-    border-color: var(--accent-gold);
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-dark);
-    margin-top: 1rem;
-}
-
-th, td {
-    padding: 1.2rem 1.4rem;
-    border-bottom: 1px solid var(--border-dark);
-    text-align: left;
-    vertical-align: middle;
-}
-
-th {
-    font-family: 'Cinzel', serif;
-    color: var(--accent-gold);
-    font-size: 0.82rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    background-color: #0a0a0a;
-    border-bottom: 1px solid var(--border-accent);
-}
-
-tr:hover td {
-    background-color: rgba(255, 255, 255, 0.015);
-}
-
-/* ==========================================
-   10. DETALLES FINOS: BADGES, CANCIONES & FOOTER
-   ========================================== */
-/* Badge "NUEVO" minimalista con corchetes japoneses */
-.badge-nuevo {
-    font-family: 'Cinzel', serif;
-    font-size: 0.65rem;
-    color: var(--accent-gold);
-    border: 1px solid var(--border-accent);
-    padding: 1px 7px;
-    margin-left: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    display: inline-block;
-    vertical-align: middle;
-}
-
-/* Lista de canciones */
-ul.tracklist-ul {
-    list-style: none;
-    padding-left: 0;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    max-height: 140px;
-    overflow-y: auto;
-}
-
-ul.tracklist-ul li {
-    padding: 3px 0;
-    border-bottom: 1px solid #181818;
-}
-
-ul.tracklist-ul li:last-child {
-    border-bottom: none;
-}
-
-/* FOOTER OFICIAL */
-footer {
-    border-top: 1px solid var(--border-dark);
-    padding: 3.5rem 1.5rem;
-    text-align: center;
-    font-family: 'Cinzel', serif;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    letter-spacing: 0.22em;
-    margin-top: 6rem;
-    background-color: #040404;
-}
-
-/* RESPONSIVO */
-@media (max-width: 768px) {
-    .featured-release {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        padding: 1.8rem;
-    }
-
-    nav {
-        gap: 1.2rem;
-    }
-
-    .glitch-title {
-        font-size: 1.7rem;
-    }
-}
+        window.onload = verificarSesion;
+    </script>
+</body>
+</html>
