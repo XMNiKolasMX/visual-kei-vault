@@ -3,78 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VISUAL KEI VAULT // ÍNDICE DE ARTISTAS</title>
+    <title>VISUAL KEI VAULT // ARTISTAS</title>
     <link rel="stylesheet" href="css/main.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Estilos unificados para la cuadrícula de artistas */
-        .artists-grid-unified {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .artist-vault-card {
+        .artist-card {
             background: #0d0d0d;
             border: 1px solid #222;
-            padding: 1.2rem;
-            text-align: center;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: border-color 0.3s ease;
+            gap: 1.5rem;
+            align-items: center;
         }
-
-        .artist-vault-card:hover {
-            border-color: #444;
-        }
-
-        .artist-vault-card img {
-            width: 100%;
-            height: 180px;
+        .artist-cover {
+            width: 140px;
+            height: 140px;
             object-fit: cover;
-            border: 1px solid #1a1a1a;
-            margin-bottom: 1rem;
+            border: 1px solid #222;
+            flex-shrink: 0;
         }
-
-        .artist-vault-card h3 {
-            color: #fff;
-            font-size: 1.2rem;
-            margin-bottom: 0.6rem;
-            letter-spacing: 1px;
-        }
-
-        .artist-vault-card p {
-            font-size: 0.85rem;
-            color: #999;
-            margin-bottom: 1.2rem;
-            line-height: 1.4;
+        .artist-content {
             flex-grow: 1;
         }
-
-        .admin-top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #222;
-            padding-bottom: 1rem;
-        }
-
-        .btn-danger-custom {
-            background: transparent;
-            border: 1px solid #721c24;
-            color: #f8d7da;
+        /* Estilo elegante para el botón de ver/gestionar discografía */
+        .btn-ver-discografia {
+            display: inline-block;
+            background: #141414;
+            border: 1px solid #333;
+            color: #d4af37;
             padding: 0.5rem 1rem;
-            cursor: pointer;
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 1px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-top: 0.8rem;
+            font-family: inherit;
         }
-
-        .btn-danger-custom:hover {
-            background: #721c24;
+        .btn-ver-discografia:hover {
+            background: #1a1a1a;
+            border-color: #d4af37;
             color: #fff;
         }
     </style>
@@ -91,24 +60,13 @@
     </header>
 
     <main>
-        <section class="panel" style="max-width: 1100px; margin: 2rem auto;">
-            
-            <!-- Barra superior dinámica (Muestra controles de Admin si hay sesión) -->
-            <div class="admin-top-bar">
-                <h2 class="section-title" style="margin: 0; border: none;">ÍNDICE DE ARTISTAS</h2>
-                <div id="admin-controls" style="display: none; gap: 0.8rem; align-items: center;">
-                    <button class="btn-action" style="font-size: 0.75rem; padding: 0.5rem 1rem;" onclick="location.href='admin.html'">+ Agregar Artista</button>
-                    <button id="logout-btn" class="btn-danger-custom">Cerrar Sesión</button>
-                </div>
+        <section class="panel" style="max-width: 950px; margin: 2rem auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #222; padding-bottom: 0.5rem;">
+                <h2 class="section-title" style="margin: 0; border: none;">CATÁLOGO DE ARTISTAS</h2>
             </div>
 
-            <div class="search-box" style="margin-bottom: 2rem;">
-                <input type="text" id="search-input" placeholder="🔍 Buscar artista por nombre..." style="width: 100%; padding: 0.8rem; background: #111; border: 1px solid #222; color: #fff; font-family: inherit;">
-            </div>
-
-            <!-- Contenedor unificado de tarjetas -->
-            <div id="artists-grid" class="artists-grid-unified">
-                <p style="color: #888; text-align: center; grid-column: 1/-1;">Cargando artistas del archivo...</p>
+            <div id="artists-list">
+                <p style="color: #888; text-align: center;">Cargando artistas...</p>
             </div>
         </section>
     </main>
@@ -119,81 +77,43 @@
 
     <script src="js/config.js"></script>
     <script>
-        let allArtists = [];
-        let isAdmin = false;
-
-        async function init() {
-            // Verificar si hay sesión de Administrador
+        async function loadArtists() {
+            // Verificar si hay sesión activa de administrador
             const { data: { session } } = await db.auth.getSession();
-            if (session) {
-                isAdmin = true;
-                document.getElementById('admin-controls').style.display = 'flex';
-            }
+            const isAdmin = !!session;
 
-            // Cargar datos de la tabla 'artists'
-            try {
-                const { data, error } = await db.from('artists').select('*').order('name');
-                if (error) throw error;
+            const { data: artists, error } = await db.from('artists').select('*').order('name', { ascending: true });
 
-                allArtists = data;
-                renderArtists(allArtists);
-            } catch (err) {
-                console.error(err);
-                document.getElementById('artists-grid').innerHTML = `
-                    <p style="color: #ff4d4d; text-align: center; grid-column: 1/-1;">
-                        Error al cargar el índice de artistas. Verifica la conexión con Supabase.
-                    </p>`;
-            }
-        }
-
-        function renderArtists(artists) {
-            const container = document.getElementById('artists-grid');
+            const container = document.getElementById('artists-list');
             container.innerHTML = '';
 
-            if (artists.length === 0) {
-                container.innerHTML = '<p style="color:#888; text-align:center; grid-column: 1/-1;">No hay artistas registrados aún en el archivo.</p>';
+            if (error || !artists || artists.length === 0) {
+                container.innerHTML = '<p style="color:#888; text-align:center;">No hay artistas registrados en el archivo.</p>';
                 return;
             }
 
             artists.forEach(artist => {
-                const img = artist.image_url || 'https://via.placeholder.com/300x200?text=No+Photo';
-                const desc = artist.description ? (artist.description.length > 90 ? artist.description.substring(0, 90) + '...' : artist.description) : 'Sin biografía disponible.';
-                
-                // Texto del botón cambia ligeramente según si es admin o usuario, pero manteniendo el diseño de tarjeta
-                const btnText = isAdmin ? 'Ver / Gestionar Discografía' : 'Ver Discografía';
+                const coverImg = artist.image_url 
+                    ? `<img src="${artist.image_url}" class="artist-cover" alt="${artist.name}">` 
+                    : `<img src="https://via.placeholder.com/140?text=No+Image" class="artist-cover" alt="Sin imagen">`;
+
+                // El texto del botón cambia dinámicamente según si es admin o usuario normal
+                const buttonText = isAdmin ? 'Ver / Gestionar Discografía' : 'Ver Discografía';
 
                 container.innerHTML += `
-                    <div class="artist-vault-card">
-                        <div>
-                            <img src="${img}" alt="${artist.name}">
-                            <h3>${artist.name}</h3>
-                            <p>${desc}</p>
+                    <div class="artist-card">
+                        ${coverImg}
+                        <div class="artist-content">
+                            <h3 style="color:#fff; margin:0 0 0.5rem 0; font-size:1.2rem;">${artist.name}</h3>
+                            <p style="color:#aaa; font-size:0.9rem; margin:0 0 1rem 0; line-height:1.5;">${artist.description || 'Sin biografía disponible.'}</p>
+                            <a href="discografia.html?banda=${artist.id}" class="btn-ver-discografia">${buttonText}</a>
                         </div>
-                        <a href="discografia.html?banda=${encodeURIComponent(artist.id)}" class="btn-action" style="display: block; text-decoration: none; font-size: 0.75rem; padding: 0.6rem; margin-top: auto;">
-                            ${btnText}
-                        </a>
                     </div>
                 `;
             });
         }
 
-        // Cerrar sesión
-        const logoutBtn = document.getElementById('logout-btn');
-        if(logoutBtn) {
-            logoutBtn.addEventListener('click', async () => {
-                await db.auth.signOut();
-                window.location.reload();
-            });
-        }
-
-        // Buscador en tiempo real
-        document.getElementById('search-input').addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            const filtered = allArtists.filter(a => a.name.toLowerCase().includes(term));
-            renderArtists(filtered);
-        });
-
-        window.onload = init;
+        window.onload = loadArtists;
     </script>
 </body>
 </html>
