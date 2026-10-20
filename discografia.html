@@ -132,6 +132,27 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
+        /* Estilo mejorado para el botón "Ver / Gestionar Discografía" */
+        .btn-view-discography {
+            display: inline-block;
+            background: #141414;
+            border: 1px solid #333;
+            color: #d4af37;
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-top: 0.8rem;
+            font-family: inherit;
+        }
+        .btn-view-discography:hover {
+            background: #1a1a1a;
+            border-color: #d4af37;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -255,7 +276,6 @@
             albums.forEach(album => {
                 const tracks = Array.isArray(album.tracklist) ? album.tracklist.join('<br>') : 'Lista de canciones no disponible.';
                 
-                // Botón TeraBox estilizado
                 const teraboxBtn = album.terabox_link 
                     ? `<a href="${album.terabox_link}" target="_blank" class="btn-terabox">📥 Descargar vía TeraBox</a>`
                     : '<span class="no-terabox">Sin enlace de descarga</span>';
