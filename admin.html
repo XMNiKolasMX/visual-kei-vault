@@ -1,43 +1,253 @@
-<div class="panel">
-    <h2>Registrar Nuevo Artista / Álbum</h2>
-    <form id="add-disc-form">
-        <div class="form-grid">
-            <input type="text" id="band_name" placeholder="Nombre de la Banda / Artista" required>
-            <input type="text" id="album_title" placeholder="Título del Álbum / Demo" required>
-            <input type="text" id="release_year" placeholder="Año (Ej: 1995)">
-            <input type="url" id="band_image" placeholder="URL de la Foto del Artista (https://...)">
-            <input type="url" id="terabox_link" placeholder="Enlace TeraBox">
-        </div>
-        <textarea id="tracklist" placeholder="Lista de canciones (separadas por salto de línea)" rows="4" style="width: 100%; margin-bottom: 1rem;"></textarea>
-        <button type="submit" class="btn-action">Guardar Registro en la Base de Datos</button>
-    </form>
-</div>
-
-<script>
-    document.getElementById('add-disc-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const tracklistArray = document.getElementById('tracklist').value
-            .split('\n')
-            .map(t => t.trim())
-            .filter(t => t.length > 0);
-
-        const newEntry = {
-            band_name: document.getElementById('band_name').value.trim(),
-            album_title: document.getElementById('album_title').value.trim(),
-            release_year: document.getElementById('release_year').value.trim(),
-            band_image: document.getElementById('band_image').value.trim() || null,
-            terabox_link: document.getElementById('terabox_link').value.trim() || null,
-            tracklist: tracklistArray
-        };
-
-        const { data, error } = await db.from('discography').insert([newEntry]);
-
-        if (error) {
-            alert('Error al guardar: ' + error.message);
-        } else {
-            alert('¡Artista y disco guardados correctamente!');
-            document.getElementById('add-disc-form').reset();
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISUAL KEI VAULT // PANEL DE ADMINISTRACIÓN</title>
+    <link rel="stylesheet" href="css/main.css">
+    <!-- Cliente Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Estilos específicos para la sección de Admin */
+        .admin-card {
+            max-width: 480px;
+            margin: 4rem auto;
+            background: #0d0d0d;
+            border: 1px solid var(--border-dark, #222);
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
         }
-    });
-</script>
+
+        .admin-form-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
+
+        .admin-form-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .admin-form-group input,
+        .admin-form-group textarea {
+            width: 100%;
+            background: #141414;
+            border: 1px solid #2a2a2a;
+            color: #e0e0e0;
+            padding: 0.8rem 1rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .admin-form-group input:focus,
+        .admin-form-group textarea:focus {
+            outline: none;
+            border-color: #721c24;
+        }
+
+        .admin-header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #222;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn-danger {
+            background: transparent;
+            border: 1px solid #721c24;
+            color: #f8d7da;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: background 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: #721c24;
+            color: #fff;
+        }
+
+        .error-message {
+            background: rgba(114, 28, 36, 0.2);
+            border: 1px solid #721c24;
+            color: #f8d7da;
+            padding: 0.8rem;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 class="glitch-title">VISUAL KEI VAULT</h1>
+        <p class="header-subtitle">Panel de Control & Acceso Restringido</p>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="artistas.html">Artistas</a>
+            <a href="nosotros.html">El Proyecto</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- FORMULARIO DE LOGIN -->
+        <div id="login-section" class="admin-card">
+            <h2 class="section-title" style="margin-bottom: 1.5rem; text-align: center; font-size: 1.2rem;">Acceso Privado</h2>
+            
+            <form id="login-form">
+                <div class="admin-form-group">
+                    <label for="admin-email">Correo Electrónico</label>
+                    <input type="email" id="admin-email" placeholder="admin@vault.com" required>
+                </div>
+
+                <div class="admin-form-group">
+                    <label for="admin-password">Contraseña</label>
+                    <input type="password" id="admin-password" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn-action" style="width: 100%; margin-top: 1rem;">Autenticar Credenciales</button>
+            </form>
+
+            <div id="login-error" class="error-message"></div>
+        </div>
+
+        <!-- PANEL DE CONTROL (Oculto hasta iniciar sesión) -->
+        <div id="admin-panel" class="panel" style="display: none; max-width: 800px; margin: 3rem auto;">
+            <div class="admin-header-actions">
+                <h2 class="section-title" style="margin-bottom: 0; border: none;">Registrar Nuevo Artista / Disco</h2>
+                <button id="logout-btn" class="btn-danger">Cerrar Sesión</button>
+            </div>
+
+            <form id="add-disc-form">
+                <div class="admin-form-group">
+                    <label for="band_name">Nombre de la Banda / Artista *</label>
+                    <input type="text" id="band_name" placeholder="Ej: Malice Mizer" required>
+                </div>
+
+                <div class="admin-form-group">
+                    <label for="album_title">Título del Álbum / Demo *</label>
+                    <input type="text" id="album_title" placeholder="Ej: Memoire" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="admin-form-group">
+                        <label for="release_year">Año de Lanzamiento</label>
+                        <input type="text" id="release_year" placeholder="Ej: 1994">
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="band_image">URL Foto del Artista</label>
+                        <input type="url" id="band_image" placeholder="https://i.imgur.com/...">
+                    </div>
+                </div>
+
+                <div class="admin-form-group">
+                    <label for="terabox_link">Enlace de TeraBox</label>
+                    <input type="url" id="terabox_link" placeholder="https://terabox.com/s/...">
+                </div>
+
+                <div class="admin-form-group">
+                    <label for="tracklist">Lista de Canciones (Una por línea)</label>
+                    <textarea id="tracklist" rows="5" placeholder="1. De Fleur&#10;2. Speed of Despair&#10;3. Baroque"></textarea>
+                </div>
+
+                <button type="submit" class="btn-action" style="width: 100%; margin-top: 1rem;">Guardar Registro en Base de Datos</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 VISUAL KEI VAULT // TODOS LOS DERECHOS RESERVADOS.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script>
+        const loginSection = document.getElementById('login-section');
+        const adminPanel = document.getElementById('admin-panel');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // Verificar sesión activa
+        async function verificarSesion() {
+            const { data: { session } } = await db.auth.getSession();
+            if (session) {
+                loginSection.style.display = 'none';
+                adminPanel.style.display = 'block';
+            } else {
+                loginSection.style.display = 'block';
+                adminPanel.style.display = 'none';
+            }
+        }
+
+        // Iniciar sesión con Supabase
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginError.style.display = 'none';
+
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value;
+
+            const { data, error } = await db.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+            if (error) {
+                loginError.innerText = "Credenciales inválidas o acceso denegado.";
+                loginError.style.display = 'block';
+            } else {
+                verificarSesion();
+            }
+        });
+
+        // Cerrar sesión
+        logoutBtn.addEventListener('click', async () => {
+            await db.auth.signOut();
+            verificarSesion();
+        });
+
+        // Guardar registro en Supabase
+        document.getElementById('add-disc-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const tracklistArray = document.getElementById('tracklist').value
+                .split('\n')
+                .map(t => t.trim())
+                .filter(t => t.length > 0);
+
+            const newEntry = {
+                band_name: document.getElementById('band_name').value.trim(),
+                album_title: document.getElementById('album_title').value.trim(),
+                release_year: document.getElementById('release_year').value.trim(),
+                band_image: document.getElementById('band_image').value.trim() || null,
+                terabox_link: document.getElementById('terabox_link').value.trim() || null,
+                tracklist: tracklistArray
+            };
+
+            const { data, error } = await db.from('discography').insert([newEntry]);
+
+            if (error) {
+                alert('Error al guardar: ' + error.message);
+            } else {
+                alert('¡Registro añadido correctamente al archivo!');
+                document.getElementById('add-disc-form').reset();
+            }
+        });
+
+        window.onload = verificarSesion;
+    </script>
+</body>
+</html>
