@@ -103,21 +103,31 @@
             const releasesContainer = document.getElementById('releases-container');
             const newsContainer = document.getElementById('news-container');
 
-            // Consulta vinculando la tabla artists para traer el nombre real de la banda
-            const { data, error } = await db.from('discography')
-                .select('*, artists(name)')
+            // 1. Consultar álbumes y artistas por separado de forma segura
+            const { data: albums, error: errAlbums } = await db.from('discography')
+                .select('*')
                 .order('created_at', { ascending: false })
                 .limit(4);
 
-            if (error || !data || data.length === 0) {
+            const { data: artists, error: errArtists } = await db.from('artists').select('*');
+
+            if (errAlbums || !albums || albums.length === 0) {
                 releasesContainer.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1;">No se encontraron registros en el catálogo.</p>`;
                 return;
             }
 
+            // Crear un mapa de artistas para vinculación rápida por ID
+            const artistsMap = {};
+            if (artists) {
+                artists.forEach(art => {
+                    artistsMap[art.id] = art.name;
+                });
+            }
+
             // Cargar Lanzamientos Recientes
             releasesContainer.innerHTML = '';
-            data.forEach(item => {
-                const bandName = item.artists ? item.artists.name : 'Artista Desconocido';
+            albums.forEach(item => {
+                const bandName = artistsMap[item.artist_id] || 'Artista Desconocido';
                 const card = document.createElement('div');
                 card.className = 'release-card';
                 card.innerHTML = `
@@ -130,10 +140,10 @@
                 releasesContainer.appendChild(card);
             });
 
-            // Cargar Noticias Dinámicas con el nombre real
-            if (data.length > 0) {
-                const primerRegistro = data[0];
-                const bandName = primerRegistro.artists ? primerRegistro.artists.name : 'Artista Desconocido';
+            // Cargar Noticias Dinámicas con el nombre real del artista
+            if (albums.length > 0) {
+                const primerRegistro = albums[0];
+                const bandName = artistsMap[primerRegistro.artist_id] || 'Artista Desconocido';
                 const fecha = new Date(primerRegistro.created_at).toISOString().split('T')[0].replace(/-/g, '.');
 
                 newsContainer.innerHTML = `
