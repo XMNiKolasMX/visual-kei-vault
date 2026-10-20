@@ -3,359 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TraduMaker HL - Inicio | RPG Maker en Español</title>
-    
-    <!-- Red de Archivos Hermanos (Proyectos Relacionados) -->
-    <meta name="related-projects" content="Visual Kei Vault: https://visual-kei-vault.onrender.com/index.html | J-Music Concerts: https://j-music-mgs0.onrender.com">
-
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="inicio.css">
-    <!-- SDK de Supabase -->
+    <title>VISUAL KEI VAULT // ARCHIVO</title>
+    <link rel="stylesheet" href="css/main.css">
+    <!-- Cliente Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        /* Estilos actualizados para el Modal con Términos Completos */
-        .verificacion-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(11, 15, 25, 0.98);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 99999;
-            padding: 20px;
-        }
-        .verificacion-overlay.oculto {
-            display: none;
-        }
-        .verificacion-card {
-            background: #161b22;
-            border: 1px solid #2a2f3f;
-            border-radius: 16px;
-            max-width: 600px;
-            width: 100%;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-            color: #ffffff;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .verificacion-card i.fa-triangle-exclamation {
-            font-size: 2.5rem;
-            color: #f59e0b;
-            margin-bottom: 10px;
-        }
-        .verificacion-card h1 {
-            font-family: 'Cinzel', serif;
-            font-size: 1.6rem;
-            margin-bottom: 10px;
-            color: #fff;
-        }
-        .verificacion-card > p {
-            color: #a0a0b0;
-            font-size: 0.85rem;
-            margin-bottom: 15px;
-        }
-
-        /* Caja de Términos Desplazable */
-        .terminos-scroll-box {
-            text-align: left;
-            background: #111520;
-            border: 1px solid #2a2f3f;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            max-height: 220px;
-            overflow-y: auto;
-            font-size: 0.8rem;
-            color: #b0b0c0;
-            line-height: 1.5;
-        }
-        .terminos-scroll-box h4 {
-            color: #fff;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            margin-bottom: 5px;
-            font-family: 'Cinzel', serif;
-        }
-        .terminos-scroll-box h4:first-child {
-            margin-top: 0;
-        }
-        .terminos-scroll-box p {
-            margin-bottom: 10px;
-        }
-
-        .terminos-check-container {
-            text-align: left;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.85rem;
-            color: #e0e0e0;
-            cursor: pointer;
-            background: rgba(99, 102, 241, 0.05);
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid rgba(99, 102, 241, 0.2);
-        }
-        .terminos-check-container input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: #6366f1;
-            cursor: pointer;
-        }
-        .botones-verificacion {
-            display: flex;
-            gap: 15px;
-        }
-        .btn-edad {
-            flex: 1;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
-            font-size: 0.95rem;
-        }
-        .btn-si {
-            background: #6366f1;
-            color: white;
-        }
-        .btn-si:hover:not(:disabled) {
-            background: #4f46e5;
-        }
-        .btn-si:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .btn-no {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-            border: 1px solid #ef4444;
-        }
-        .btn-no:hover {
-            background: #ef4444;
-            color: white;
-        }
-
-        /* Estilos de las secciones del sitio original */
-        .guild-section {
-            margin: 4rem auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2rem;
-        }
-        .guild-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 2.5rem;
-            position: relative;
-            overflow: hidden;
-            transition: border-color 0.3s;
-        }
-        .guild-card:hover {
-            border-color: var(--accent);
-        }
-        .guild-card h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .guild-card h2 i { color: var(--gold); }
-        .schedule-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(16, 185, 129, 0.15);
-            color: #34d399;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-        .schedule-time {
-            font-size: 1.3rem;
-            font-family: 'Cinzel', serif;
-            color: white;
-            margin-bottom: 10px;
-        }
-        .schedule-desc {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropbtn {
-            background: rgba(124, 58, 237, 0.15);
-            color: white;
-            padding: 8px 16px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            border: 1px solid rgba(124, 58, 237, 0.4);
-            border-radius: 8px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-            font-family: 'Inter', sans-serif;
-        }
-        .dropbtn:hover {
-            background: rgba(124, 58, 237, 0.3);
-            border-color: var(--accent);
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background-color: #161b22;
-            min-width: 220px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
-            z-index: 1000;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 8px;
-            animation: fadeIn 0.2s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .dropdown-content a {
-            color: var(--text-main);
-            padding: 12px 16px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-        .dropdown-content a:last-child {
-            border-bottom: none;
-        }
-        .dropdown-content a:hover {
-            background-color: rgba(124, 58, 237, 0.15);
-            color: var(--accent);
-        }
-        .dropdown-content a.active {
-            background-color: rgba(124, 58, 237, 0.2);
-            color: #a78bfa;
-            font-weight: 600;
-        }
-        .dropdown-content.show {
-            display: block;
-        }
-        .dropdown-divider {
-            height: 1px;
-            background: rgba(255, 255, 255, 0.1);
-            margin: 4px 0;
-        }
-        .dropdown-header-label {
-            font-size: 0.7rem;
-            color: #888;
-            text-transform: uppercase;
-            padding: 6px 16px 2px 16px;
-            letter-spacing: 1px;
-            font-weight: bold;
-        }
-    </style>
 </head>
 <body>
-
-    <!-- Modal de Verificación +18 y Términos y Condiciones Completos -->
-    <div class="verificacion-overlay" id="modalVerificacion">
-        <div class="verificacion-card">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-            <h1>Restricción de Edad - Contenido Explícito (+18)</h1>
-            <p>Bienvenido a TraduMaker HL. Por favor, lea detenidamente los siguientes términos antes de continuar.</p>
-
-            <div class="terminos-scroll-box">
-                <h4>1. Mayoría de Edad</h4>
-                <p>El acceso a este sitio web está estrictamente reservado a personas mayores de 18 años (o la mayoría de edad legal en su jurisdicción). Al ingresar, usted declara bajo juramento cumplir con este requisito.</p>
-
-                <h4>2. Naturaleza del Contenido</h4>
-                <p>Este sitio web recopila, aloja y comparte modificaciones, traducciones y parches en español para videojuegos independientes desarrollados en motores como RPG Maker, los cuales pueden contener material explícito, lenguaje adulto, violencia o temáticas no aptas para menores.</p>
-
-                <h4>3. Propiedad Intelectual y Parches</h4>
-                <p>TraduMaker HL no reclama la propiedad de los juegos originales ni de los recursos gráficos/narrativos pertenecientes a sus respectivos creadores o desarrolladores originales. Los parches de traducción se distribuyen con fines lúdicos y de preservación cultural sin ánimo de lucro directo.</p>
-
-                <h4>4. Exención de Responsabilidad</h4>
-                <p>Los administradores de este sitio no se hacen responsables por el mal uso que los usuarios puedan dar a los enlaces o archivos proporcionados. El uso del sitio y la descarga de los archivos corren por cuenta y riesgo exclusivo del usuario.</p>
-
-                <h4>5. Conducta del Usuario</h4>
-                <p>Queda prohibido intentar vulnerar la seguridad del sitio, extraer bases de datos por medios automatizados o redistribuir contenido malicioso a través de nuestras comunidades asociadas.</p>
-            </div>
-
-            <label class="terminos-check-container">
-                <input type="checkbox" id="checkTerminos" onchange="actualizarBoton()">
-                <span>He leído y acepto los Términos y Condiciones, y confirmo que soy mayor de 18 años.</span>
-            </label>
-
-            <div class="botones-verificacion">
-                <button class="btn-edad btn-no" onclick="rechazarAcceso()">Salir del Sitio</button>
-                <button class="btn-edad btn-si" id="btnIngresar" onclick="aceptarAcceso()" disabled>Acepto los términos y condiciones</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Navegación Profesional Multi-página -->
-    <header class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <i class="fa-solid fa-gamepad"></i> TraduMaker<span>HL</span>
-            </div>
-
-            <!-- Menú Desplegable (Dropdown) -->
-            <div class="dropdown">
-                <button onclick="toggleMenuDesplegable(event)" class="dropbtn">
-                    <i class="fa-solid fa-bars"></i> Menú <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; margin-left: 2px;"></i>
-                </button>
-                <div id="navDropdown" class="dropdown-content">
-                    <a href="index.html" class="active"><i class="fa-solid fa-house"></i> Inicio</a>
-                    <a href="catalogo.html"><i class="fa-solid fa-layer-group"></i> Catálogo RPG</a>
-                    <a href="votaciones.html"><i class="fa-solid fa-square-poll-vertical"></i> Próximos Proyectos <span style="background: #f59e0b; color: #111520; font-size: 0.55rem; padding: 2px 4px; border-radius: 3px; font-weight: 700; margin-left: auto;">BETA</span></a>
-                    <a href="nosotros.html"><i class="fa-solid fa-users"></i> Sobre Nosotros</a>
-                    <a href="avances.html"><i class="fa-solid fa-bars-progress"></i> Avances de Traducción</a>
-                    <a href="apoyanos.html"><i class="fa-solid fa-hand-holding-dollar"></i> Apóyanos</a>
-                    <a href="cuenta.html">
-                        <i class="fa-solid fa-user"></i> Cuenta 
-                        <span id="badgeCuentaPronto" style="font-size: 0.6rem; background: #6366f1; color: white; padding: 2px 5px; border-radius: 3px; margin-left: auto; font-weight: 600;">Pronto</span>
-                    </a>
-                    
-                    <!-- Mis otras páginas -->
-                    <div class="dropdown-divider"></div>
-                    <div class="dropdown-header-label">Mis Otras Páginas</div>
-                    <a href="https://visual-kei-vault.onrender.com/index.html" target="_blank"><i class="fa-solid fa-compact-disc"></i> Visual Kei Vault</a>
-                    <a href="https://j-music-mgs0.onrender.com" target="_blank"><i class="fa-solid fa-video"></i> J-Music Concerts</a>
-                </div>
-            </div>
-
-            <div class="nav-version">
-                <span>Versión 2.0</span>
-            </div>
-        </div>
+    <header>
+        <h1 class="glitch-title">VISUAL KEI VAULT</h1>
+        <p class="header-subtitle">Proyecto de Archivo Sonoro y Discográfico 1980–1999</p>
+        <nav>
+            <a href="index.html" class="active">Inicio</a>
+            <a href="artistas.html">Artistas</a>
+            <a href="nosotros.html">El Proyecto</a>
+        </nav>
     </header>
 
     <main>
@@ -416,7 +77,7 @@
                 <div>
                     <h3 style="font-family: 'Cinzel', serif; color: var(--accent-gold); font-size: 1rem; margin-bottom: 0.5rem; text-transform: uppercase;">Sencillos & Demos de Colección</h3>
                     <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.7;">
-                        Maquetas en cassette de distribution limitada, sencillos promocionales e interpretaciones de estudio raras de la era independiente.
+                        Maquetas en cassette de distribución limitada, sencillos promocionales e interpretaciones de estudio raras de la era independiente.
                     </p>
                 </div>
             </div>
@@ -432,60 +93,17 @@
     </main>
 
     <footer>
-        <p>© 2026 TRADUMAKER HL // TODOS LOS DERECHOS RESERVADOS.</p>
+        <p>© 2026 VISUAL KEI VAULT // TODOS LOS DERECHOS RESERVADOS.</p>
     </footer>
 
     <!-- Scripts de Supabase -->
     <script src="js/config.js"></script>
     <script>
-        function toggleMenuDesplegable(event) {
-            if (event) event.stopPropagation();
-            document.getElementById("navDropdown").classList.toggle("show");
-        }
-
-        // Cerrar el menú si se hace clic fuera de él
-        window.onclick = function(event) {
-            if (!event.target.matches('.dropbtn') && !event.target.matches('.dropbtn *')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
-                }
-            }
-        }
-
-        function actualizarBoton() {
-            const check = document.getElementById('checkTerminos');
-            const btn = document.getElementById('btnIngresar');
-            btn.disabled = !check.checked;
-        }
-
-        function aceptarAcceso() {
-            document.getElementById('modalVerificacion').classList.add('oculto');
-            localStorage.setItem('trandumaker_verificado', 'true');
-        }
-
-        function rechazarAcceso() {
-            window.location.href = 'https://www.google.com';
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('trandumaker_verificado') === 'true') {
-                document.getElementById('modalVerificacion').classList.add('oculto');
-            }
-        });
-
         async function cargarInicio() {
             const releasesContainer = document.getElementById('releases-container');
             const newsContainer = document.getElementById('news-container');
 
-            // Consulta vinculando la tabla artists para evitar el error de undefined en el nombre
-            const { data, error } = await db.from('discography')
-                .select('*, artists(name)')
-                .order('created_at', { ascending: false })
-                .limit(4);
+            const { data, error } = await db.from('discography').select('*').order('created_at', { ascending: false }).limit(4);
 
             if (error || !data || data.length === 0) {
                 releasesContainer.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1;">No se encontraron registros en el catálogo.</p>`;
@@ -495,12 +113,11 @@
             // Cargar Lanzamientos Recientes
             releasesContainer.innerHTML = '';
             data.forEach(item => {
-                const bandName = item.artists ? item.artists.name : 'Artista Desconocido';
                 const card = document.createElement('div');
                 card.className = 'release-card';
                 card.innerHTML = `
                     <div>
-                        <div class="band-name">${bandName}</div>
+                        <div class="band-name">${item.band_name}</div>
                         <div class="album-name">${item.album_title} (${item.release_year || 'N/A'})</div>
                     </div>
                     ${item.terabox_link ? `<a href="${item.terabox_link}" target="_blank" class="terabox-btn" style="text-align:center;">Descargar</a>` : '<span style="font-size:0.8rem; color:var(--text-muted);">Sin enlace</span>'}
@@ -508,17 +125,18 @@
                 releasesContainer.appendChild(card);
             });
 
-            // Cargar Noticias Dinámicas con el nombre real del artista
+            // Cargar Noticias Dinámicas
+            // Cargar Noticias Dinámicas (Mostrando únicamente el artista / banda)
             if (data.length > 0) {
                 const primerRegistro = data[0];
-                const bandName = primerRegistro.artists ? primerRegistro.artists.name : 'Artista Desconocido';
                 const fecha = new Date(primerRegistro.created_at).toISOString().split('T')[0].replace(/-/g, '.');
-                
+
                 newsContainer.innerHTML = `
                     <div class="news-item">
                         <span class="news-date">${fecha}</span>
                         <span class="news-tag">NUEVO INGRESO</span>
-                        <span class="news-text">Nueva banda agregada: <strong>${bandName}</strong></span>
+                        <span class="news-text">Incorporado al archivo: <strong>${primerRegistro.band_name}</strong> — ${primerRegistro.album_title}</span>
+                        <span class="news-text">Nueva banda agregada: <strong>${primerRegistro.band_name}</strong></span>
                     </div>
                     <div class="news-item">
                         <span class="news-date">2026.10.19</span>
@@ -528,12 +146,12 @@
                 `;
 
                 // Actualizar sección destacada con el último disco subido
-                document.getElementById('featured-title').innerText = `${bandName.toUpperCase()}`;
+                document.getElementById('featured-title').innerText = `${primerRegistro.band_name.toUpperCase()}`;
                 document.getElementById('featured-desc').innerText = `Último ingreso en el catálogo: "${primerRegistro.album_title}" (${primerRegistro.release_year || 'N/A'}). Resguardado con lista de temas comprobada.`;
             }
         }
 
-        window.addEventListener('load', cargarInicio);
+        window.onload = cargarInicio;
     </script>
 </body>
 </html>
