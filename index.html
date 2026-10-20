@@ -125,7 +125,7 @@
                 releasesContainer.appendChild(card);
             });
 
-            // Cargar Noticias Dinámicas
+            // Cargar Noticias Dinámicas (Mostrando únicamente el artista / banda)
             if (data.length > 0) {
                 const primerRegistro = data[0];
                 const fecha = new Date(primerRegistro.created_at).toISOString().split('T')[0].replace(/-/g, '.');
@@ -134,7 +134,7 @@
                     <div class="news-item">
                         <span class="news-date">${fecha}</span>
                         <span class="news-tag">NUEVO INGRESO</span>
-                        <span class="news-text">Incorporado al archivo: <strong>${primerRegistro.band_name}</strong> — ${primerRegistro.album_title}</span>
+                        <span class="news-text">Nueva banda agregada: <strong>${primerRegistro.band_name}</strong></span>
                     </div>
                     <div class="news-item">
                         <span class="news-date">2026.10.19</span>
