@@ -3,19 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VISUAL KEI VAULT // PANEL DE ADMINISTRACIÓN</title>
+    <title>VISUAL KEI VAULT // PANEL ADMINISTRADOR</title>
     <link rel="stylesheet" href="css/main.css">
-    <!-- Cliente Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Estilos específicos para la sección de Admin */
         .admin-card {
-            max-width: 480px;
+            max-width: 450px;
             margin: 4rem auto;
             background: #0d0d0d;
-            border: 1px solid var(--border-dark, #222);
+            border: 1px solid #222;
             padding: 2.5rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
         .admin-form-group {
@@ -42,7 +40,6 @@
             font-family: inherit;
             font-size: 0.9rem;
             box-sizing: border-box;
-            transition: border-color 0.3s ease;
         }
 
         .admin-form-group input:focus,
@@ -51,7 +48,7 @@
             border-color: #721c24;
         }
 
-        .admin-header-actions {
+        .header-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -67,14 +64,70 @@
             padding: 0.5rem 1rem;
             cursor: pointer;
             font-size: 0.8rem;
-            letter-spacing: 1px;
             text-transform: uppercase;
-            transition: background 0.3s ease;
         }
 
-        .btn-danger:hover {
-            background: #721c24;
+        .btn-secondary {
+            background: #222;
+            border: 1px solid #444;
             color: #fff;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .artist-grid-admin {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .artist-card-admin {
+            background: #111;
+            border: 1px solid #222;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .artist-card-admin img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border: 1px solid #222;
+            margin-bottom: 0.8rem;
+        }
+
+        .artist-card-admin h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
+            color: #fff;
+        }
+
+        .artist-card-admin p {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-bottom: 1rem;
+            min-height: 2.4em;
+        }
+
+        .modal-bg {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #0d0d0d;
+            border: 1px solid #333;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
         }
 
         .error-message {
@@ -84,7 +137,6 @@
             padding: 0.8rem;
             font-size: 0.85rem;
             margin-top: 1rem;
-            text-align: center;
             display: none;
         }
     </style>
@@ -92,7 +144,7 @@
 <body>
     <header>
         <h1 class="glitch-title">VISUAL KEI VAULT</h1>
-        <p class="header-subtitle">Panel de Control & Acceso Restringido</p>
+        <p class="header-subtitle">Gestión de Artistas y Discografía</p>
         <nav>
             <a href="index.html">Inicio</a>
             <a href="artistas.html">Artistas</a>
@@ -104,146 +156,223 @@
         <!-- FORMULARIO DE LOGIN -->
         <div id="login-section" class="admin-card">
             <h2 class="section-title" style="margin-bottom: 1.5rem; text-align: center; font-size: 1.2rem;">Acceso Privado</h2>
-            
             <form id="login-form">
                 <div class="admin-form-group">
-                    <label for="admin-email">Correo Electrónico</label>
+                    <label>Correo Electrónico</label>
                     <input type="email" id="admin-email" placeholder="admin@vault.com" required>
                 </div>
-
                 <div class="admin-form-group">
-                    <label for="admin-password">Contraseña</label>
+                    <label>Contraseña</label>
                     <input type="password" id="admin-password" placeholder="••••••••" required>
                 </div>
-
-                <button type="submit" class="btn-action" style="width: 100%; margin-top: 1rem;">Autenticar Credenciales</button>
+                <button type="submit" class="btn-action" style="width: 100%;">Ingresar</button>
             </form>
-
             <div id="login-error" class="error-message"></div>
         </div>
 
-        <!-- PANEL DE CONTROL (Oculto hasta iniciar sesión) -->
-        <div id="admin-panel" class="panel" style="display: none; max-width: 800px; margin: 3rem auto;">
-            <div class="admin-header-actions">
-                <h2 class="section-title" style="margin-bottom: 0; border: none;">Registrar Nuevo Artista / Disco</h2>
-                <button id="logout-btn" class="btn-danger">Cerrar Sesión</button>
+        <!-- VISTA PRINCIPAL: LISTA DE ARTISTAS -->
+        <div id="artists-view" class="panel" style="display: none; max-width: 1000px; margin: 2rem auto;">
+            <div class="header-bar">
+                <h2 class="section-title" style="margin:0; border:none;">Directorio de Artistas</h2>
+                <div>
+                    <button class="btn-action" onclick="openArtistModal()" style="margin-right: 0.5rem;">+ Agregar Artista</button>
+                    <button id="logout-btn" class="btn-danger">Cerrar Sesión</button>
+                </div>
             </div>
 
-            <form id="add-disc-form">
-                <div class="admin-form-group">
-                    <label for="band_name">Nombre de la Banda / Artista *</label>
-                    <input type="text" id="band_name" placeholder="Ej: Malice Mizer" required>
-                </div>
+            <div id="artists-list-admin" class="artist-grid-admin">
+                <!-- Se cargan dinámicamente -->
+            </div>
+        </div>
+
+        <!-- VISTA SECUNDARIA: AGREGAR ÁLBUM A ARTISTA SELECCIONADO -->
+        <div id="discography-view" class="panel" style="display: none; max-width: 800px; margin: 2rem auto;">
+            <button class="btn-secondary" onclick="showArtistsView()">← Volver a Artistas</button>
+            
+            <div class="header-bar">
+                <h2 id="selected-artist-title" class="section-title" style="margin:0; border:none;">Gestionar Discografía</h2>
+            </div>
+
+            <form id="add-album-form">
+                <input type="hidden" id="selected_artist_id">
 
                 <div class="admin-form-group">
-                    <label for="album_title">Título del Álbum / Demo *</label>
+                    <label>Título del Álbum / Demo *</label>
                     <input type="text" id="album_title" placeholder="Ej: Memoire" required>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="admin-form-group">
-                        <label for="release_year">Año de Lanzamiento</label>
+                        <label>Año de Lanzamiento</label>
                         <input type="text" id="release_year" placeholder="Ej: 1994">
                     </div>
-
                     <div class="admin-form-group">
-                        <label for="band_image">URL Foto del Artista</label>
-                        <input type="url" id="band_image" placeholder="https://i.imgur.com/...">
+                        <label>Enlace TeraBox</label>
+                        <input type="url" id="terabox_link" placeholder="https://terabox.com/s/...">
                     </div>
                 </div>
 
                 <div class="admin-form-group">
-                    <label for="terabox_link">Enlace de TeraBox</label>
-                    <input type="url" id="terabox_link" placeholder="https://terabox.com/s/...">
-                </div>
-
-                <div class="admin-form-group">
-                    <label for="tracklist">Lista de Canciones (Una por línea)</label>
+                    <label>Lista de Canciones (Una por línea)</label>
                     <textarea id="tracklist" rows="5" placeholder="1. De Fleur&#10;2. Speed of Despair&#10;3. Baroque"></textarea>
                 </div>
 
-                <button type="submit" class="btn-action" style="width: 100%; margin-top: 1rem;">Guardar Registro en Base de Datos</button>
+                <button type="submit" class="btn-action" style="width: 100%;">Guardar Disco / Demo</button>
             </form>
         </div>
     </main>
 
-    <footer>
-        <p>© 2026 VISUAL KEI VAULT // TODOS LOS DERECHOS RESERVADOS.</p>
-    </footer>
+    <!-- MODAL PARA AGREGAR NUEVO ARTISTA -->
+    <div id="artist-modal" class="modal-bg">
+        <div class="modal-content">
+            <h3 class="section-title" style="margin-top:0;">Nuevo Artista / Banda</h3>
+            <form id="add-artist-form">
+                <div class="admin-form-group">
+                    <label>Nombre de la Banda *</label>
+                    <input type="text" id="new_artist_name" placeholder="Ej: Dir En Grey" required>
+                </div>
+                <div class="admin-form-group">
+                    <label>Breve Descripción</label>
+                    <textarea id="new_artist_desc" rows="3" placeholder="Banda pionera formada en Osaka en 1997..."></textarea>
+                </div>
+                <div class="admin-form-group">
+                    <label>URL de Foto del Artista</label>
+                    <input type="url" id="new_artist_image" placeholder="https://i.imgur.com/...">
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn-action" style="flex:1;">Guardar Artista</button>
+                    <button type="button" class="btn-secondary" onclick="closeArtistModal()" style="flex:1; margin-bottom:0;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    <!-- Scripts -->
     <script src="js/config.js"></script>
     <script>
         const loginSection = document.getElementById('login-section');
-        const adminPanel = document.getElementById('admin-panel');
-        const loginForm = document.getElementById('login-form');
-        const loginError = document.getElementById('login-error');
-        const logoutBtn = document.getElementById('logout-btn');
+        const artistsView = document.getElementById('artists-view');
+        const discographyView = document.getElementById('discography-view');
+        const artistModal = document.getElementById('artist-modal');
 
-        // Verificar sesión activa
+        // Verificar Sesión
         async function verificarSesion() {
             const { data: { session } } = await db.auth.getSession();
             if (session) {
                 loginSection.style.display = 'none';
-                adminPanel.style.display = 'block';
+                showArtistsView();
             } else {
                 loginSection.style.display = 'block';
-                adminPanel.style.display = 'none';
+                artistsView.style.display = 'none';
+                discographyView.style.display = 'none';
             }
         }
 
-        // Iniciar sesión con Supabase
-        loginForm.addEventListener('submit', async (e) => {
+        // Login
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            loginError.style.display = 'none';
-
             const email = document.getElementById('admin-email').value.trim();
             const password = document.getElementById('admin-password').value;
+            const errorDiv = document.getElementById('login-error');
 
-            const { data, error } = await db.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
-
+            const { error } = await db.auth.signInWithPassword({ email, password });
             if (error) {
-                loginError.innerText = "Credenciales inválidas o acceso denegado.";
-                loginError.style.display = 'block';
+                errorDiv.innerText = "Credenciales incorrectas.";
+                errorDiv.style.display = 'block';
             } else {
+                errorDiv.style.display = 'none';
                 verificarSesion();
             }
         });
 
-        // Cerrar sesión
-        logoutBtn.addEventListener('click', async () => {
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', async () => {
             await db.auth.signOut();
             verificarSesion();
         });
 
-        // Guardar registro en Supabase
-        document.getElementById('add-disc-form').addEventListener('submit', async (e) => {
+        // Mostrar Vista de Artistas y Cargarlos
+        async function showArtistsView() {
+            discographyView.style.display = 'none';
+            artistsView.style.display = 'block';
+
+            const { data: artists, error } = await db.from('artists').select('*').order('name');
+            const container = document.getElementById('artists-list-admin');
+            container.innerHTML = '';
+
+            if (artists && artists.length > 0) {
+                artists.forEach(artist => {
+                    const img = artist.image_url || 'https://via.placeholder.com/300x160?text=No+Image';
+                    const desc = artist.description ? (artist.description.substring(0, 70) + '...') : 'Sin descripción.';
+                    
+                    container.innerHTML += `
+                        <div class="artist-card-admin">
+                            <img src="${img}" alt="${artist.name}">
+                            <h3>${artist.name}</h3>
+                            <p>${desc}</p>
+                            <button class="btn-action" style="width: 100%; font-size: 0.75rem;" onclick="openAddDiscography(${artist.id}, '${artist.name.replace(/'/g, "\\'")}')">Ver / Agregar Discografía</button>
+                        </div>
+                    `;
+                });
+            } else {
+                container.innerHTML = '<p style="color:#888; grid-column: 1/-1; text-align:center;">No hay artistas creados aún. Haz clic en "+ Agregar Artista".</p>';
+            }
+        }
+
+        // Abrir y cerrar Modal de Artista
+        function openArtistModal() { artistModal.style.display = 'flex'; }
+        function closeArtistModal() { artistModal.style.display = 'none'; }
+
+        // Crear Nuevo Artista
+        document.getElementById('add-artist-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+            const newArtist = {
+                name: document.getElementById('new_artist_name').value.trim(),
+                description: document.getElementById('new_artist_desc').value.trim() || null,
+                image_url: document.getElementById('new_artist_image').value.trim() || null
+            };
+
+            const { error } = await db.from('artists').insert([newArtist]);
+            if (error) {
+                alert('Error al crear artista: ' + error.message);
+            } else {
+                alert('¡Artista creado con éxito!');
+                document.getElementById('add-artist-form').reset();
+                closeArtistModal();
+                showArtistsView();
+            }
+        });
+
+        // Abrir Vista para Agregar Discografía
+        function openAddDiscography(artistId, artistName) {
+            artistsView.style.display = 'none';
+            discographyView.style.display = 'block';
+
+            document.getElementById('selected_artist_id').value = artistId;
+            document.getElementById('selected-artist-title').innerText = 'Discografía: ' + artistName;
+        }
+
+        // Guardar Álbum
+        document.getElementById('add-album-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
             const tracklistArray = document.getElementById('tracklist').value
                 .split('\n')
                 .map(t => t.trim())
                 .filter(t => t.length > 0);
 
-            const newEntry = {
-                band_name: document.getElementById('band_name').value.trim(),
+            const newAlbum = {
+                artist_id: document.getElementById('selected_artist_id').value,
                 album_title: document.getElementById('album_title').value.trim(),
-                release_year: document.getElementById('release_year').value.trim(),
-                band_image: document.getElementById('band_image').value.trim() || null,
+                release_year: document.getElementById('release_year').value.trim() || null,
                 terabox_link: document.getElementById('terabox_link').value.trim() || null,
                 tracklist: tracklistArray
             };
 
-            const { data, error } = await db.from('discography').insert([newEntry]);
-
+            const { error } = await db.from('discography').insert([newAlbum]);
             if (error) {
-                alert('Error al guardar: ' + error.message);
+                alert('Error al guardar álbum: ' + error.message);
             } else {
-                alert('¡Registro añadido correctamente al archivo!');
-                document.getElementById('add-disc-form').reset();
+                alert('¡Álbum/Demo agregado correctamente!');
+                document.getElementById('add-album-form').reset();
             }
         });
 
