@@ -5,28 +5,144 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VISUAL KEI VAULT // DISCOGRAFÍA</title>
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .album-card {
+        /* Header del Artista al Centro */
+        .artist-header-center {
+            text-align: center;
+            background: #080808;
+            border: 1px solid #1a1a1a;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .artist-header-center img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #333;
+            margin-bottom: 1rem;
+        }
+
+        /* Toolbar de Controles (Sorteo y Botones de Cambio de Vista) */
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: #0d0d0d;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid #222;
+            border-radius: 8px;
+        }
+        .select-sort {
+            background: #141824;
+            border: 1px solid #2a2f3f;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            outline: none;
+        }
+        .view-switcher {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .view-btn {
+            background: #141824;
+            border: 1px solid #2a2f3f;
+            color: #8a99ad;
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .view-btn:hover {
+            color: #fff;
+            background: #1e2538;
+        }
+        .view-btn.active {
+            background: #38daf6;
+            color: #0b0f19;
+            border-color: #38daf6;
+            font-weight: bold;
+        }
+
+        /* VISTA 1: Cuadrícula de 5 columnas (5 en 5) */
+        .albums-container.grid-view {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1.2rem;
+        }
+        @media (max-width: 1100px) {
+            .albums-container.grid-view { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .albums-container.grid-view { grid-template-columns: repeat(1, 1fr); }
+        }
+
+        .grid-view .album-card {
+            background: #0d0d0d;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .grid-view .album-card:hover {
+            border-color: #d4af37;
+            transform: translateY(-4px);
+        }
+        .grid-view .album-cover {
+            width: 100%;
+            aspect-ratio: 1/1;
+            height: auto;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #222;
+            margin-bottom: 0.8rem;
+        }
+        .grid-view .tracklist-box { display: none; }
+        .grid-view .album-header {
+            flex-direction: column;
+            border: none;
+            padding: 0;
+            margin-bottom: 0.5rem;
+            width: 100%;
+        }
+
+        /* VISTA 2: Lista Detallada Clásica */
+        .albums-container.detailed-view {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .detailed-view .album-card {
             background: #0d0d0d;
             border: 1px solid #222;
             padding: 1.5rem;
-            margin-bottom: 1.5rem;
             display: flex;
             gap: 1.5rem;
             align-items: flex-start;
         }
-        .album-cover {
+        .detailed-view .album-cover {
             width: 140px;
             height: 140px;
             object-fit: cover;
             border: 1px solid #222;
             flex-shrink: 0;
         }
-        .album-content {
-            flex-grow: 1;
-        }
-        .album-header {
+        .detailed-view .album-content { flex-grow: 1; }
+        .detailed-view .album-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -34,7 +150,7 @@
             padding-bottom: 0.5rem;
             margin-bottom: 1rem;
         }
-        .tracklist-box {
+        .detailed-view .tracklist-box {
             background: #111;
             padding: 1rem;
             font-family: monospace;
@@ -43,6 +159,61 @@
             margin: 1rem 0;
             border: 1px solid #1a1a1a;
         }
+
+        /* VISTA 3: Lista Comprimida */
+        .albums-container.compact-view {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .compact-view .album-card {
+            background: #0d0d0d;
+            border: 1px solid #222;
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .compact-view .album-cover {
+            width: 45px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .compact-view .tracklist-box { display: none; }
+        .compact-view .album-header { border: none; padding: 0; margin: 0; }
+
+        /* Badges & Botones */
+        .release-type-badge {
+            display: inline-block;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: #d4af37;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .btn-terabox {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #141414;
+            border: 1px solid #333;
+            color: #e0e0e0;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .btn-terabox:hover { background: #222; border-color: #666; color: #fff; }
+        .no-terabox { color: #555; font-size: 0.75rem; font-style: italic; }
+
+        /* Modales */
         .modal-bg {
             display: none;
             position: fixed;
@@ -58,101 +229,18 @@
             padding: 2rem;
             max-width: 500px;
             width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
         }
-        .admin-form-group {
-            margin-bottom: 1rem;
+        .admin-form-group { margin-bottom: 1rem; }
+        .admin-form-group label { display: block; font-size: 0.75rem; color: #888; margin-bottom: 0.3rem; text-transform: uppercase; }
+        .admin-form-group input, .admin-form-group textarea, .admin-form-group select {
+            width: 100%; background: #141414; border: 1px solid #2a2a2a; color: #fff; padding: 0.6rem; box-sizing: border-box; font-family: inherit;
         }
-        .admin-form-group label {
-            display: block;
-            font-size: 0.75rem;
-            color: #888;
-            margin-bottom: 0.3rem;
-            text-transform: uppercase;
-        }
-        .admin-form-group input, .admin-form-group textarea {
-            width: 100%;
-            background: #141414;
-            border: 1px solid #2a2a2a;
-            color: #fff;
-            padding: 0.6rem;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-        .admin-actions-bar {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.8rem;
-        }
-        .btn-edit {
-            background: #222;
-            border: 1px solid #444;
-            color: #fff;
-            padding: 0.4rem 0.8rem;
-            cursor: pointer;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-        }
-        .btn-delete {
-            background: transparent;
-            border: 1px solid #721c24;
-            color: #f8d7da;
-            padding: 0.4rem 0.8rem;
-            cursor: pointer;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-        }
-        .btn-delete:hover {
-            background: #721c24;
-            color: #fff;
-        }
-        /* Botón de descarga TeraBox estilizado */
-        .btn-terabox {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: #141414;
-            border: 1px solid #333;
-            color: #e0e0e0;
-            padding: 0.5rem 1rem;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        .btn-terabox:hover {
-            background: #222;
-            border-color: #666;
-            color: #fff;
-        }
-        .no-terabox {
-            color: #555;
-            font-size: 0.75rem;
-            font-style: italic;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Estilo mejorado para el botón "Ver / Gestionar Discografía" */
-        .btn-view-discography {
-            display: inline-block;
-            background: #141414;
-            border: 1px solid #333;
-            color: #d4af37;
-            padding: 0.5rem 1rem;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            margin-top: 0.8rem;
-            font-family: inherit;
-        }
-        .btn-view-discography:hover {
-            background: #1a1a1a;
-            border-color: #d4af37;
-            color: #fff;
-        }
+        .admin-actions-bar { display: flex; gap: 0.5rem; margin-top: 0.8rem; }
+        .btn-edit { background: #222; border: 1px solid #444; color: #fff; padding: 0.4rem 0.8rem; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; }
+        .btn-delete { background: transparent; border: 1px solid #721c24; color: #f8d7da; padding: 0.4rem 0.8rem; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; }
+        .btn-delete:hover { background: #721c24; color: #fff; }
     </style>
 </head>
 <body>
@@ -167,21 +255,44 @@
     </header>
 
     <main>
-        <section class="panel" style="max-width: 950px; margin: 2rem auto;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #222; padding-bottom: 0.5rem;">
+        <section class="panel" style="max-width: 1100px; margin: 2rem auto;">
+            
+            <!-- INFORMACIÓN DEL ARTISTA AL CENTRO -->
+            <div id="artist-info" class="artist-header-center">
                 <h2 id="artist-name" class="section-title" style="margin: 0; border: none;">DISCOGRAFÍA</h2>
-                
-                <button id="admin-add-album-btn" class="btn-action" style="display: none; font-size: 0.75rem; padding: 0.5rem 1rem;" onclick="openCreateModal()">
-                    + Agregar Discografía
-                </button>
             </div>
 
-            <div id="artist-info" style="margin-bottom: 2rem; color: #aaa; font-size: 0.9rem;">
-                <!-- Biografía y foto del artista -->
+            <!-- BARRA DE HERRAMIENTAS Y VISTAS -->
+            <div class="controls-bar">
+                <select id="sort-select" class="select-sort" onchange="loadAlbums()">
+                    <option value="year-asc">Alfabético (A - Z)</option>
+                    <option value="year-asc-release">Año de Lanzamiento (Antiguos primero)</option>
+                    <option value="year-desc-release">Año de Lanzamiento (Recientes primero)</option>
+                </select>
+
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <button id="admin-add-album-btn" class="btn-action" style="display: none; font-size: 0.75rem; padding: 0.5rem 1rem;" onclick="openCreateModal()">
+                        + Agregar Discografía
+                    </button>
+
+                    <!-- Selector de Modos de Vista -->
+                    <div class="view-switcher">
+                        <button class="view-btn active" id="btn-view-grid" onclick="setMode('grid')" title="Vista Cuadrícula 5x5">
+                            <i class="fa-solid fa-border-all"></i>
+                        </button>
+                        <button class="view-btn" id="btn-view-detailed" onclick="setMode('detailed')" title="Vista Detallada Clásica">
+                            <i class="fa-solid fa-list"></i>
+                        </button>
+                        <button class="view-btn" id="btn-view-compact" onclick="setMode('compact')" title="Vista Compacta">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <div id="albums-list">
-                <p style="color: #888; text-align: center;">Cargando discografía...</p>
+            <!-- CONTENEDOR DE DISCOS -->
+            <div id="albums-list" class="albums-container grid-view">
+                <p style="color: #888; text-align: center; grid-column: 1/-1;">Cargando discografía...</p>
             </div>
         </section>
     </main>
@@ -189,7 +300,7 @@
     <!-- MODAL PARA CREAR / EDITAR ÁLBUM -->
     <div id="album-modal" class="modal-bg">
         <div class="modal-content">
-            <h3 id="modal-title" class="section-title" style="margin-top:0;">Nuevo Álbum / Demo</h3>
+            <h3 id="modal-title" class="section-title" style="margin-top:0;">Nuevo Lanzamiento</h3>
             <form id="album-form">
                 <input type="hidden" id="edit_album_id">
                 
@@ -197,24 +308,39 @@
                     <label>Título del Álbum / Single *</label>
                     <input type="text" id="album_title" placeholder="Ej: Memoire" required>
                 </div>
+
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="admin-form-group">
+                        <label>Tipo de Lanzamiento</label>
+                        <select id="release_type">
+                            <option value="Álbum">Álbum de Estudio</option>
+                            <option value="Single">Single / Sencillo</option>
+                            <option value="Maxi-Single">Maxi-Single</option>
+                            <option value="Demo">Demo / Maqueta</option>
+                            <option value="Recopilatorio">Recopilatorio (Best)</option>
+                        </select>
+                    </div>
                     <div class="admin-form-group">
                         <label>Año de Lanzamiento</label>
                         <input type="text" id="release_year" placeholder="Ej: 1994">
                     </div>
-                    <div class="admin-form-group">
-                        <label>URL de la Carátula</label>
-                        <input type="url" id="cover_image" placeholder="https://i.imgur.com/...">
-                    </div>
                 </div>
+
+                <div class="admin-form-group">
+                    <label>URL de la Carátula</label>
+                    <input type="url" id="cover_image" placeholder="https://i.imgur.com/...">
+                </div>
+
                 <div class="admin-form-group">
                     <label>Enlace TeraBox</label>
                     <input type="url" id="terabox_link" placeholder="https://terabox.com/s/...">
                 </div>
+
                 <div class="admin-form-group">
                     <label>Lista de Canciones (Una por línea)</label>
                     <textarea id="tracklist" rows="4" placeholder="1. De Fleur&#10;2. Speed of Despair"></textarea>
                 </div>
+
                 <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                     <button type="submit" class="btn-action" style="flex:1;">Guardar Cambios</button>
                     <button type="button" class="btn-secondary" onclick="closeAlbumModal()" style="flex:1; background:#222; border:1px solid #444; color:#fff; cursor:pointer;">Cancelar</button>
@@ -232,10 +358,22 @@
         const urlParams = new URLSearchParams(window.location.search);
         const artistId = urlParams.get('banda');
         let isAdmin = false;
+        let currentMode = 'grid';
+
+        function setMode(mode) {
+            currentMode = mode;
+            const container = document.getElementById('albums-list');
+            
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-view-${mode}`).classList.add('active');
+
+            container.className = `albums-container ${mode}-view`;
+            loadAlbums();
+        }
 
         async function init() {
             if (!artistId) {
-                document.getElementById('albums-list').innerHTML = '<p style="color:#ff4d4d;">No se especificó un artista válido.</p>';
+                document.getElementById('albums-list').innerHTML = '<p style="color:#ff4d4d; grid-column:1/-1;">No se especificó un artista válido.</p>';
                 return;
             }
 
@@ -247,12 +385,10 @@
 
             const { data: artist } = await db.from('artists').select('*').eq('id', artistId).single();
             if (artist) {
-                document.getElementById('artist-name').innerText = 'DISCOGRAFÍA: ' + artist.name.toUpperCase();
                 document.getElementById('artist-info').innerHTML = `
-                    <div style="display: flex; gap: 1.5rem; align-items: center; background: #080808; padding: 1rem; border: 1px solid #1a1a1a;">
-                        ${artist.image_url ? `<img src="${artist.image_url}" style="width: 110px; height: 110px; object-fit: cover; border: 1px solid #222;">` : ''}
-                        <p style="margin: 0; line-height: 1.5;">${artist.description || 'Sin biografía disponible.'}</p>
-                    </div>
+                    ${artist.image_url ? `<img src="${artist.image_url}" alt="${artist.name}">` : ''}
+                    <h2 class="section-title" style="margin: 0 0 0.5rem 0; border: none; font-size:1.8rem;">${artist.name.toUpperCase()}</h2>
+                    <p style="margin: 0 auto; max-width:650px; color:#aaa; line-height: 1.6;">${artist.description || 'Sin biografía disponible.'}</p>
                 `;
             }
 
@@ -260,16 +396,23 @@
         }
 
         async function loadAlbums() {
-            const { data: albums, error } = await db.from('discography')
-                .select('*')
-                .eq('artist_id', artistId)
-                .order('release_year', { ascending: true });
+            const sortVal = document.getElementById('sort-select').value;
+            let query = db.from('discography').select('*').eq('artist_id', parseInt(artistId));
 
+            if (sortVal === 'year-asc-release') {
+                query = query.order('release_year', { ascending: true });
+            } else if (sortVal === 'year-desc-release') {
+                query = query.order('release_year', { ascending: false });
+            } else {
+                query = query.order('album_title', { ascending: true });
+            }
+
+            const { data: albums, error } = await query;
             const container = document.getElementById('albums-list');
             container.innerHTML = '';
 
             if (error || !albums || albums.length === 0) {
-                container.innerHTML = '<p style="color:#888; text-align:center;">No hay álbumes o demos registrados aún para este artista.</p>';
+                container.innerHTML = '<p style="color:#888; text-align:center; grid-column:1/-1;">No hay álbumes o demos registrados aún para este artista.</p>';
                 return;
             }
 
@@ -277,43 +420,65 @@
                 const tracks = Array.isArray(album.tracklist) ? album.tracklist.join('<br>') : 'Lista de canciones no disponible.';
                 
                 const teraboxBtn = album.terabox_link 
-                    ? `<a href="${album.terabox_link}" target="_blank" class="btn-terabox">📥 Descargar vía TeraBox</a>`
-                    : '<span class="no-terabox">Sin enlace de descarga</span>';
+                    ? `<a href="${album.terabox_link}" target="_blank" class="btn-terabox">📥 Descargar</a>`
+                    : '<span class="no-terabox">Sin enlace</span>';
 
                 const coverImg = album.cover_image 
                     ? `<img src="${album.cover_image}" class="album-cover" alt="${album.album_title}">` 
                     : `<img src="https://via.placeholder.com/140?text=No+Cover" class="album-cover" alt="Sin carátula">`;
 
+                const typeTag = album.release_type ? `<span class="release-type-badge">${album.release_type}</span>` : '';
+
                 let adminControlsHTML = '';
                 if (isAdmin) {
                     adminControlsHTML = `
                         <div class="admin-actions-bar">
-                            <button class="btn-edit" onclick="openEditModal(${album.id})">✏️ Editar Álbum</button>
-                            <button class="btn-delete" onclick="deleteAlbum(${album.id})">🗑️ Eliminar</button>
+                            <button class="btn-edit" onclick="openEditModal(${album.id})">✏️ Editar</button>
+                            <button class="btn-delete" onclick="deleteAlbum(${album.id})">🗑️</button>
                         </div>
                     `;
                 }
 
-                container.innerHTML += `
-                    <div class="album-card">
-                        ${coverImg}
-                        <div class="album-content">
-                            <div class="album-header">
+                if (currentMode === 'compact') {
+                    container.innerHTML += `
+                        <div class="album-card">
+                            <div style="display:flex; align-items:center; gap:1rem;">
+                                ${coverImg}
                                 <div>
-                                    <h3 style="color:#fff; margin:0 0 0.3rem 0; font-size:1.1rem;">${album.album_title} <span style="color:#888; font-size:0.85rem;">(${album.release_year || 'Año desconocido'})</span></h3>
+                                    <strong style="color:#fff;">${album.album_title}</strong> ${typeTag}
+                                    <span style="color:#888; font-size:0.8rem; margin-left:8px;">(${album.release_year || 'N/A'})</span>
                                 </div>
-                                ${teraboxBtn}
                             </div>
-                            <div class="tracklist-box">${tracks}</div>
-                            ${adminControlsHTML}
+                            <div style="display:flex; align-items:center; gap:1rem;">
+                                ${teraboxBtn}
+                                ${adminControlsHTML}
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                } else {
+                    container.innerHTML += `
+                        <div class="album-card">
+                            ${coverImg}
+                            <div class="album-content">
+                                <div class="album-header">
+                                    <h3 style="color:#fff; margin:0 0 0.3rem 0; font-size:1rem;">
+                                        ${album.album_title} 
+                                        ${typeTag}
+                                        <span style="color:#888; font-size:0.85rem;">(${album.release_year || 'Año desconocido'})</span>
+                                    </h3>
+                                    ${teraboxBtn}
+                                </div>
+                                <div class="tracklist-box">${tracks}</div>
+                                ${adminControlsHTML}
+                            </div>
+                        </div>
+                    `;
+                }
             });
         }
 
         function openCreateModal() {
-            document.getElementById('modal-title').innerText = 'Nuevo Álbum / Demo';
+            document.getElementById('modal-title').innerText = 'Nuevo Lanzamiento';
             document.getElementById('album-form').reset();
             document.getElementById('edit_album_id').value = '';
             document.getElementById('album-modal').style.display = 'flex';
@@ -326,9 +491,10 @@
                 return;
             }
 
-            document.getElementById('modal-title').innerText = 'Editar Álbum / Single';
+            document.getElementById('modal-title').innerText = 'Editar Lanzamiento';
             document.getElementById('edit_album_id').value = album.id;
             document.getElementById('album_title').value = album.album_title || '';
+            document.getElementById('release_type').value = album.release_type || 'Álbum';
             document.getElementById('release_year').value = album.release_year || '';
             document.getElementById('cover_image').value = album.cover_image || '';
             document.getElementById('terabox_link').value = album.terabox_link || '';
@@ -350,8 +516,9 @@
                 .filter(t => t.length > 0);
 
             const albumData = {
-                artist_id: artistId,
+                artist_id: parseInt(artistId),
                 album_title: document.getElementById('album_title').value.trim(),
+                release_type: document.getElementById('release_type').value,
                 release_year: document.getElementById('release_year').value.trim() || null,
                 cover_image: document.getElementById('cover_image').value.trim() || null,
                 terabox_link: document.getElementById('terabox_link').value.trim() || null,
@@ -360,7 +527,7 @@
 
             let error;
             if (albumId) {
-                const res = await db.from('discography').update(albumData).eq('id', albumId);
+                const res = await db.from('discography').update(albumData).eq('id', parseInt(albumId));
                 error = res.error;
             } else {
                 const res = await db.from('discography').insert([albumData]);
@@ -378,7 +545,7 @@
 
         async function deleteAlbum(albumId) {
             if (confirm('¿Estás seguro de eliminar este álbum de la base de datos?')) {
-                const { error } = await db.from('discography').delete().eq('id', albumId);
+                const { error } = await db.from('discography').delete().eq('id', parseInt(albumId));
                 if (error) {
                     alert('Error al eliminar: ' + error.message);
                 } else {
