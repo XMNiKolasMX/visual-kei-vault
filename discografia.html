@@ -25,12 +25,12 @@
             margin-bottom: 1rem;
         }
 
-        /* Toolbar de Controles (Sorteo y Botones de Cambio de Vista) */
+        /* Toolbar de Controles (Ordenamiento y Vistas) */
         .controls-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             background: #0d0d0d;
             padding: 0.8rem 1.2rem;
             border: 1px solid #222;
@@ -71,6 +71,39 @@
             background: #38daf6;
             color: #0b0f19;
             border-color: #38daf6;
+            font-weight: bold;
+        }
+
+        /* Barra de Filtros por Categoría / Etiqueta */
+        .category-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+        .filter-tag-btn {
+            background: #101010;
+            border: 1px solid #2a2a2a;
+            color: #aaa;
+            padding: 0.4rem 1rem;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.25s ease;
+            font-family: inherit;
+        }
+        .filter-tag-btn:hover {
+            background: #1a1a1a;
+            border-color: #555;
+            color: #fff;
+        }
+        .filter-tag-btn.active {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: #d4af37;
+            color: #d4af37;
             font-weight: bold;
         }
 
@@ -270,9 +303,9 @@
             <!-- BARRA DE HERRAMIENTAS Y VISTAS -->
             <div class="controls-bar">
                 <select id="sort-select" class="select-sort" onchange="loadAlbums()">
-                    <option value="title-asc">Alfabético (A - Z)</option>
                     <option value="year-asc-release">Año de Lanzamiento (Antiguos primero)</option>
                     <option value="year-desc-release">Año de Lanzamiento (Recientes primero)</option>
+                    <option value="title-asc">Alfabético (A - Z)</option>
                 </select>
 
                 <div style="display: flex; gap: 1rem; align-items: center;">
@@ -293,6 +326,16 @@
                         </button>
                     </div>
                 </div>
+            </div>
+
+            <!-- FILTROS POR CATEGORÍA / ETIQUETAS -->
+            <div class="category-filter-bar">
+                <button class="filter-tag-btn active" onclick="filterCategory('todos', this)">TODOS</button>
+                <button class="filter-tag-btn" onclick="filterCategory('Álbum', this)">ÁLBUM</button>
+                <button class="filter-tag-btn" onclick="filterCategory('Single', this)">SINGLE</button>
+                <button class="filter-tag-btn" onclick="filterCategory('Maxi-Single', this)">MAXI-SINGLE</button>
+                <button class="filter-tag-btn" onclick="filterCategory('Demo', this)">DEMO</button>
+                <button class="filter-tag-btn" onclick="filterCategory('Recopilatorio', this)">RECOPILATORIO (BEST)</button>
             </div>
 
             <!-- CONTENEDOR DE DISCOS -->
@@ -364,6 +407,7 @@
         const artistId = urlParams.get('banda');
         let isAdmin = false;
         let currentMode = 'grid';
+        let selectedCategory = 'todos';
 
         function setMode(mode) {
             currentMode = mode;
@@ -373,6 +417,13 @@
             document.getElementById(`btn-view-${mode}`).classList.add('active');
 
             container.className = `albums-container ${mode}-view`;
+            loadAlbums();
+        }
+
+        function filterCategory(category, btnElement) {
+            selectedCategory = category;
+            document.querySelectorAll('.filter-tag-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
             loadAlbums();
         }
 
@@ -404,12 +455,18 @@
             const sortVal = document.getElementById('sort-select').value;
             let query = db.from('discography').select('*').eq('artist_id', parseInt(artistId));
 
-            if (sortVal === 'year-asc-release') {
-                query = query.order('release_year', { ascending: true });
-            } else if (sortVal === 'year-desc-release') {
+            // Filtrado por categoría seleccionada
+            if (selectedCategory !== 'todos') {
+                query = query.eq('release_type', selectedCategory);
+            }
+
+            // Ordenamiento por año o título
+            if (sortVal === 'year-desc-release') {
                 query = query.order('release_year', { ascending: false });
-            } else {
+            } else if (sortVal === 'title-asc') {
                 query = query.order('album_title', { ascending: true });
+            } else {
+                query = query.order('release_year', { ascending: true });
             }
 
             const { data: albums, error } = await query;
@@ -417,7 +474,7 @@
             container.innerHTML = '';
 
             if (error || !albums || albums.length === 0) {
-                container.innerHTML = '<p style="color:#888; text-align:center; grid-column:1/-1;">No hay álbumes o demos registrados aún para este artista.</p>';
+                container.innerHTML = '<p style="color:#888; text-align:center; grid-column:1/-1;">No hay lanzamientos registrados para esta categoría.</p>';
                 return;
             }
 
