@@ -74,7 +74,7 @@
             font-weight: bold;
         }
 
-        /* VISTA 1: Cuadrícula responsiva estilo galería */
+        /* VISTA 1: Cuadrícula de 5 columnas (5 en 5: 1 izq - 3 centro - 1 der) */
         .albums-container.grid-view {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -263,9 +263,9 @@
                         + Agregar Discografía
                     </button>
 
-                    <!-- Selector de Modos de Vista Estilo Galería/Lista -->
+                    <!-- Selector de Modos de Vista -->
                     <div class="view-switcher">
-                        <button class="view-btn active" id="btn-view-grid" onclick="setMode('grid')" title="Vista Cuadrícula">
+                        <button class="view-btn active" id="btn-view-grid" onclick="setMode('grid')" title="Vista Cuadrícula 5x5">
                             <i class="fa-solid fa-border-all"></i>
                         </button>
                         <button class="view-btn" id="btn-view-detailed" onclick="setMode('detailed')" title="Vista Detallada Clásica">
@@ -487,6 +487,7 @@
                 .map(t => t.trim())
                 .filter(t => t.length > 0);
 
+            // Objeto adaptado estrictamente a tus columnas reales en Supabase
             const albumData = {
                 artist_id: parseInt(artistId),
                 album_title: document.getElementById('album_title').value.trim(),
