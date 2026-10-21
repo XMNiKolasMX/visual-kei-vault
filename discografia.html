@@ -74,7 +74,7 @@
             font-weight: bold;
         }
 
-        /* VISTA 1: Cuadrícula de 5 columnas (5 en 5: 1 izq - 3 centro - 1 der) */
+        /* VISTA 1: Cuadrícula de 5 columnas (5 en 5) */
         .albums-container.grid-view {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -183,6 +183,21 @@
         .compact-view .tracklist-box { display: none; }
         .compact-view .album-header { border: none; padding: 0; margin: 0; }
 
+        /* Etiqueta del Tipo de Lanzamiento */
+        .release-type-badge {
+            display: inline-block;
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            color: #d4af37;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-left: 6px;
+            vertical-align: middle;
+            border-radius: 3px;
+        }
+
         /* Botones y Enlaces */
         .btn-terabox {
             display: inline-flex;
@@ -222,7 +237,9 @@
         }
         .admin-form-group { margin-bottom: 1rem; }
         .admin-form-group label { display: block; font-size: 0.75rem; color: #888; margin-bottom: 0.3rem; text-transform: uppercase; }
-        .admin-form-group input, .admin-form-group textarea {
+        .admin-form-group input, 
+        .admin-form-group textarea,
+        .admin-form-group select {
             width: 100%; background: #141414; border: 1px solid #2a2a2a; color: #fff; padding: 0.6rem; box-sizing: border-box; font-family: inherit;
         }
         .admin-actions-bar { display: flex; gap: 0.5rem; margin-top: 0.8rem; }
@@ -297,9 +314,21 @@
                     <input type="text" id="album_title" placeholder="Ej: Memoire" required>
                 </div>
 
-                <div class="admin-form-group">
-                    <label>Año de Lanzamiento</label>
-                    <input type="text" id="release_year" placeholder="Ej: 1994">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="admin-form-group">
+                        <label>Tipo de Lanzamiento</label>
+                        <select id="release_type">
+                            <option value="Álbum">Álbum de Estudio</option>
+                            <option value="Single">Single / Sencillo</option>
+                            <option value="Maxi-Single">Maxi-Single</option>
+                            <option value="Demo">Demo / Maqueta</option>
+                            <option value="Recopilatorio">Recopilatorio (Best)</option>
+                        </select>
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Año de Lanzamiento</label>
+                        <input type="text" id="release_year" placeholder="Ej: 1994">
+                    </div>
                 </div>
 
                 <div class="admin-form-group">
@@ -403,6 +432,8 @@
                     ? `<img src="${album.cover_image}" class="album-cover" alt="${album.album_title}">` 
                     : `<img src="https://via.placeholder.com/140?text=No+Cover" class="album-cover" alt="Sin carátula">`;
 
+                const typeTag = album.release_type ? `<span class="release-type-badge">${album.release_type}</span>` : '';
+
                 let adminControlsHTML = '';
                 if (isAdmin) {
                     adminControlsHTML = `
@@ -419,7 +450,7 @@
                             <div style="display:flex; align-items:center; gap:1rem;">
                                 ${coverImg}
                                 <div>
-                                    <strong style="color:#fff;">${album.album_title}</strong> 
+                                    <strong style="color:#fff;">${album.album_title}</strong> ${typeTag}
                                     <span style="color:#888; font-size:0.8rem; margin-left:8px;">(${album.release_year || 'N/A'})</span>
                                 </div>
                             </div>
@@ -437,6 +468,7 @@
                                 <div class="album-header">
                                     <h3 style="color:#fff; margin:0 0 0.3rem 0; font-size:1rem;">
                                         ${album.album_title} 
+                                        ${typeTag}
                                         <span style="color:#888; font-size:0.85rem;">(${album.release_year || 'Año desconocido'})</span>
                                     </h3>
                                     ${teraboxBtn}
@@ -467,6 +499,7 @@
             document.getElementById('modal-title').innerText = 'Editar Lanzamiento';
             document.getElementById('edit_album_id').value = album.id;
             document.getElementById('album_title').value = album.album_title || '';
+            document.getElementById('release_type').value = album.release_type || 'Álbum';
             document.getElementById('release_year').value = album.release_year || '';
             document.getElementById('cover_image').value = album.cover_image || '';
             document.getElementById('terabox_link').value = album.terabox_link || '';
@@ -487,10 +520,10 @@
                 .map(t => t.trim())
                 .filter(t => t.length > 0);
 
-            // Objeto adaptado estrictamente a tus columnas reales en Supabase
             const albumData = {
                 artist_id: parseInt(artistId),
                 album_title: document.getElementById('album_title').value.trim(),
+                release_type: document.getElementById('release_type').value,
                 release_year: document.getElementById('release_year').value.trim() || null,
                 cover_image: document.getElementById('cover_image').value.trim() || null,
                 terabox_link: document.getElementById('terabox_link').value.trim() || null,
