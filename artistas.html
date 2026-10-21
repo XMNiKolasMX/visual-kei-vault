@@ -5,41 +5,196 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VISUAL KEI VAULT // ARTISTAS</title>
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .artist-card {
+        /* Toolbar de Controles (Sorteo y Vistas) */
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            background: #0d0d0d;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid #222;
+            border-radius: 8px;
+        }
+        .select-sort {
+            background: #141824;
+            border: 1px solid #2a2f3f;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            outline: none;
+        }
+        .view-switcher {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .view-btn {
+            background: #141824;
+            border: 1px solid #2a2f3f;
+            color: #8a99ad;
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .view-btn:hover {
+            color: #fff;
+            background: #1e2538;
+        }
+        .view-btn.active {
+            background: #38daf6;
+            color: #0b0f19;
+            border-color: #38daf6;
+            font-weight: bold;
+        }
+
+        /* Barra de Filtros por Épocas y Subgéneros del VK */
+        .genre-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+        .filter-tag-btn {
+            background: #101010;
+            border: 1px solid #2a2a2a;
+            color: #aaa;
+            padding: 0.4rem 1rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.25s ease;
+            font-family: inherit;
+        }
+        .filter-tag-btn:hover {
+            background: #1a1a1a;
+            border-color: #555;
+            color: #fff;
+        }
+        .filter-tag-btn.active {
+            background: rgba(212, 175, 55, 0.15);
+            border-color: #d4af37;
+            color: #d4af37;
+            font-weight: bold;
+        }
+
+        /* VISTA 1: Cuadrícula de 5 columnas (5 en 5) */
+        .artists-container.grid-view {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1.2rem;
+        }
+        @media (max-width: 1100px) {
+            .artists-container.grid-view { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .artists-container.grid-view { grid-template-columns: repeat(1, 1fr); }
+        }
+
+        .grid-view .artist-card {
+            background: #0d0d0d;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .grid-view .artist-card:hover {
+            border-color: #d4af37;
+            transform: translateY(-4px);
+        }
+        .grid-view .artist-cover {
+            width: 100%;
+            aspect-ratio: 1/1;
+            height: auto;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #222;
+            margin-bottom: 0.8rem;
+        }
+        .grid-view .artist-content p {
+            display: none; /* Se oculta la bio extensa en la vista 5x5 para mantener la simetría */
+        }
+
+        /* VISTA 2: Lista Detallada (Diseño Anterior) */
+        .artists-container.detailed-view {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .detailed-view .artist-card {
             background: #0d0d0d;
             border: 1px solid #222;
             padding: 1.5rem;
-            margin-bottom: 1.5rem;
             display: flex;
             gap: 1.5rem;
             align-items: center;
         }
-        .artist-cover {
+        .detailed-view .artist-cover {
             width: 140px;
             height: 140px;
             object-fit: cover;
             border: 1px solid #222;
             flex-shrink: 0;
         }
-        .artist-content {
+        .detailed-view .artist-content {
             flex-grow: 1;
         }
-        /* Estilo elegante para el botón de ver/gestionar discografía */
+
+        /* VISTA 3: Lista Compacta */
+        .artists-container.compact-view {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .compact-view .artist-card {
+            background: #0d0d0d;
+            border: 1px solid #222;
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .compact-view .artist-cover {
+            width: 45px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .compact-view .artist-content p { display: none; }
+
+        /* Estilo del Botón de Discografía */
         .btn-ver-discografia {
             display: inline-block;
             background: #141414;
             border: 1px solid #333;
             color: #d4af37;
             padding: 0.5rem 1rem;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             text-decoration: none;
             transition: all 0.3s ease;
             margin-top: 0.8rem;
             font-family: inherit;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
         }
         .btn-ver-discografia:hover {
             background: #1a1a1a;
@@ -60,13 +215,46 @@
     </header>
 
     <main>
-        <section class="panel" style="max-width: 950px; margin: 2rem auto;">
+        <section class="panel" style="max-width: 1100px; margin: 2rem auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #222; padding-bottom: 0.5rem;">
                 <h2 class="section-title" style="margin: 0; border: none;">CATÁLOGO DE ARTISTAS</h2>
             </div>
 
-            <div id="artists-list">
-                <p style="color: #888; text-align: center;">Cargando artistas...</p>
+            <!-- CONTROLES Y SWAP DE VISTAS -->
+            <div class="controls-bar">
+                <select id="sort-select" class="select-sort" onchange="loadArtists()">
+                    <option value="name-asc">Alfabético (A - Z)</option>
+                    <option value="name-desc">Alfabético (Z - A)</option>
+                </select>
+
+                <div class="view-switcher">
+                    <button class="view-btn active" id="btn-view-grid" onclick="setMode('grid')" title="Vista Cuadrícula 5x5">
+                        <i class="fa-solid fa-border-all"></i>
+                    </button>
+                    <button class="view-btn" id="btn-view-detailed" onclick="setMode('detailed')" title="Vista Detallada Clásica">
+                        <i class="fa-solid fa-list"></i>
+                    </button>
+                    <button class="view-btn" id="btn-view-compact" onclick="setMode('compact')" title="Vista Compacta">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- FILTROS POR ÉPOCAS Y SUBGÉNEROS DEL VISUAL KEI -->
+            <div class="genre-filter-bar">
+                <button class="filter-tag-btn active" onclick="filterGenre('todos', this)">TODOS</button>
+                <button class="filter-tag-btn" onclick="filterGenre('80s', this)">80'S</button>
+                <button class="filter-tag-btn" onclick="filterGenre('90s', this)">90'S</button>
+                <button class="filter-tag-btn" onclick="filterGenre('gothic', this)">GOTHIC / POST-PUNK</button>
+                <button class="filter-tag-btn" onclick="filterGenre('metal', this)">HEAVY METAL / THRASH</button>
+                <button class="filter-tag-btn" onclick="filterGenre('nagoya', this)">NAGOYA KEI</button>
+                <button class="filter-tag-btn" onclick="filterGenre('kansai', this)">KANSAI KEI</button>
+                <button class="filter-tag-btn" onclick="filterGenre('soft', this)">SOFT VISUAL KEI</button>
+            </div>
+
+            <!-- CONTENEDOR DE ARTISTAS -->
+            <div id="artists-list" class="artists-container grid-view">
+                <p style="color: #888; text-align: center; grid-column: 1/-1;">Cargando artistas...</p>
             </div>
         </section>
     </main>
@@ -77,39 +265,99 @@
 
     <script src="js/config.js"></script>
     <script>
+        let currentMode = 'grid';
+        let selectedFilter = 'todos';
+
+        function setMode(mode) {
+            currentMode = mode;
+            const container = document.getElementById('artists-list');
+            
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-view-${mode}`).classList.add('active');
+
+            container.className = `artists-container ${mode}-view`;
+            loadArtists();
+        }
+
+        function filterGenre(filterKey, btnElement) {
+            selectedFilter = filterKey;
+            document.querySelectorAll('.filter-tag-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            loadArtists();
+        }
+
         async function loadArtists() {
-            // Verificar si hay sesión activa de administrador
             const { data: { session } } = await db.auth.getSession();
             const isAdmin = !!session;
 
-            const { data: artists, error } = await db.from('artists').select('*').order('name', { ascending: true });
+            const sortVal = document.getElementById('sort-select').value;
+            let query = db.from('artists').select('*');
 
+            if (sortVal === 'name-desc') {
+                query = query.order('name', { ascending: false });
+            } else {
+                query = query.order('name', { ascending: true });
+            }
+
+            const { data: artists, error } = await query;
             const container = document.getElementById('artists-list');
             container.innerHTML = '';
 
             if (error || !artists || artists.length === 0) {
-                container.innerHTML = '<p style="color:#888; text-align:center;">No hay artistas registrados en el archivo.</p>';
+                container.innerHTML = '<p style="color:#888; text-align:center; grid-column: 1/-1;">No hay artistas registrados en el archivo.</p>';
                 return;
             }
 
-            artists.forEach(artist => {
+            // Filtrado local según la descripción o palabra clave
+            const filteredArtists = artists.filter(artist => {
+                if (selectedFilter === 'todos') return true;
+                const desc = (artist.description || '').toLowerCase();
+                const name = (artist.name || '').toLowerCase();
+
+                if (selectedFilter === '80s') return desc.includes('198') || desc.includes('80');
+                if (selectedFilter === '90s') return desc.includes('199') || desc.includes('90');
+                if (selectedFilter === 'gothic') return desc.includes('gótico') || desc.includes('gothic') || desc.includes('post-punk');
+                if (selectedFilter === 'metal') return desc.includes('metal') || desc.includes('thrash') || desc.includes('speed');
+                if (selectedFilter === 'nagoya') return desc.includes('nagoya');
+                if (selectedFilter === 'kansai') return desc.includes('kansai') || desc.includes('osaka');
+                if (selectedFilter === 'soft') return desc.includes('soft') || desc.includes('pop');
+                return true;
+            });
+
+            if (filteredArtists.length === 0) {
+                container.innerHTML = '<p style="color:#888; text-align:center; grid-column: 1/-1;">No se encontraron artistas para esta categoría.</p>';
+                return;
+            }
+
+            filteredArtists.forEach(artist => {
                 const coverImg = artist.image_url 
                     ? `<img src="${artist.image_url}" class="artist-cover" alt="${artist.name}">` 
                     : `<img src="https://via.placeholder.com/140?text=No+Image" class="artist-cover" alt="Sin imagen">`;
 
-                // El texto del botón cambia dinámicamente según si es admin o usuario normal
                 const buttonText = isAdmin ? 'Ver / Gestionar Discografía' : 'Ver Discografía';
 
-                container.innerHTML += `
-                    <div class="artist-card">
-                        ${coverImg}
-                        <div class="artist-content">
-                            <h3 style="color:#fff; margin:0 0 0.5rem 0; font-size:1.2rem;">${artist.name}</h3>
-                            <p style="color:#aaa; font-size:0.9rem; margin:0 0 1rem 0; line-height:1.5;">${artist.description || 'Sin biografía disponible.'}</p>
-                            <a href="discografia.html?banda=${artist.id}" class="btn-ver-discografia">${buttonText}</a>
+                if (currentMode === 'compact') {
+                    container.innerHTML += `
+                        <div class="artist-card">
+                            <div style="display:flex; align-items:center; gap:1rem;">
+                                ${coverImg}
+                                <h3 style="color:#fff; margin:0; font-size:1.05rem;">${artist.name}</h3>
+                            </div>
+                            <a href="discografia.html?banda=${artist.id}" class="btn-ver-discografia" style="width:auto; margin:0;">${buttonText}</a>
                         </div>
-                    </div>
-                `;
+                    `;
+                } else {
+                    container.innerHTML += `
+                        <div class="artist-card">
+                            ${coverImg}
+                            <div class="artist-content">
+                                <h3 style="color:#fff; margin:0 0 0.5rem 0; font-size:1.1rem;">${artist.name}</h3>
+                                <p style="color:#aaa; font-size:0.88rem; margin:0 0 0.8rem 0; line-height:1.5;">${artist.description || 'Sin biografía disponible.'}</p>
+                                <a href="discografia.html?banda=${artist.id}" class="btn-ver-discografia">${buttonText}</a>
+                            </div>
+                        </div>
+                    `;
+                }
             });
         }
 
