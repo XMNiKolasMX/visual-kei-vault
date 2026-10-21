@@ -7,6 +7,63 @@
     <link rel="stylesheet" href="css/main.css">
     <!-- Cliente Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Estilos del Modal del Administrador */
+        .modal-bg {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #0d0d0d;
+            border: 1px solid #333;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            color: #fff;
+        }
+        .admin-form-group {
+            margin-bottom: 1rem;
+        }
+        .admin-form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: #888;
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+        }
+        .admin-form-group input, 
+        .admin-form-group textarea, 
+        .admin-form-group select {
+            width: 100%;
+            background: #141414;
+            border: 1px solid #2a2a2a;
+            color: #fff;
+            padding: 0.6rem;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .btn-admin-edit {
+            background: #141414;
+            border: 1px solid #d4af37;
+            color: #d4af37;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-admin-edit:hover {
+            background: #d4af37;
+            color: #000;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -36,18 +93,23 @@
             </div>
         </section>
 
-        <!-- SECCIÓN 2: MATERIAL DESTACADO -->
-        <section class="featured-release">
-            <div class="featured-cover">
-                <span class="featured-cover-text">COLECCIÓN ESPECIAL</span>
+        <!-- SECCIÓN 2: MATERIAL DESTACADO (EDITABLE POR EL ADMIN) -->
+        <section class="featured-release" style="position: relative;">
+            <!-- Botón de administración (Oculto para usuarios, visible solo para admin) -->
+            <div id="admin-featured-controls" style="position: absolute; top: 1rem; right: 1rem; display: none;">
+                <button class="btn-admin-edit" onclick="openFeaturedModal()">⚙️ Editar Destacado</button>
+            </div>
+
+            <div class="featured-cover" id="featured-cover-box">
+                <span class="featured-cover-text" id="featured-tag">COLECCIÓN ESPECIAL</span>
             </div>
             <div class="featured-info">
-                <div class="release-label">DEMOS & MATERIAL INDEPENDIENTE</div>
+                <div class="release-label" id="featured-label">DEMOS & MATERIAL INDEPENDIENTE</div>
                 <h2 id="featured-title">RESCATE DISCOGRÁFICO</h2>
                 <p id="featured-desc">
                     Digitalización y resguardo de ediciones limitadas, maquetas de estudio y discografías de audio pertenecientes al circuito subterráneo.
                 </p>
-                <a href="artistas.html" class="terabox-btn" style="padding: 12px 28px;">Explorar Archivo</a>
+                <a href="artistas.html" id="featured-link" class="terabox-btn" style="padding: 12px 28px;">Explorar Archivo</a>
             </div>
         </section>
 
@@ -92,6 +154,54 @@
         </section>
     </main>
 
+    <!-- MODAL DE ADMINISTRACIÓN PARA SELECCIONAR MATERIAL DESTACADO -->
+    <div id="featured-modal" class="modal-bg">
+        <div class="modal-content">
+            <h3 class="section-title" style="margin-top:0;">Configurar Material Destacado</h3>
+            <form id="featured-form">
+                <div class="admin-form-group">
+                    <label>Etiqueta Superior (Categoría)</label>
+                    <select id="input_featured_label">
+                        <option value="COLECCIÓN RARA">Colección Rara</option>
+                        <option value="DIFÍCIL DE CONSEGUIR">Difícil de Conseguir</option>
+                        <option value="DEMO & MATERIAL INDEPENDIENTE">Demos & Material Independiente</option>
+                        <option value="EDICIÓN LIMITADA EN CASSETTE">Edición Limitada en Cassette</option>
+                        <option value="RESCATE DISCOGRÁFICO">Rescate Discográfico</option>
+                    </select>
+                </div>
+
+                <div class="admin-form-group">
+                    <label>1. Seleccionar Artista *</label>
+                    <select id="select_artist" onchange="onArtistSelected()" required>
+                        <option value="">Cargando artistas...</option>
+                    </select>
+                </div>
+
+                <div class="admin-form-group">
+                    <label>2. Seleccionar Disco / Lanzamiento</label>
+                    <select id="select_album">
+                        <option value="">-- Selecciona primero un artista --</option>
+                    </select>
+                </div>
+
+                <div class="admin-form-group">
+                    <label>Texto de Portada (Sello)</label>
+                    <input type="text" id="input_featured_tag" placeholder="Ej: COLECCIÓN ESPECIAL">
+                </div>
+
+                <div class="admin-form-group">
+                    <label>Descripción del Material Destacado</label>
+                    <textarea id="input_featured_desc" rows="3" placeholder="Escribe un detalle de por qué esta pieza es rara o valiosa..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn-action" style="flex:1;">Guardar Cambios</button>
+                    <button type="button" onclick="closeFeaturedModal()" style="flex:1; background:#222; border:1px solid #444; color:#fff; cursor:pointer;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <footer>
         <p>© 2026 VISUAL KEI VAULT // TODOS LOS DERECHOS RESERVADOS.</p>
     </footer>
@@ -99,17 +209,28 @@
     <!-- Scripts de Supabase -->
     <script src="js/config.js"></script>
     <script>
+        let globalArtists = [];
+        let globalAlbums = [];
+
         async function cargarInicio() {
             const releasesContainer = document.getElementById('releases-container');
             const newsContainer = document.getElementById('news-container');
 
-            // 1. Consultar álbumes y artistas por separado de forma segura
+            // Verificar si hay una sesión activa de administrador
+            const { data: { session } } = await db.auth.getSession();
+            if (session) {
+                document.getElementById('admin-featured-controls').style.display = 'block';
+            }
+
+            // Consultar álbumes y artistas
             const { data: albums, error: errAlbums } = await db.from('discography')
                 .select('*')
-                .order('created_at', { ascending: false })
-                .limit(4);
+                .order('created_at', { ascending: false });
 
             const { data: artists, error: errArtists } = await db.from('artists').select('*');
+
+            globalArtists = artists || [];
+            globalAlbums = albums || [];
 
             if (errAlbums || !albums || albums.length === 0) {
                 releasesContainer.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1;">No se encontraron registros en el catálogo.</p>`;
@@ -124,9 +245,9 @@
                 });
             }
 
-            // Cargar Lanzamientos Recientes
+            // Cargar Lanzamientos Recientes (primeros 4)
             releasesContainer.innerHTML = '';
-            albums.forEach(item => {
+            albums.slice(0, 4).forEach(item => {
                 const bandName = artistsMap[item.artist_id] || 'Artista Desconocido';
                 const card = document.createElement('div');
                 card.className = 'release-card';
@@ -140,7 +261,7 @@
                 releasesContainer.appendChild(card);
             });
 
-            // Cargar Noticias Dinámicas con el nombre real del artista
+            // Cargar Noticias Dinámicas
             if (albums.length > 0) {
                 const primerRegistro = albums[0];
                 const bandName = artistsMap[primerRegistro.artist_id] || 'Artista Desconocido';
@@ -158,12 +279,95 @@
                         <span class="news-text">Sincronización del catálogo e índice de búsquedas completada.</span>
                     </div>
                 `;
+            }
 
-                // Actualizar sección destacada con el último disco subido
+            // Cargar datos personalizados de la sección Destacados si existen
+            renderFeaturedSection(albums, artistsMap);
+        }
+
+        function renderFeaturedSection(albums, artistsMap) {
+            const savedFeatured = JSON.parse(localStorage.getItem('vk_featured_custom'));
+
+            if (savedFeatured) {
+                document.getElementById('featured-label').innerText = savedFeatured.label;
+                document.getElementById('featured-tag').innerText = savedFeatured.tag;
+                document.getElementById('featured-title').innerText = savedFeatured.title.toUpperCase();
+                document.getElementById('featured-desc').innerText = savedFeatured.desc;
+                if (savedFeatured.artistId) {
+                    document.getElementById('featured-link').href = `discografia.html?banda=${savedFeatured.artistId}`;
+                }
+            } else if (albums.length > 0) {
+                const primerRegistro = albums[0];
+                const bandName = artistsMap[primerRegistro.artist_id] || 'Artista Desconocido';
                 document.getElementById('featured-title').innerText = `${bandName.toUpperCase()}`;
                 document.getElementById('featured-desc').innerText = `Último ingreso en el catálogo: "${primerRegistro.album_title}" (${primerRegistro.release_year || 'N/A'}). Resguardado con lista de temas comprobada.`;
+                document.getElementById('featured-link').href = `discografia.html?banda=${primerRegistro.artist_id}`;
             }
         }
+
+        function openFeaturedModal() {
+            const selectArtist = document.getElementById('select_artist');
+            selectArtist.innerHTML = '<option value="">-- Selecciona un Artista --</option>';
+
+            globalArtists.forEach(art => {
+                selectArtist.innerHTML += `<option value="${art.id}">${art.name}</option>`;
+            });
+
+            document.getElementById('featured-modal').style.display = 'flex';
+        }
+
+        function closeFeaturedModal() {
+            document.getElementById('featured-modal').style.display = 'none';
+        }
+
+        function onArtistSelected() {
+            const artistId = document.getElementById('select_artist').value;
+            const selectAlbum = document.getElementById('select_album');
+            selectAlbum.innerHTML = '<option value="">-- Todos los Discos / Selección General --</option>';
+
+            if (!artistId) return;
+
+            const artistAlbums = globalAlbums.filter(alb => alb.artist_id == artistId);
+            artistAlbums.forEach(alb => {
+                selectAlbum.innerHTML += `<option value="${alb.id}">${alb.album_title} (${alb.release_year || 'N/A'})</option>`;
+            });
+        }
+
+        document.getElementById('featured-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const artistId = document.getElementById('select_artist').value;
+            const albumId = document.getElementById('select_album').value;
+            const label = document.getElementById('input_featured_label').value;
+            const tag = document.getElementById('input_featured_tag').value.trim() || 'COLECCIÓN ESPECIAL';
+            const customDesc = document.getElementById('input_featured_desc').value.trim();
+
+            const selectedArtist = globalArtists.find(a => a.id == artistId);
+            const selectedAlbum = globalAlbums.find(alb => alb.id == albumId);
+
+            let title = selectedArtist ? selectedArtist.name : 'RESCATE DISCOGRÁFICO';
+            let desc = customDesc;
+
+            if (!desc && selectedAlbum) {
+                desc = `Material raro destacado: "${selectedAlbum.album_title}" (${selectedAlbum.release_year || 'N/A'}). Resguardado en el archivo digital.`;
+            } else if (!desc && selectedArtist) {
+                desc = `${selectedArtist.name}: ${selectedArtist.description || 'Colección rara de material independiente y maquetas de estudio.'}`;
+            }
+
+            const featuredData = {
+                artistId: artistId,
+                albumId: albumId,
+                label: label,
+                tag: tag,
+                title: title,
+                desc: desc
+            };
+
+            localStorage.setItem('vk_featured_custom', JSON.stringify(featuredData));
+            alert('¡Material destacado actualizado con éxito!');
+            closeFeaturedModal();
+            location.reload();
+        });
 
         window.onload = cargarInicio;
     </script>
