@@ -25,7 +25,7 @@
             margin-bottom: 1rem;
         }
 
-        /* Toolbar de Controles (Ordenamiento y Vistas) */
+        /* Toolbar de Controles */
         .controls-bar {
             display: flex;
             justify-content: space-between;
@@ -74,7 +74,7 @@
             font-weight: bold;
         }
 
-        /* Barra de Filtros por Categoría / Etiqueta */
+        /* Barra de Filtros por Categoría */
         .category-filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -216,7 +216,7 @@
         .compact-view .tracklist-box { display: none; }
         .compact-view .album-header { border: none; padding: 0; margin: 0; }
 
-        /* Etiqueta del Tipo de Lanzamiento */
+        /* Badges & Botones */
         .release-type-badge {
             display: inline-block;
             background: rgba(212, 175, 55, 0.15);
@@ -230,8 +230,6 @@
             vertical-align: middle;
             border-radius: 3px;
         }
-
-        /* Botones y Enlaces */
         .btn-terabox {
             display: inline-flex;
             align-items: center;
@@ -263,7 +261,7 @@
             background: #0d0d0d;
             border: 1px solid #333;
             padding: 2rem;
-            max-width: 550px;
+            max-width: 580px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
@@ -280,13 +278,30 @@
         .btn-delete { background: transparent; border: 1px solid #721c24; color: #f8d7da; padding: 0.4rem 0.8rem; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; }
         .btn-delete:hover { background: #721c24; color: #fff; }
 
-        /* Caja de Opciones de Canción */
-        .song-note-box {
-            background: #11151c;
-            border: 1px solid #242b3a;
-            padding: 0.8rem;
-            margin-top: 0.5rem;
+        /* Caja de Asistente de Canciones */
+        .song-helper-box {
+            background: #10141d;
+            border: 1px solid #1e2638;
+            padding: 1rem;
+            margin-top: 0.8rem;
+            border-radius: 6px;
+        }
+        .btn-add-song-note {
+            background: #1a2333;
+            border: 1px solid #38daf6;
+            color: #38daf6;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.72rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-top: 0.6rem;
             border-radius: 4px;
+            transition: all 0.2s;
+            width: 100%;
+        }
+        .btn-add-song-note:hover {
+            background: #38daf6;
+            color: #0b0f19;
         }
     </style>
 </head>
@@ -337,7 +352,7 @@
                 </div>
             </div>
 
-            <!-- FILTROS POR CATEGORÍA / ETIQUETAS -->
+            <!-- FILTROS POR CATEGORÍA -->
             <div class="category-filter-bar">
                 <button class="filter-tag-btn active" onclick="filterCategory('todos', this)">TODOS</button>
                 <button class="filter-tag-btn" onclick="filterCategory('Álbum', this)">ÁLBUM</button>
@@ -366,10 +381,11 @@
                     <input type="text" id="album_title" placeholder="Ej: Memoire" required>
                 </div>
 
+                <!-- TIPO DE LANZAMIENTO LÍMITE OFICIAL -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="admin-form-group">
-                        <label>Tipo de Lanzamiento</label>
-                        <select id="release_type">
+                        <label>Tipo de Lanzamiento *</label>
+                        <select id="release_type" required>
                             <option value="Álbum">Álbum de Estudio</option>
                             <option value="Single">Single / Sencillo</option>
                             <option value="Maxi-Single">Maxi-Single</option>
@@ -393,26 +409,38 @@
                     <input type="url" id="terabox_link" placeholder="https://terabox.com/s/...">
                 </div>
 
-                <!-- SECCIÓN DE CANCIONES Y ACLARACIONES -->
+                <!-- SECCIÓN DE CANCIONES CON ASISTENTE DE OBSERVACIONES -->
                 <div class="admin-form-group">
                     <label>Lista de Canciones (Una por línea)</label>
                     <textarea id="tracklist" rows="5" placeholder="1. De Fleur&#10;2. Speed of Despair"></textarea>
                     
-                    <!-- ACLARACIONES PARA CANCIONES YA EXISTENTES O NUEVAS VERSIONES -->
-                    <div class="song-note-box">
-                        <label style="color:#38daf6; font-size:0.75rem;">Aclaración / Estado Especial de Canción:</label>
-                        <select id="song_status_type" onchange="toggleSongReferenceSelect()">
-                            <option value="normal">Ninguno (Canciones normales)</option>
-                            <option value="not_added">Esta canción NO está en este disco porque ya pertenece a otro álbum/single</option>
-                            <option value="new_version">Esta canción es una NUEVA VERSIÓN / REMAKE de un tema anterior</option>
-                        </select>
-
-                        <div id="song-reference-group" style="display: none; margin-top: 0.6rem;">
-                            <label style="color:#aaa; font-size:0.7rem;">Seleccionar Disco de Referencia / Origen:</label>
-                            <select id="song_reference_album">
-                                <option value="">-- Seleccionar disco --</option>
-                            </select>
+                    <!-- HERRAMIENTA AUXILIAR DE OBSERVACIONES -->
+                    <div class="song-helper-box">
+                        <label style="color:#d4af37; font-size:0.75rem; font-weight:bold;">🛠️ Asistente para agregar observaciones a la lista:</label>
+                        
+                        <div style="margin-top:0.5rem;">
+                            <input type="text" id="helper_song_name" placeholder="Nombre de la canción (Ej: Transylvania)">
                         </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top:0.5rem;">
+                            <div>
+                                <label style="font-size:0.7rem; color:#aaa;">Motivo / Estado:</label>
+                                <select id="helper_song_type">
+                                    <option value="not_included">Esta canción NO está (Ya incluida en otro álbum/single)</option>
+                                    <option value="new_version">Esta canción es una NUEVA VERSIÓN / REMAKE de...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size:0.7rem; color:#aaa;">Álbum o Single de referencia:</label>
+                                <select id="helper_target_album">
+                                    <option value="">-- Cargar lista de discos --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-add-song-note" onclick="insertSongNoteToTracklist()">
+                            + Agregar observación a la Lista de Canciones
+                        </button>
                     </div>
                 </div>
 
@@ -455,23 +483,45 @@
             loadAlbums();
         }
 
-        function toggleSongReferenceSelect() {
-            const val = document.getElementById('song_status_type').value;
-            const refGroup = document.getElementById('song-reference-group');
-            if (val === 'not_added' || val === 'new_version') {
-                refGroup.style.display = 'block';
-                populateSongReferenceAlbums();
-            } else {
-                refGroup.style.display = 'none';
-            }
-        }
-
-        function populateSongReferenceAlbums() {
-            const select = document.getElementById('song_reference_album');
-            select.innerHTML = '<option value="">-- Seleccionar disco original --</option>';
+        function populateHelperAlbums() {
+            const select = document.getElementById('helper_target_album');
+            select.innerHTML = '<option value="">-- Seleccionar Disco --</option>';
             artistAlbumsCache.forEach(alb => {
                 select.innerHTML += `<option value="${alb.album_title}">[${alb.release_type || 'Disco'}] ${alb.album_title} (${alb.release_year || 'N/A'})</option>`;
             });
+        }
+
+        function insertSongNoteToTracklist() {
+            const songName = document.getElementById('helper_song_name').value.trim();
+            const songType = document.getElementById('helper_song_type').value;
+            const targetAlbum = document.getElementById('helper_target_album').value;
+
+            if (!songName) {
+                alert('Ingresa el nombre de la canción.');
+                return;
+            }
+            if (!targetAlbum) {
+                alert('Selecciona el álbum o single de referencia.');
+                return;
+            }
+
+            const tracklistTextarea = document.getElementById('tracklist');
+            let formattedLine = '';
+
+            if (songType === 'not_included') {
+                formattedLine = `${songName} (Esta canción no se agregó porque ya está en: "${targetAlbum}")`;
+            } else if (songType === 'new_version') {
+                formattedLine = `${songName} (Nueva Versión / Remake de: "${targetAlbum}")`;
+            }
+
+            if (tracklistTextarea.value.trim().length > 0) {
+                tracklistTextarea.value += `\n${formattedLine}`;
+            } else {
+                tracklistTextarea.value = formattedLine;
+            }
+
+            document.getElementById('helper_song_name').value = '';
+            alert('¡Observación añadida a la lista!');
         }
 
         async function init() {
@@ -515,7 +565,10 @@
             }
 
             const { data: albums, error } = await query;
-            if (albums) artistAlbumsCache = albums;
+            if (albums) {
+                artistAlbumsCache = albums;
+                populateHelperAlbums();
+            }
 
             const container = document.getElementById('albums-list');
             container.innerHTML = '';
@@ -590,8 +643,8 @@
             document.getElementById('modal-title').innerText = 'Nuevo Lanzamiento';
             document.getElementById('album-form').reset();
             document.getElementById('edit_album_id').value = '';
-            document.getElementById('song-reference-group').style.display = 'none';
             document.getElementById('album-modal').style.display = 'flex';
+            populateHelperAlbums();
         }
 
         async function openEditModal(albumId) {
@@ -611,6 +664,7 @@
             document.getElementById('tracklist').value = Array.isArray(album.tracklist) ? album.tracklist.join('\n') : '';
             
             document.getElementById('album-modal').style.display = 'flex';
+            populateHelperAlbums();
         }
 
         function closeAlbumModal() {
@@ -620,20 +674,10 @@
         document.getElementById('album-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const albumId = document.getElementById('edit_album_id').value;
-            let tracklistLines = document.getElementById('tracklist').value
+            const tracklistArray = document.getElementById('tracklist').value
                 .split('\n')
                 .map(t => t.trim())
                 .filter(t => t.length > 0);
-
-            // PROCESAR ACLARACIONES EN CANCIONES
-            const songStatus = document.getElementById('song_status_type').value;
-            const refAlbum = document.getElementById('song_reference_album').value;
-
-            if (songStatus === 'not_added' && refAlbum) {
-                tracklistLines.push(`⚠️ (Nota: Esta canción NO se incluyó en esta edición porque ya pertenece a: "${refAlbum}")`);
-            } else if (songStatus === 'new_version' && refAlbum) {
-                tracklistLines.push(`🔄 (Nota: Incluye Nueva Versión / Remake de: "${refAlbum}")`);
-            }
 
             const albumData = {
                 artist_id: parseInt(artistId),
@@ -642,7 +686,7 @@
                 release_year: document.getElementById('release_year').value.trim() || null,
                 cover_image: document.getElementById('cover_image').value.trim() || null,
                 terabox_link: document.getElementById('terabox_link').value.trim() || null,
-                tracklist: tracklistLines
+                tracklist: tracklistArray
             };
 
             let error;
