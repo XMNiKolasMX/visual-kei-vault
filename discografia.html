@@ -336,6 +336,7 @@
                 <button class="filter-tag-btn" onclick="filterCategory('Maxi-Single', this)">MAXI-SINGLE</button>
                 <button class="filter-tag-btn" onclick="filterCategory('Demo', this)">DEMO</button>
                 <button class="filter-tag-btn" onclick="filterCategory('Recopilatorio', this)">RECOPILATORIO (BEST)</button>
+                <button class="filter-tag-btn" onclick="filterCategory('Canción Incluida', this)">INCLUIDA EN OTRO DISCO</button>
             </div>
 
             <!-- CONTENEDOR DE DISCOS -->
@@ -353,25 +354,34 @@
                 <input type="hidden" id="edit_album_id">
                 
                 <div class="admin-form-group">
-                    <label>Título del Álbum / Single *</label>
-                    <input type="text" id="album_title" placeholder="Ej: Memoire" required>
+                    <label>Título de la Canción / Obra *</label>
+                    <input type="text" id="album_title" placeholder="Ej: Memoire o Nombre de la Canción" required>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="admin-form-group">
                         <label>Tipo de Lanzamiento</label>
-                        <select id="release_type">
+                        <select id="release_type" onchange="toggleParentAlbumSelect()">
                             <option value="Álbum">Álbum de Estudio</option>
                             <option value="Single">Single / Sencillo</option>
                             <option value="Maxi-Single">Maxi-Single</option>
                             <option value="Demo">Demo / Maqueta</option>
                             <option value="Recopilatorio">Recopilatorio (Best)</option>
+                            <option value="Canción Incluida">Esta canción ya está en otro álbum</option>
                         </select>
                     </div>
                     <div class="admin-form-group">
                         <label>Año de Lanzamiento</label>
                         <input type="text" id="release_year" placeholder="Ej: 1994">
                     </div>
+                </div>
+
+                <!-- SELECTOR DINÁMICO DE ÁLBUM CONTENEDOR -->
+                <div class="admin-form-group" id="parent-album-group" style="display: none;">
+                    <label style="color: #38daf6;">Seleccionar el Álbum / Single donde ya viene incluida:</label>
+                    <select id="parent_album_select">
+                        <option value="">-- Seleccionar disco contenedor --</option>
+                    </select>
                 </div>
 
                 <div class="admin-form-group">
@@ -408,6 +418,7 @@
         let isAdmin = false;
         let currentMode = 'grid';
         let selectedCategory = 'todos';
+        let artistAlbumsCache = [];
 
         function setMode(mode) {
             currentMode = mode;
@@ -425,6 +436,27 @@
             document.querySelectorAll('.filter-tag-btn').forEach(b => b.classList.remove('active'));
             btnElement.classList.add('active');
             loadAlbums();
+        }
+
+        function toggleParentAlbumSelect() {
+            const val = document.getElementById('release_type').value;
+            const parentGroup = document.getElementById('parent-album-group');
+            if (val === 'Canción Incluida') {
+                parentGroup.style.display = 'block';
+                populateParentAlbums();
+            } else {
+                parentGroup.style.display = 'none';
+            }
+        }
+
+        function populateParentAlbums() {
+            const select = document.getElementById('parent_album_select');
+            select.innerHTML = '<option value="">-- Seleccionar disco contenedor --</option>';
+            artistAlbumsCache.forEach(alb => {
+                if (alb.release_type !== 'Canción Incluida') {
+                    select.innerHTML += `<option value="${alb.album_title}">[${alb.release_type || 'Álbum'}] ${alb.album_title} (${alb.release_year || 'N/A'})</option>`;
+                }
+            });
         }
 
         async function init() {
@@ -455,12 +487,10 @@
             const sortVal = document.getElementById('sort-select').value;
             let query = db.from('discography').select('*').eq('artist_id', parseInt(artistId));
 
-            // Filtrado por categoría seleccionada
             if (selectedCategory !== 'todos') {
                 query = query.eq('release_type', selectedCategory);
             }
 
-            // Ordenamiento por año o título
             if (sortVal === 'year-desc-release') {
                 query = query.order('release_year', { ascending: false });
             } else if (sortVal === 'title-asc') {
@@ -470,6 +500,8 @@
             }
 
             const { data: albums, error } = await query;
+            if (albums) artistAlbumsCache = albums;
+
             const container = document.getElementById('albums-list');
             container.innerHTML = '';
 
@@ -543,6 +575,7 @@
             document.getElementById('modal-title').innerText = 'Nuevo Lanzamiento';
             document.getElementById('album-form').reset();
             document.getElementById('edit_album_id').value = '';
+            document.getElementById('parent-album-group').style.display = 'none';
             document.getElementById('album-modal').style.display = 'flex';
         }
 
@@ -562,6 +595,7 @@
             document.getElementById('terabox_link').value = album.terabox_link || '';
             document.getElementById('tracklist').value = Array.isArray(album.tracklist) ? album.tracklist.join('\n') : '';
             
+            toggleParentAlbumSelect();
             document.getElementById('album-modal').style.display = 'flex';
         }
 
@@ -577,10 +611,20 @@
                 .map(t => t.trim())
                 .filter(t => t.length > 0);
 
+            let title = document.getElementById('album_title').value.trim();
+            const relType = document.getElementById('release_type').value;
+            
+            if (relType === 'Canción Incluida') {
+                const parentAlbum = document.getElementById('parent_album_select').value;
+                if (parentAlbum) {
+                    title = `${title} (Ya está en: ${parentAlbum})`;
+                }
+            }
+
             const albumData = {
                 artist_id: parseInt(artistId),
-                album_title: document.getElementById('album_title').value.trim(),
-                release_type: document.getElementById('release_type').value,
+                album_title: title,
+                release_type: relType,
                 release_year: document.getElementById('release_year').value.trim() || null,
                 cover_image: document.getElementById('cover_image').value.trim() || null,
                 terabox_link: document.getElementById('terabox_link').value.trim() || null,
