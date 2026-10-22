@@ -11,25 +11,28 @@
         /* Header del Artista al Centro */
         .artist-header-center {
             text-align: center;
-            background: #080808;
-            border: 1px solid #1a1a1a;
+            background: #0d0b14;
+            border: 1px solid var(--border-accent);
             padding: 2rem;
             margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
         }
         .artist-header-center img.artist-avatar {
             width: 150px;
             height: 150px;
             object-fit: cover;
             border-radius: 50%;
-            border: 2px solid #333;
+            border: 2px solid var(--accent-gold);
             margin-bottom: 1rem;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
         }
 
         /* Sección de Integrantes / Alineación de la Banda */
         .members-section {
             margin-top: 2rem;
             padding-top: 1.5rem;
-            border-top: 1px solid #1f1f1f;
+            border-top: 1px solid var(--border-dark);
         }
         .members-grid {
             display: grid;
@@ -39,23 +42,25 @@
             justify-content: center;
         }
         .member-card {
-            background: #0f0f0f;
-            border: 1px solid #222;
+            background: var(--bg-card);
+            border: 1px solid var(--border-dark);
             padding: 0.8rem;
             border-radius: 6px;
             text-align: center;
             position: relative;
-            transition: border-color 0.2s ease;
+            transition: all 0.25s ease;
         }
         .member-card:hover {
-            border-color: #d4af37;
+            border-color: var(--accent-gold);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.5);
         }
         .member-photo {
             width: 80px;
             height: 80px;
             object-fit: cover;
             border-radius: 50%;
-            border: 1px solid #333;
+            border: 1px solid var(--border-accent);
             margin: 0 auto 0.5rem auto;
             display: block;
         }
@@ -63,30 +68,32 @@
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            border: 1px dashed #444;
-            background: #141414;
-            color: #666;
+            border: 1px dashed var(--border-accent);
+            background: #140d1a;
+            color: var(--text-muted);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.65rem;
             text-transform: uppercase;
             margin: 0 auto 0.5rem auto;
+            letter-spacing: 0.5px;
         }
         .member-name {
-            color: #fff;
+            color: var(--text-white);
             font-size: 0.85rem;
             font-weight: bold;
             margin-bottom: 0.2rem;
         }
         .member-role {
-            color: #d4af37;
+            color: var(--accent-gold);
             font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-weight: 600;
         }
         .member-years {
-            color: #777;
+            color: var(--text-muted);
             font-size: 0.68rem;
             margin-top: 0.2rem;
         }
@@ -97,14 +104,15 @@
             justify-content: center;
         }
         .btn-member-mini {
-            background: #1a1a1a;
-            border: 1px solid #333;
+            background: #181122;
+            border: 1px solid var(--border-dark);
             color: #ccc;
             font-size: 0.6rem;
             padding: 2px 6px;
             cursor: pointer;
+            border-radius: 3px;
         }
-        .btn-member-mini:hover { color: #fff; border-color: #666; }
+        .btn-member-mini:hover { color: #fff; border-color: var(--accent-gold); }
 
         /* Toolbar de Controles */
         .controls-bar {
@@ -112,14 +120,14 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
-            background: #0d0d0d;
+            background: var(--bg-surface);
             padding: 0.8rem 1.2rem;
-            border: 1px solid #222;
+            border: 1px solid var(--border-dark);
             border-radius: 8px;
         }
         .select-sort {
-            background: #141824;
-            border: 1px solid #2a2f3f;
+            background: #140e1e;
+            border: 1px solid var(--border-accent);
             color: #fff;
             padding: 0.5rem 1rem;
             border-radius: 6px;
@@ -132,9 +140,9 @@
             gap: 0.5rem;
         }
         .view-btn {
-            background: #141824;
-            border: 1px solid #2a2f3f;
-            color: #8a99ad;
+            background: #140e1e;
+            border: 1px solid var(--border-accent);
+            color: var(--text-muted);
             width: 38px;
             height: 38px;
             border-radius: 8px;
@@ -146,16 +154,17 @@
         }
         .view-btn:hover {
             color: #fff;
-            background: #1e2538;
+            background: #1f162e;
         }
         .view-btn.active {
-            background: #38daf6;
-            color: #0b0f19;
-            border-color: #38daf6;
+            background: var(--accent-cyan);
+            color: #08060a;
+            border-color: var(--accent-cyan);
             font-weight: bold;
+            box-shadow: 0 0 10px rgba(56, 218, 246, 0.3);
         }
 
-        /* Barra de Filtros */
+        /* Barra de Filtros por Categoría */
         .category-filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -164,9 +173,9 @@
             justify-content: center;
         }
         .filter-tag-btn {
-            background: #101010;
-            border: 1px solid #2a2a2a;
-            color: #aaa;
+            background: #100b14;
+            border: 1px solid var(--border-dark);
+            color: var(--text-muted);
             padding: 0.4rem 1rem;
             font-size: 0.78rem;
             text-transform: uppercase;
@@ -177,18 +186,18 @@
             font-family: inherit;
         }
         .filter-tag-btn:hover {
-            background: #1a1a1a;
-            border-color: #555;
+            background: #181122;
+            border-color: var(--accent-crimson);
             color: #fff;
         }
         .filter-tag-btn.active {
             background: rgba(212, 175, 55, 0.15);
-            border-color: #d4af37;
-            color: #d4af37;
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
             font-weight: bold;
         }
 
-        /* VISTA 1: Cuadrícula 5x5 */
+        /* VISTA 1: Cuadrícula de 5 columnas (5 en 5) */
         .albums-container.grid-view {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -202,8 +211,8 @@
         }
 
         .grid-view .album-card {
-            background: #0d0d0d;
-            border: 1px solid #222;
+            background: var(--bg-card);
+            border: 1px solid var(--border-dark);
             border-radius: 8px;
             padding: 1rem;
             display: flex;
@@ -213,7 +222,7 @@
             transition: transform 0.2s, border-color 0.2s;
         }
         .grid-view .album-card:hover {
-            border-color: #d4af37;
+            border-color: var(--accent-gold);
             transform: translateY(-4px);
         }
         .grid-view .album-cover {
@@ -222,7 +231,7 @@
             height: auto;
             object-fit: cover;
             border-radius: 6px;
-            border: 1px solid #222;
+            border: 1px solid var(--border-dark);
             margin-bottom: 0.8rem;
         }
         .grid-view .tracklist-box { display: none; }
@@ -234,44 +243,47 @@
             width: 100%;
         }
 
-        /* VISTA 2: Lista Detallada */
+        /* VISTA 2: Lista Detallada Clásica */
         .albums-container.detailed-view {
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
         }
         .detailed-view .album-card {
-            background: #0d0d0d;
-            border: 1px solid #222;
+            background: var(--bg-card);
+            border: 1px solid var(--border-dark);
             padding: 1.5rem;
             display: flex;
             gap: 1.5rem;
             align-items: flex-start;
+            border-radius: 8px;
         }
         .detailed-view .album-cover {
             width: 140px;
             height: 140px;
             object-fit: cover;
-            border: 1px solid #222;
+            border: 1px solid var(--border-dark);
             flex-shrink: 0;
+            border-radius: 4px;
         }
         .detailed-view .album-content { flex-grow: 1; }
         .detailed-view .album-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #222;
+            border-bottom: 1px solid var(--border-dark);
             padding-bottom: 0.5rem;
             margin-bottom: 1rem;
         }
         .detailed-view .tracklist-box {
-            background: #111;
+            background: #0d0a12;
             padding: 1rem;
-            font-family: monospace;
+            font-family: 'JetBrains Mono', monospace;
             font-size: 0.85rem;
-            color: #ccc;
+            color: var(--text-body);
             margin: 1rem 0;
-            border: 1px solid #1a1a1a;
+            border: 1px solid var(--border-dark);
+            border-radius: 4px;
         }
 
         /* VISTA 3: Lista Comprimida */
@@ -281,12 +293,13 @@
             gap: 0.5rem;
         }
         .compact-view .album-card {
-            background: #0d0d0d;
-            border: 1px solid #222;
+            background: var(--bg-card);
+            border: 1px solid var(--border-dark);
             padding: 0.8rem 1.2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            border-radius: 6px;
         }
         .compact-view .album-cover {
             width: 45px;
@@ -302,7 +315,7 @@
             display: inline-block;
             background: rgba(212, 175, 55, 0.15);
             border: 1px solid rgba(212, 175, 55, 0.4);
-            color: #d4af37;
+            color: var(--accent-gold);
             font-size: 0.65rem;
             padding: 2px 6px;
             text-transform: uppercase;
@@ -310,67 +323,71 @@
             margin-left: 6px;
             vertical-align: middle;
             border-radius: 3px;
+            font-weight: 600;
         }
         .btn-terabox {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            background: #141414;
-            border: 1px solid #333;
-            color: #e0e0e0;
+            background: #140d1a;
+            border: 1px solid var(--border-accent);
+            color: var(--accent-gold-light);
             padding: 0.4rem 0.8rem;
             font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             text-decoration: none;
             transition: all 0.3s ease;
+            border-radius: 4px;
         }
-        .btn-terabox:hover { background: #222; border-color: #666; color: #fff; }
-        .no-terabox { color: #555; font-size: 0.75rem; font-style: italic; }
+        .btn-terabox:hover { background: var(--accent-cyan); color: #08060a; border-color: var(--accent-cyan); }
+        .no-terabox { color: var(--text-dim); font-size: 0.75rem; font-style: italic; }
 
         /* Modales */
         .modal-bg {
             display: none;
             position: fixed;
             top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.88);
             justify-content: center;
             align-items: center;
             z-index: 1000;
         }
         .modal-content {
-            background: #0d0d0d;
-            border: 1px solid #333;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-accent);
             padding: 2rem;
             max-width: 580px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
+            border-radius: 8px;
+            box-shadow: var(--shadow-crimson);
         }
         .admin-form-group { margin-bottom: 1rem; }
-        .admin-form-group label { display: block; font-size: 0.75rem; color: #888; margin-bottom: 0.3rem; text-transform: uppercase; }
+        .admin-form-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem; text-transform: uppercase; }
         .admin-form-group input, 
         .admin-form-group textarea,
         .admin-form-group select {
-            width: 100%; background: #141414; border: 1px solid #2a2a2a; color: #fff; padding: 0.6rem; box-sizing: border-box; font-family: inherit;
+            width: 100%; background: #0c0812; border: 1px solid var(--border-dark); color: #fff; padding: 0.6rem; box-sizing: border-box; font-family: inherit; border-radius: 4px;
         }
         .admin-actions-bar { display: flex; gap: 0.5rem; margin-top: 0.8rem; }
-        .btn-edit { background: #222; border: 1px solid #444; color: #fff; padding: 0.4rem 0.8rem; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; }
-        .btn-delete { background: transparent; border: 1px solid #721c24; color: #f8d7da; padding: 0.4rem 0.8rem; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; }
-        .btn-delete:hover { background: #721c24; color: #fff; }
+        .btn-edit { background: #1a1224; border: 1px solid var(--border-accent); color: #fff; padding: 0.4rem 0.8rem; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; border-radius: 4px; }
+        .btn-delete { background: transparent; border: 1px solid var(--accent-crimson); color: var(--accent-crimson-bright); padding: 0.4rem 0.8rem; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; border-radius: 4px; }
+        .btn-delete:hover { background: var(--accent-crimson); color: #fff; }
 
         .song-helper-box {
-            background: #10141d;
-            border: 1px solid #1e2638;
+            background: #120b18;
+            border: 1px solid var(--border-accent);
             padding: 1rem;
             margin-top: 0.8rem;
             border-radius: 6px;
         }
         .btn-add-song-note {
-            background: #1a2333;
-            border: 1px solid #38daf6;
-            color: #38daf6;
-            padding: 0.4rem 0.8rem;
+            background: #181122;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 0.45rem 0.8rem;
             font-size: 0.72rem;
             cursor: pointer;
             text-transform: uppercase;
@@ -378,8 +395,9 @@
             border-radius: 4px;
             transition: all 0.2s;
             width: 100%;
+            font-weight: 600;
         }
-        .btn-add-song-note:hover { background: #38daf6; color: #0b0f19; }
+        .btn-add-song-note:hover { background: var(--accent-cyan); color: #08060a; }
     </style>
 </head>
 <body>
@@ -404,7 +422,7 @@
             <!-- SECCIÓN DE INTEGRANTES DE LA BANDA -->
             <div class="members-section">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3 style="font-family:'Cinzel', serif; color:#d4af37; font-size:1rem; margin:0; letter-spacing:1px; text-transform:uppercase;">
+                    <h3 style="font-family:'Cinzel', serif; color:var(--accent-gold); font-size:1rem; margin:0; letter-spacing:1px; text-transform:uppercase;">
                         Alineación / Integrantes
                     </h3>
                     <button id="admin-add-member-btn" class="btn-action" style="display:none; font-size:0.68rem; padding:0.3rem 0.7rem;" onclick="openCreateMemberModal()">
@@ -413,7 +431,7 @@
                 </div>
 
                 <div id="members-list" class="members-grid">
-                    <p style="color:#666; font-size:0.8rem; grid-column:1/-1;">Cargando integrantes...</p>
+                    <p style="color:var(--text-muted); font-size:0.8rem; grid-column:1/-1;">Cargando integrantes...</p>
                 </div>
             </div>
 
@@ -459,7 +477,7 @@
 
             <!-- CONTENEDOR DE DISCOS -->
             <div id="albums-list" class="albums-container grid-view">
-                <p style="color: #888; text-align: center; grid-column: 1/-1;">Cargando discografía...</p>
+                <p style="color: var(--text-muted); text-align: center; grid-column: 1/-1;">Cargando discografía...</p>
             </div>
         </section>
     </main>
@@ -552,7 +570,7 @@
                     <textarea id="tracklist" rows="5" placeholder="1. De Fleur&#10;2. Speed of Despair"></textarea>
                     
                     <div class="song-helper-box">
-                        <label style="color:#d4af37; font-size:0.75rem; font-weight:bold;">🛠️ Asistente para agregar observaciones a la lista:</label>
+                        <label style="color:var(--accent-gold); font-size:0.75rem; font-weight:bold;">🛠️ Asistente para agregar observaciones a la lista:</label>
                         
                         <div style="margin-top:0.5rem;">
                             <input type="text" id="helper_song_name" placeholder="Nombre de la canción (Ej: Transylvania)">
@@ -560,14 +578,14 @@
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top:0.5rem;">
                             <div>
-                                <label style="font-size:0.7rem; color:#aaa;">Motivo / Estado:</label>
+                                <label style="font-size:0.7rem; color:var(--text-muted);">Motivo / Estado:</label>
                                 <select id="helper_song_type">
                                     <option value="not_included">Esta canción NO está (Ya incluida en otro álbum/single)</option>
                                     <option value="new_version">Esta canción es una NUEVA VERSIÓN / REMAKE de...</option>
                                 </select>
                             </div>
                             <div>
-                                <label style="font-size:0.7rem; color:#aaa;">Álbum o Single de referencia:</label>
+                                <label style="font-size:0.7rem; color:var(--text-muted);">Álbum o Single de referencia:</label>
                                 <select id="helper_target_album">
                                     <option value="">-- Cargar lista de discos --</option>
                                 </select>
@@ -678,7 +696,7 @@
                 document.getElementById('artist-info').innerHTML = `
                     ${artist.image_url ? `<img src="${artist.image_url}" class="artist-avatar" alt="${artist.name}">` : ''}
                     <h2 class="section-title" style="margin: 0 0 0.5rem 0; border: none; font-size:1.8rem;">${artist.name.toUpperCase()}</h2>
-                    <p style="margin: 0 auto; max-width:650px; color:#aaa; line-height: 1.6;">${artist.description || 'Sin biografía disponible.'}</p>
+                    <p style="margin: 0 auto; max-width:650px; color:var(--text-body); line-height: 1.6;">${artist.description || 'Sin biografía disponible.'}</p>
                 `;
             }
 
@@ -686,7 +704,7 @@
             loadAlbums();
         }
 
-        /* LÓGICA DE INTEGRANTES / MIEMBROS DE LA BANDA */
+        /* LÓGICA DE INTEGRANTES / MIEMBROS DE LA BANDA (ACTUALES Y EX-INTEGRANTES) */
         async function loadMembers() {
             const { data: members, error } = await db.from('members')
                 .select('*')
@@ -697,11 +715,25 @@
             container.innerHTML = '';
 
             if (error || !members || members.length === 0) {
-                container.innerHTML = '<p style="color:#666; font-size:0.8rem; grid-column:1/-1;">No hay integrantes registrados en la alineación.</p>';
+                container.innerHTML = '<p style="color:var(--text-muted); font-size:0.8rem; grid-column:1/-1;">No hay integrantes registrados en la alineación.</p>';
                 return;
             }
 
+            const currentMembers = [];
+            const formerMembers = [];
+
             members.forEach(mem => {
+                const years = (mem.years_active || '').toLowerCase();
+                const isFormer = years.includes('ex') || (years.includes('-') && !years.includes('presente') && !years.includes('actual') && !years.includes('hoy'));
+                
+                if (isFormer) {
+                    formerMembers.push(mem);
+                } else {
+                    currentMembers.push(mem);
+                }
+            });
+
+            const renderCard = (mem) => {
                 const photoHTML = mem.image_url 
                     ? `<img src="${mem.image_url}" class="member-photo" alt="${mem.name}">`
                     : `<div class="member-photo-placeholder">Sin Imagen</div>`;
@@ -716,7 +748,7 @@
                     `;
                 }
 
-                container.innerHTML += `
+                return `
                     <div class="member-card">
                         ${photoHTML}
                         <div class="member-name">${mem.name}</div>
@@ -725,7 +757,25 @@
                         ${adminBtns}
                     </div>
                 `;
-            });
+            };
+
+            let htmlOutput = '';
+
+            if (currentMembers.length > 0) {
+                htmlOutput += `<div style="grid-column:1/-1; color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; font-weight:bold; margin-bottom:0.3rem;">Alineación Principal / Actual:</div>`;
+                currentMembers.forEach(mem => {
+                    htmlOutput += renderCard(mem);
+                });
+            }
+
+            if (formerMembers.length > 0) {
+                htmlOutput += `<div style="grid-column:1/-1; color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; font-weight:bold; margin-top:1rem; margin-bottom:0.3rem; border-top: 1px dashed var(--border-dark); padding-top: 0.8rem;">Ex-Integrantes / Miembros Anteriores:</div>`;
+                formerMembers.forEach(mem => {
+                    htmlOutput += renderCard(mem);
+                });
+            }
+
+            container.innerHTML = htmlOutput;
         }
 
         function openCreateMemberModal() {
@@ -816,7 +866,7 @@
             container.innerHTML = '';
 
             if (error || !albums || albums.length === 0) {
-                container.innerHTML = '<p style="color:#888; text-align:center; grid-column:1/-1;">No hay lanzamientos registrados para esta categoría.</p>';
+                container.innerHTML = '<p style="color:var(--text-muted); text-align:center; grid-column:1/-1;">No hay lanzamientos registrados para esta categoría.</p>';
                 return;
             }
 
@@ -850,7 +900,7 @@
                                 ${coverImg}
                                 <div>
                                     <strong style="color:#fff;">${album.album_title}</strong> ${typeTag}
-                                    <span style="color:#888; font-size:0.8rem; margin-left:8px;">(${album.release_year || 'N/A'})</span>
+                                    <span style="color:var(--text-muted); font-size:0.8rem; margin-left:8px;">(${album.release_year || 'N/A'})</span>
                                 </div>
                             </div>
                             <div style="display:flex; align-items:center; gap:1rem;">
@@ -868,7 +918,7 @@
                                     <h3 style="color:#fff; margin:0 0 0.3rem 0; font-size:1rem;">
                                         ${album.album_title} 
                                         ${typeTag}
-                                        <span style="color:#888; font-size:0.85rem;">(${album.release_year || 'Año desconocido'})</span>
+                                        <span style="color:var(--text-muted); font-size:0.85rem;">(${album.release_year || 'Año desconocido'})</span>
                                     </h3>
                                     ${teraboxBtn}
                                 </div>
