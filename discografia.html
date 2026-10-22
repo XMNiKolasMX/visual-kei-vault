@@ -28,7 +28,7 @@
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
         }
 
-        /* Sección de Integrantes / Cronología Gráfica Avanzada */
+        /* Sección de Integrantes / Cronología Gráfica */
         .members-section {
             margin-top: 2rem;
             padding-top: 1.5rem;
@@ -64,21 +64,26 @@
             gap: 0.5rem;
         }
 
-        /* FILAS DE LA LÍNEA DE TIEMPO CON FOTO Y ACCIONES */
+        /* TÍTULOS DE CADA ALINEACIÓN */
         .timeline-group-title {
             color: var(--accent-gold);
             font-size: 0.78rem;
             text-transform: uppercase;
             font-weight: bold;
-            margin: 1.2rem 0 0.5rem 0;
+            margin: 1.5rem 0 0.6rem 0;
             letter-spacing: 1px;
-            border-bottom: 1px solid #1f172e;
-            padding-bottom: 0.2rem;
+            border-bottom: 1px solid #241936;
+            padding-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
+
+        /* FILAS DE LA LÍNEA DE TIEMPO */
         .timeline-row {
             display: flex;
             align-items: center;
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.7rem;
             background: #100b17;
             border: 1px solid var(--border-dark);
             padding: 0.5rem 0.8rem;
@@ -96,16 +101,16 @@
             gap: 0.6rem;
         }
         .timeline-avatar {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             object-fit: cover;
             border: 1px solid var(--border-accent);
             flex-shrink: 0;
         }
         .timeline-avatar-placeholder {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             background: #1a1226;
             border: 1px dashed var(--border-accent);
@@ -139,12 +144,12 @@
         .timeline-track-area {
             flex-grow: 1;
             position: relative;
-            height: 22px;
+            height: 24px;
             background: #140e1e;
             border-radius: 4px;
             border: 1px solid #1f172e;
             margin: 0 1rem;
-            overflow: hidden;
+            overflow: visible;
         }
         .timeline-bar-segment {
             position: absolute;
@@ -155,11 +160,11 @@
             align-items: center;
             justify-content: center;
             color: #08060a;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             font-weight: bold;
-            padding: 0 4px;
+            padding: 0 6px;
             white-space: nowrap;
-            box-shadow: 0 0 8px rgba(0,0,0,0.5);
+            box-shadow: 0 0 8px rgba(0,0,0,0.6);
             transition: filter 0.2s;
         }
         .timeline-bar-segment:hover {
@@ -167,7 +172,7 @@
             cursor: pointer;
         }
 
-        /* ACCIONES DE ADMIN EN LA FILA (EDITAR / BORRAR) */
+        /* ACCIONES DE ADMIN (EDITAR / BORRAR) */
         .timeline-actions {
             display: flex;
             gap: 0.4rem;
@@ -210,12 +215,13 @@
             margin-left: 245px;
             margin-right: 70px;
             border-top: 1px solid var(--border-dark);
-            padding-top: 0.4rem;
-            margin-top: 0.8rem;
+            padding-top: 0.5rem;
+            margin-top: 1rem;
             color: var(--text-muted);
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             justify-content: space-between;
             font-family: monospace;
+            font-weight: bold;
         }
 
         /* Toolbar de Controles de Discos */
@@ -367,7 +373,7 @@
                 <h2 id="artist-name" class="section-title" style="margin: 0; border: none;">DISCOGRAFÍA</h2>
             </div>
 
-            <!-- SECCIÓN DE INTEGRANTES (LÍNEA DE TIEMPO COMPLETA) -->
+            <!-- SECCIÓN DE INTEGRANTES (LÍNEA DE TIEMPO ORDENADA) -->
             <div class="members-section">
                 <div class="timeline-chart-container">
                     <div class="timeline-chart-header-bar">
@@ -379,7 +385,7 @@
                         </button>
                     </div>
 
-                    <!-- FILAS DE LA CRONOLOGÍA (FOTO, ROL, BARRAS Y BOTONES) -->
+                    <!-- FILAS DE LA CRONOLOGÍA AGRUPADAS -->
                     <div id="timeline-chart-rows">
                         <p style="color:var(--text-muted); font-size:0.75rem;">Generando cronología de integrantes...</p>
                     </div>
@@ -458,7 +464,7 @@
                 <div class="admin-form-group">
                     <label>Alineación / Etapa de la Banda *</label>
                     <select id="member_lineup" required>
-                        <option value="Alineación Principal / Actual">Alineación Principal / Actual</option>
+                        <option value="Alineación Final / Actual">Alineación Final / Actual</option>
                         <option value="Primera Alineación">Primera Alineación</option>
                         <option value="Segunda Alineación">Segunda Alineación</option>
                         <option value="Tercera Alineación">Tercera Alineación</option>
@@ -480,8 +486,8 @@
                 </div>
 
                 <div class="admin-form-group">
-                    <label>Años de Actividad / Período (Ej: 1991 o 1991 - 1997) *</label>
-                    <input type="text" id="member_years" placeholder="Ej: 1992 - 1992 o 1991 - 1997" required>
+                    <label>Años de Actividad / Período (Ej: 1992 o 1991 - 1997) *</label>
+                    <input type="text" id="member_years" placeholder="Ej: 1992 o 1991 - 1997" required>
                 </div>
 
                 <div class="admin-form-group">
@@ -660,7 +666,7 @@
             loadAlbums();
         }
 
-        /* LÓGICA DE LA LÍNEA DE TIEMPO CON FOTO, ROL, BARRAS Y BOTONES DE EDICIÓN */
+        /* LÓGICA DE CRONOLOGÍA ORDENADA (ACTUAL PRIMERO) */
         async function loadMembers() {
             const { data: members, error } = await db.from('members')
                 .select('*')
@@ -685,7 +691,7 @@
                 const numbers = str.match(/\d{4}/g);
                 if (!numbers) return { start: 1991, end: 2000 };
                 const start = parseInt(numbers[0]);
-                let end = numbers[1] ? parseInt(numbers[1]) : start; // Si pone solo un año o repetido, abarca el año completo
+                let end = numbers[1] ? parseInt(numbers[1]) : start;
                 if (end < start) end = start;
                 if (str.toLowerCase().includes('presente') || str.toLowerCase().includes('actual')) {
                     end = 2026;
@@ -702,25 +708,33 @@
             if (globalMinYear > globalMaxYear) { globalMinYear = 1990; globalMaxYear = 2000; }
             const totalSpan = (globalMaxYear - globalMinYear) || 1;
 
-            // Renderizar eje de años inferior
             for (let y = globalMinYear; y <= globalMaxYear; y += Math.ceil(totalSpan / 8)) {
                 yearsAxisContainer.innerHTML += `<span>${y}</span>`;
             }
 
-            // Agrupar miembros por su Alineación / Etapa
+            // Agrupar miembros por Alineación y ordenar para que la actual vaya primero
             const lineupsGrouped = {};
             members.forEach(m => {
-                const lName = m.lineup || 'Alineación Principal / Actual';
+                let lName = m.lineup || 'Primera Alineación';
                 if (!lineupsGrouped[lName]) lineupsGrouped[lName] = [];
                 lineupsGrouped[lName].push(m);
             });
+
+            // Forzar orden deseado: Alineación Actual primero, luego el resto
+            const orderedLineups = {};
+            if (lineupsGrouped['Alineación Final / Actual']) {
+                orderedLineups['Alineación Final / Actual'] = lineupsGrouped['Alineación Final / Actual'];
+                delete lineupsGrouped['Alineación Final / Actual'];
+            }
+            for (const [key, val] of Object.entries(lineupsGrouped)) {
+                orderedLineups[key] = val;
+            }
 
             const roleOrder = { 'Vocalista': 1, 'Guitarrista': 2, 'Bajista': 3, 'Baterista': 4, 'Tecladista': 5, 'Miembro de Soporte': 6, 'Líder / Compositor': 7 };
 
             let htmlOutput = '';
 
-            for (const [lineupName, mems] of Object.entries(lineupsGrouped)) {
-                // Ordenar por rol dentro de su alineación
+            for (const [lineupName, mems] of Object.entries(orderedLineups)) {
                 mems.sort((a, b) => {
                     const rA = roleOrder[a.role] || 99;
                     const rB = roleOrder[b.role] || 99;
@@ -733,8 +747,7 @@
                 mems.forEach(m => {
                     const { start, end } = parseYears(m.years_active);
                     const leftPercent = ((start - globalMinYear) / totalSpan) * 100;
-                    // Asegurar que si es un solo año tenga un ancho visible mínimo (ej. 3% o proporcional)
-                    const widthPercent = Math.max((( (end === start ? start + 0.8 : end) - start) / totalSpan) * 100, 3.5);
+                    const widthPercent = Math.max((( (end === start ? start + 0.8 : end) - start) / totalSpan) * 100, 4);
 
                     let colorClass = 'role-color-soporte';
                     const rLower = (m.role || '').toLowerCase();
@@ -788,7 +801,7 @@
             document.getElementById('member-form').reset();
             document.getElementById('edit_member_id').value = '';
             document.getElementById('member_status').value = 'actual';
-            document.getElementById('member_lineup').value = 'Alineación Principal / Actual';
+            document.getElementById('member_lineup').value = 'Alineación Final / Actual';
             document.getElementById('member-modal').style.display = 'flex';
         }
 
@@ -800,7 +813,7 @@
             document.getElementById('edit_member_id').value = member.id;
             document.getElementById('member_name').value = member.name;
             document.getElementById('member_status').value = member.status || 'actual';
-            document.getElementById('member_lineup').value = member.lineup || 'Alineación Principal / Actual';
+            document.getElementById('member_lineup').value = member.lineup || 'Alineación Final / Actual';
             document.getElementById('member_role').value = member.role;
             document.getElementById('member_years').value = member.years_active || '';
             document.getElementById('member_image_url').value = member.image_url || '';
