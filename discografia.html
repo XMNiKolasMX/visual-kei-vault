@@ -263,7 +263,7 @@
             background: #0d0d0d;
             border: 1px solid #333;
             padding: 2rem;
-            max-width: 500px;
+            max-width: 550px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
@@ -279,6 +279,15 @@
         .btn-edit { background: #222; border: 1px solid #444; color: #fff; padding: 0.4rem 0.8rem; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; }
         .btn-delete { background: transparent; border: 1px solid #721c24; color: #f8d7da; padding: 0.4rem 0.8rem; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; }
         .btn-delete:hover { background: #721c24; color: #fff; }
+
+        /* Caja de Opciones de Canción */
+        .song-note-box {
+            background: #11151c;
+            border: 1px solid #242b3a;
+            padding: 0.8rem;
+            margin-top: 0.5rem;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -336,7 +345,6 @@
                 <button class="filter-tag-btn" onclick="filterCategory('Maxi-Single', this)">MAXI-SINGLE</button>
                 <button class="filter-tag-btn" onclick="filterCategory('Demo', this)">DEMO</button>
                 <button class="filter-tag-btn" onclick="filterCategory('Recopilatorio', this)">RECOPILATORIO (BEST)</button>
-                <button class="filter-tag-btn" onclick="filterCategory('Canción Incluida', this)">INCLUIDA EN OTRO DISCO</button>
             </div>
 
             <!-- CONTENEDOR DE DISCOS -->
@@ -354,34 +362,25 @@
                 <input type="hidden" id="edit_album_id">
                 
                 <div class="admin-form-group">
-                    <label>Título de la Canción / Obra *</label>
-                    <input type="text" id="album_title" placeholder="Ej: Memoire o Nombre de la Canción" required>
+                    <label>Título del Álbum / Single / Lanzamiento *</label>
+                    <input type="text" id="album_title" placeholder="Ej: Memoire" required>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="admin-form-group">
                         <label>Tipo de Lanzamiento</label>
-                        <select id="release_type" onchange="toggleParentAlbumSelect()">
+                        <select id="release_type">
                             <option value="Álbum">Álbum de Estudio</option>
                             <option value="Single">Single / Sencillo</option>
                             <option value="Maxi-Single">Maxi-Single</option>
                             <option value="Demo">Demo / Maqueta</option>
                             <option value="Recopilatorio">Recopilatorio (Best)</option>
-                            <option value="Canción Incluida">Esta canción ya está en otro álbum</option>
                         </select>
                     </div>
                     <div class="admin-form-group">
                         <label>Año de Lanzamiento</label>
                         <input type="text" id="release_year" placeholder="Ej: 1994">
                     </div>
-                </div>
-
-                <!-- SELECTOR DINÁMICO DE ÁLBUM CONTENEDOR -->
-                <div class="admin-form-group" id="parent-album-group" style="display: none;">
-                    <label style="color: #38daf6;">Seleccionar el Álbum / Single donde ya viene incluida:</label>
-                    <select id="parent_album_select">
-                        <option value="">-- Seleccionar disco contenedor --</option>
-                    </select>
                 </div>
 
                 <div class="admin-form-group">
@@ -394,9 +393,27 @@
                     <input type="url" id="terabox_link" placeholder="https://terabox.com/s/...">
                 </div>
 
+                <!-- SECCIÓN DE CANCIONES Y ACLARACIONES -->
                 <div class="admin-form-group">
                     <label>Lista de Canciones (Una por línea)</label>
-                    <textarea id="tracklist" rows="4" placeholder="1. De Fleur&#10;2. Speed of Despair"></textarea>
+                    <textarea id="tracklist" rows="5" placeholder="1. De Fleur&#10;2. Speed of Despair"></textarea>
+                    
+                    <!-- ACLARACIONES PARA CANCIONES YA EXISTENTES O NUEVAS VERSIONES -->
+                    <div class="song-note-box">
+                        <label style="color:#38daf6; font-size:0.75rem;">Aclaración / Estado Especial de Canción:</label>
+                        <select id="song_status_type" onchange="toggleSongReferenceSelect()">
+                            <option value="normal">Ninguno (Canciones normales)</option>
+                            <option value="not_added">Esta canción NO está en este disco porque ya pertenece a otro álbum/single</option>
+                            <option value="new_version">Esta canción es una NUEVA VERSIÓN / REMAKE de un tema anterior</option>
+                        </select>
+
+                        <div id="song-reference-group" style="display: none; margin-top: 0.6rem;">
+                            <label style="color:#aaa; font-size:0.7rem;">Seleccionar Disco de Referencia / Origen:</label>
+                            <select id="song_reference_album">
+                                <option value="">-- Seleccionar disco --</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
@@ -438,24 +455,22 @@
             loadAlbums();
         }
 
-        function toggleParentAlbumSelect() {
-            const val = document.getElementById('release_type').value;
-            const parentGroup = document.getElementById('parent-album-group');
-            if (val === 'Canción Incluida') {
-                parentGroup.style.display = 'block';
-                populateParentAlbums();
+        function toggleSongReferenceSelect() {
+            const val = document.getElementById('song_status_type').value;
+            const refGroup = document.getElementById('song-reference-group');
+            if (val === 'not_added' || val === 'new_version') {
+                refGroup.style.display = 'block';
+                populateSongReferenceAlbums();
             } else {
-                parentGroup.style.display = 'none';
+                refGroup.style.display = 'none';
             }
         }
 
-        function populateParentAlbums() {
-            const select = document.getElementById('parent_album_select');
-            select.innerHTML = '<option value="">-- Seleccionar disco contenedor --</option>';
+        function populateSongReferenceAlbums() {
+            const select = document.getElementById('song_reference_album');
+            select.innerHTML = '<option value="">-- Seleccionar disco original --</option>';
             artistAlbumsCache.forEach(alb => {
-                if (alb.release_type !== 'Canción Incluida') {
-                    select.innerHTML += `<option value="${alb.album_title}">[${alb.release_type || 'Álbum'}] ${alb.album_title} (${alb.release_year || 'N/A'})</option>`;
-                }
+                select.innerHTML += `<option value="${alb.album_title}">[${alb.release_type || 'Disco'}] ${alb.album_title} (${alb.release_year || 'N/A'})</option>`;
             });
         }
 
@@ -575,7 +590,7 @@
             document.getElementById('modal-title').innerText = 'Nuevo Lanzamiento';
             document.getElementById('album-form').reset();
             document.getElementById('edit_album_id').value = '';
-            document.getElementById('parent-album-group').style.display = 'none';
+            document.getElementById('song-reference-group').style.display = 'none';
             document.getElementById('album-modal').style.display = 'flex';
         }
 
@@ -595,7 +610,6 @@
             document.getElementById('terabox_link').value = album.terabox_link || '';
             document.getElementById('tracklist').value = Array.isArray(album.tracklist) ? album.tracklist.join('\n') : '';
             
-            toggleParentAlbumSelect();
             document.getElementById('album-modal').style.display = 'flex';
         }
 
@@ -606,29 +620,29 @@
         document.getElementById('album-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const albumId = document.getElementById('edit_album_id').value;
-            const tracklistArray = document.getElementById('tracklist').value
+            let tracklistLines = document.getElementById('tracklist').value
                 .split('\n')
                 .map(t => t.trim())
                 .filter(t => t.length > 0);
 
-            let title = document.getElementById('album_title').value.trim();
-            const relType = document.getElementById('release_type').value;
-            
-            if (relType === 'Canción Incluida') {
-                const parentAlbum = document.getElementById('parent_album_select').value;
-                if (parentAlbum) {
-                    title = `${title} (Ya está en: ${parentAlbum})`;
-                }
+            // PROCESAR ACLARACIONES EN CANCIONES
+            const songStatus = document.getElementById('song_status_type').value;
+            const refAlbum = document.getElementById('song_reference_album').value;
+
+            if (songStatus === 'not_added' && refAlbum) {
+                tracklistLines.push(`⚠️ (Nota: Esta canción NO se incluyó en esta edición porque ya pertenece a: "${refAlbum}")`);
+            } else if (songStatus === 'new_version' && refAlbum) {
+                tracklistLines.push(`🔄 (Nota: Incluye Nueva Versión / Remake de: "${refAlbum}")`);
             }
 
             const albumData = {
                 artist_id: parseInt(artistId),
-                album_title: title,
-                release_type: relType,
+                album_title: document.getElementById('album_title').value.trim(),
+                release_type: document.getElementById('release_type').value,
                 release_year: document.getElementById('release_year').value.trim() || null,
                 cover_image: document.getElementById('cover_image').value.trim() || null,
                 terabox_link: document.getElementById('terabox_link').value.trim() || null,
-                tracklist: tracklistArray
+                tracklist: tracklistLines
             };
 
             let error;
