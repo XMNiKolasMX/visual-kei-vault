@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VISUAL KEI VAULT // DISCOGRAFÍA</title>
+    <title>VISUAL KEI VAULT // DISCOGRÁFÍA</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -64,7 +64,7 @@
             gap: 0.5rem;
         }
 
-        /* TÍTULOS DE SECCIÓN LIMPIOS (SIN ETIQUETAS CONFUSAS) */
+        /* TÍTULOS DE SECCIÓN DE MIEMBROS */
         .timeline-group-title {
             color: var(--accent-gold);
             font-size: 0.78rem;
@@ -224,7 +224,7 @@
             font-weight: bold;
         }
 
-        /* Toolbar de Controles de Discos */
+        /* TOOLBAR Y CONTROLES DE DISCOS */
         .controls-bar {
             display: flex;
             justify-content: space-between;
@@ -268,7 +268,7 @@
             box-shadow: 0 0 10px rgba(56, 218, 246, 0.3);
         }
 
-        /* Filtros por Categoría */
+        /* FILTROS POR CATEGORÍA */
         .category-filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -297,7 +297,7 @@
             font-weight: bold;
         }
 
-        /* Modales */
+        /* MODALES */
         .modal-bg {
             display: none;
             position: fixed;
@@ -373,7 +373,7 @@
                 <h2 id="artist-name" class="section-title" style="margin: 0; border: none;">DISCOGRAFÍA</h2>
             </div>
 
-            <!-- SECCIÓN DE INTEGRANTES (LÍNEA DE TIEMPO LIMPIA) -->
+            <!-- SECCIÓN DE INTEGRANTES (LÍNEA DE TIEMPO) -->
             <div class="members-section">
                 <div class="timeline-chart-container">
                     <div class="timeline-chart-header-bar">
@@ -411,10 +411,10 @@
                     </button>
 
                     <div class="view-switcher">
-                        <button class="view-btn active" id="btn-view-grid" onclick="setMode('grid')" title="Vista Cuadrícula 5x5">
+                        <button class="view-btn active" id="btn-view-grid" onclick="setMode('grid')" title="Vista Cuadrícula">
                             <i class="fa-solid fa-border-all"></i>
                         </button>
-                        <button class="view-btn" id="btn-view-detailed" onclick="setMode('detailed')" title="Vista Detallada Clásica">
+                        <button class="view-btn" id="btn-view-detailed" onclick="setMode('detailed')" title="Vista Detallada">
                             <i class="fa-solid fa-list"></i>
                         </button>
                         <button class="view-btn" id="btn-view-compact" onclick="setMode('compact')" title="Vista Compacta">
@@ -434,7 +434,7 @@
                 <button class="filter-tag-btn" onclick="filterCategory('Recopilatorio', this)">RECOPILATORIO (BEST)</button>
             </div>
 
-            <!-- CONTENEDOR DE DISCOS -->
+            <!-- CONTENEDOR DE DISCOS (RECUPERA SU DISEÑO ORIGINAL PERFECTO) -->
             <div id="albums-list" class="albums-container grid-view">
                 <p style="color: var(--text-muted); text-align: center; grid-column: 1/-1;">Cargando discografía...</p>
             </div>
@@ -655,7 +655,7 @@
             loadAlbums();
         }
 
-        /* LÓGICA DE CRONOLOGÍA LIMPIA (MIEMBROS ACTUALES PRIMERO, LUEGO EX-INTEGRANTES) */
+        /* LÓGICA DE CRONOLOGÍA DE INTEGRANTES */
         async function loadMembers() {
             const { data: members, error } = await db.from('members')
                 .select('*')
@@ -847,7 +847,7 @@
             }
         }
 
-        /* CARGA Y GESTIÓN DE DISCOGRAFÍA */
+        /* CARGA Y GESTIÓN DE DISCOGRAFÍA (DISEÑO ORIGINAL RESTAURADO) */
         async function loadAlbums() {
             const sortVal = document.getElementById('sort-select').value;
             let query = db.from('discography').select('*').eq('artist_id', parseInt(artistId));
@@ -881,7 +881,7 @@
             albums.forEach(album => {
                 const tracks = Array.isArray(album.tracklist) ? album.tracklist.join('<br>') : 'Lista de canciones no disponible.';
                 const teraboxBtn = album.terabox_link 
-                    ? `<a href="${album.terabox_link}" target="_blank" class="btn-terabox">📥 Descargar</a>`
+                    ? `<a href="${album.terabox_link}" target="_blank" class="btn-terabox"><i class="fa-solid fa-download"></i> Descargar</a>`
                     : '<span class="no-terabox">Sin enlace</span>';
 
                 const coverImg = album.cover_image 
@@ -891,19 +891,19 @@
                 const typeTag = album.release_type ? `<span class="release-type-badge">${album.release_type}</span>` : '';
 
                 let adminControlsHTML = isAdmin ? `
-                    <div class="admin-actions-bar">
-                        <button class="btn-edit" onclick="openEditModal(${album.id})">✏️ Editar</button>
-                        <button class="btn-delete" onclick="deleteAlbum(${album.id})">🗑️</button>
+                    <div class="admin-actions-bar" style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                        <button class="btn-edit" onclick="openEditModal(${album.id})"><i class="fa-solid fa-pen"></i> Editar</button>
+                        <button class="btn-delete" onclick="deleteAlbum(${album.id})"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 ` : '';
 
                 if (currentMode === 'compact') {
                     container.innerHTML += `
-                        <div class="album-card">
+                        <div class="album-card" style="display:flex; justify-content:space-between; align-items:center; padding:1rem; width:100%;">
                             <div style="display:flex; align-items:center; gap:1rem;">
                                 ${coverImg}
                                 <div>
-                                    <strong style="color:#fff;">${album.album_title}</strong> ${typeTag}
+                                    <strong style="color:#fff; font-size:0.95rem;">${album.album_title}</strong> ${typeTag}
                                     <span style="color:var(--text-muted); font-size:0.8rem; margin-left:8px;">(${album.release_year || 'N/A'})</span>
                                 </div>
                             </div>
@@ -913,20 +913,35 @@
                             </div>
                         </div>
                     `;
+                } else if (currentMode === 'detailed') {
+                    container.innerHTML += `
+                        <div class="album-card" style="display:flex; gap:1.5rem; padding:1.5rem; width:100%;">
+                            ${coverImg}
+                            <div style="flex-grow:1;">
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                    <h3 style="color:#fff; margin:0 0 0.4rem 0; font-size:1.1rem;">
+                                        ${album.album_title} ${typeTag}
+                                        <span style="color:var(--text-muted); font-size:0.85rem;">(${album.release_year || 'N/A'})</span>
+                                    </h3>
+                                    ${teraboxBtn}
+                                </div>
+                                <div class="tracklist-box" style="margin-top:0.8rem; font-size:0.85rem;">${tracks}</div>
+                                ${adminControlsHTML}
+                            </div>
+                        </div>
+                    `;
                 } else {
+                    // Vista Grid Original (Cuadrícula 5x5)
                     container.innerHTML += `
                         <div class="album-card">
                             ${coverImg}
                             <div class="album-content">
-                                <div class="album-header">
-                                    <h3 style="color:#fff; margin:0 0 0.3rem 0; font-size:1rem;">
-                                        ${album.album_title} 
-                                        ${typeTag}
-                                        <span style="color:var(--text-muted); font-size:0.85rem;">(${album.release_year || 'Año desconocido'})</span>
-                                    </h3>
+                                <h3 style="color:#fff; margin:0 0 0.3rem 0; font-size:0.95rem;">${album.album_title}</h3>
+                                <p style="color:var(--text-muted); font-size:0.75rem; margin:0 0 0.5rem 0;">${album.release_type || 'Álbum'} (${album.release_year || 'N/A'})</p>
+                                <div class="tracklist-box" style="font-size:0.78rem; max-height:100px; overflow-y:auto; margin-bottom:0.8rem;">${tracks}</div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto;">
                                     ${teraboxBtn}
                                 </div>
-                                <div class="tracklist-box">${tracks}</div>
                                 ${adminControlsHTML}
                             </div>
                         </div>
