@@ -28,65 +28,122 @@
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
         }
 
-        /* Sección de Integrantes / Cronología Gráfica */
+        /* Sección de Integrantes / Cronología Gráfica Avanzada */
         .members-section {
             margin-top: 2rem;
             padding-top: 1.5rem;
             border-top: 1px solid var(--border-dark);
         }
 
-        /* LÍNEA DE TIEMPO VISUAL ESTILO CHART / WIKIPEDIA */
         .timeline-chart-container {
             background: #0b0812;
             border: 1px solid var(--border-accent);
             border-radius: 8px;
-            padding: 1.2rem;
+            padding: 1.5rem;
             margin-top: 1rem;
             margin-bottom: 2rem;
             overflow-x: auto;
             box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
         }
+        .timeline-chart-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            border-bottom: 1px dashed var(--border-dark);
+            padding-bottom: 0.8rem;
+        }
         .timeline-chart-title {
             color: var(--accent-gold);
-            font-size: 0.82rem;
+            font-size: 0.88rem;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 1rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-        .timeline-bar-row {
+
+        /* FILAS DE LA LÍNEA DE TIEMPO CON FOTO Y ACCIONES */
+        .timeline-group-title {
+            color: var(--accent-gold);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin: 1.2rem 0 0.5rem 0;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #1f172e;
+            padding-bottom: 0.2rem;
+        }
+        .timeline-row {
             display: flex;
             align-items: center;
-            margin-bottom: 0.6rem;
-            font-size: 0.75rem;
+            margin-bottom: 0.8rem;
+            background: #100b17;
+            border: 1px solid var(--border-dark);
+            padding: 0.5rem 0.8rem;
+            border-radius: 6px;
+            transition: border-color 0.2s;
         }
-        .timeline-label {
-            width: 140px;
+        .timeline-row:hover {
+            border-color: var(--accent-gold);
+        }
+        .timeline-member-info {
+            width: 230px;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .timeline-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--border-accent);
+            flex-shrink: 0;
+        }
+        .timeline-avatar-placeholder {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #1a1226;
+            border: 1px dashed var(--border-accent);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.5rem;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .timeline-member-texts {
+            overflow: hidden;
+        }
+        .timeline-member-name {
             color: #fff;
-            font-weight: 600;
+            font-size: 0.8rem;
+            font-weight: bold;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
-        .timeline-label .mini-role {
-            color: var(--text-muted);
+        .timeline-member-role {
+            color: var(--accent-gold);
             font-size: 0.65rem;
-            font-weight: normal;
+            text-transform: uppercase;
+            font-weight: 600;
         }
-        .timeline-track {
+
+        /* TRACK Y BARRAS DE TIEMPO */
+        .timeline-track-area {
             flex-grow: 1;
-            height: 18px;
+            position: relative;
+            height: 22px;
             background: #140e1e;
             border-radius: 4px;
-            position: relative;
             border: 1px solid #1f172e;
+            margin: 0 1rem;
             overflow: hidden;
         }
         .timeline-bar-segment {
@@ -94,25 +151,64 @@
             top: 2px;
             bottom: 2px;
             border-radius: 3px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 8px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #08060a;
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 0 4px;
+            white-space: nowrap;
+            box-shadow: 0 0 8px rgba(0,0,0,0.5);
+            transition: filter 0.2s;
         }
         .timeline-bar-segment:hover {
-            filter: brightness(1.3);
+            filter: brightness(1.25);
             cursor: pointer;
         }
 
+        /* ACCIONES DE ADMIN EN LA FILA (EDITAR / BORRAR) */
+        .timeline-actions {
+            display: flex;
+            gap: 0.4rem;
+            flex-shrink: 0;
+        }
+        .btn-timeline-action {
+            background: #181124;
+            border: 1px solid var(--border-dark);
+            color: #ccc;
+            font-size: 0.7rem;
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-timeline-action:hover {
+            color: #fff;
+            border-color: var(--accent-gold);
+            background: #241936;
+        }
+        .btn-timeline-action.delete:hover {
+            border-color: var(--accent-crimson);
+            color: var(--accent-crimson-bright);
+        }
+
         /* Colores por Rol/Instrumento */
-        .role-color-vocalista { background: #ff4d4d; border: 1px solid #ff6666; }
+        .role-color-vocalista { background: #ff4d4d; color: #fff !important; border: 1px solid #ff6666; }
         .role-color-guitarrista { background: #38daf6; border: 1px solid #5ce1f8; }
-        .role-color-bajista { background: #a855f7; border: 1px solid #c084fc; }
+        .role-color-bajista { background: #a855f7; color: #fff !important; border: 1px solid #c084fc; }
         .role-color-baterista { background: #f59e0b; border: 1px solid #fbbf24; }
         .role-color-tecladista { background: #10b981; border: 1px solid #34d399; }
-        .role-color-soporte { background: #6b7280; border: 1px solid #9ca3af; }
+        .role-color-soporte { background: #6b7280; color: #fff !important; border: 1px solid #9ca3af; }
 
         .timeline-years-header {
             display: flex;
-            margin-left: 140px;
+            margin-left: 245px;
+            margin-right: 70px;
             border-top: 1px solid var(--border-dark);
             padding-top: 0.4rem;
             margin-top: 0.8rem;
@@ -122,116 +218,7 @@
             font-family: monospace;
         }
 
-        /* TÍTULOS DE CADA ALINEACIÓN ABAJO */
-        .lineup-group-title {
-            color: var(--accent-gold);
-            font-size: 0.82rem;
-            text-transform: uppercase;
-            font-weight: bold;
-            margin-top: 1.5rem;
-            margin-bottom: 0.6rem;
-            letter-spacing: 1px;
-            border-bottom: 1px dashed var(--border-dark);
-            padding-bottom: 0.3rem;
-        }
-
-        /* TARJETAS DE INTEGRANTES */
-        .members-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 1.2rem;
-            margin-top: 0.8rem;
-            justify-content: start;
-        }
-        .member-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-dark);
-            padding: 0.9rem;
-            border-radius: 8px;
-            text-align: center;
-            position: relative;
-            transition: all 0.25s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .member-card:hover {
-            border-color: var(--accent-gold);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 18px rgba(0,0,0,0.5);
-        }
-        .member-photo {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 1px solid var(--border-accent);
-            margin: 0 auto 0.5rem auto;
-            display: block;
-        }
-        .member-photo-placeholder {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 1px dashed var(--border-accent);
-            background: #140d1a;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            margin: 0 auto 0.5rem auto;
-            letter-spacing: 0.5px;
-        }
-        .member-name {
-            color: var(--text-white);
-            font-size: 0.88rem;
-            font-weight: bold;
-            margin-bottom: 0.2rem;
-        }
-        .member-role {
-            color: var(--accent-gold);
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-        }
-        .member-years {
-            color: var(--text-muted);
-            font-size: 0.7rem;
-            margin-top: 0.2rem;
-            font-weight: 500;
-        }
-        .replacement-badge {
-            background: rgba(147, 51, 234, 0.15);
-            border: 1px solid rgba(168, 85, 247, 0.35);
-            color: #d8b4fe;
-            font-size: 0.65rem;
-            padding: 4px 6px;
-            border-radius: 4px;
-            margin-top: 0.5rem;
-            line-height: 1.3;
-            text-align: center;
-        }
-        .member-admin-actions {
-            margin-top: 0.6rem;
-            display: flex;
-            gap: 0.3rem;
-            justify-content: center;
-        }
-        .btn-member-mini {
-            background: #181122;
-            border: 1px solid var(--border-dark);
-            color: #ccc;
-            font-size: 0.65rem;
-            padding: 2px 7px;
-            cursor: pointer;
-            border-radius: 3px;
-        }
-        .btn-member-mini:hover { color: #fff; border-color: var(--accent-gold); }
-
-        /* Toolbar de Controles */
+        /* Toolbar de Controles de Discos */
         .controls-bar {
             display: flex;
             justify-content: space-between;
@@ -252,10 +239,7 @@
             cursor: pointer;
             outline: none;
         }
-        .view-switcher {
-            display: flex;
-            gap: 0.5rem;
-        }
+        .view-switcher { display: flex; gap: 0.5rem; }
         .view-btn {
             background: #140e1e;
             border: 1px solid var(--border-accent);
@@ -269,10 +253,7 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .view-btn:hover {
-            color: #fff;
-            background: #1f162e;
-        }
+        .view-btn:hover { color: #fff; background: #1f162e; }
         .view-btn.active {
             background: var(--accent-cyan);
             color: #08060a;
@@ -302,11 +283,7 @@
             transition: all 0.25s ease;
             font-family: inherit;
         }
-        .filter-tag-btn:hover {
-            background: #181122;
-            border-color: var(--accent-crimson);
-            color: #fff;
-        }
+        .filter-tag-btn:hover { background: #181122; border-color: var(--accent-crimson); color: #fff; }
         .filter-tag-btn.active {
             background: rgba(212, 175, 55, 0.15);
             border-color: var(--accent-gold);
@@ -390,31 +367,25 @@
                 <h2 id="artist-name" class="section-title" style="margin: 0; border: none;">DISCOGRAFÍA</h2>
             </div>
 
-            <!-- SECCIÓN DE INTEGRANTES DE LA BANDA -->
+            <!-- SECCIÓN DE INTEGRANTES (LÍNEA DE TIEMPO COMPLETA) -->
             <div class="members-section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h3 style="font-family:'Cinzel', serif; color:var(--accent-gold); font-size:1rem; margin:0; letter-spacing:1px; text-transform:uppercase;">
-                        Cronología e Integrantes de la Banda
-                    </h3>
-                    <button id="admin-add-member-btn" class="btn-action" style="display:none; font-size:0.68rem; padding:0.3rem 0.7rem;" onclick="openCreateMemberModal()">
-                        + Agregar Integrante
-                    </button>
-                </div>
-
-                <!-- DIBUJO DE LA LÍNEA DE TIEMPO VISUAL -->
                 <div class="timeline-chart-container">
-                    <div class="timeline-chart-title">
-                        <i class="fa-solid fa-chart-gantt"></i> Línea de Tiempo de Miembros (Cronología)
+                    <div class="timeline-chart-header-bar">
+                        <div class="timeline-chart-title">
+                            <i class="fa-solid fa-timeline"></i> Cronología e Integrantes de la Banda
+                        </div>
+                        <button id="admin-add-member-btn" class="btn-action" style="display:none; font-size:0.7rem; padding:0.4rem 0.9rem;" onclick="openCreateMemberModal()">
+                            + Agregar Integrante
+                        </button>
                     </div>
-                    <div id="timeline-chart-bars">
-                        <p style="color:var(--text-muted); font-size:0.75rem;">Generando gráfico de cronología...</p>
-                    </div>
-                    <div id="timeline-years-axis" class="timeline-years-header"></div>
-                </div>
 
-                <!-- TARJETAS CON FOTOS CLASIFICADAS POR ALINEACIÓN -->
-                <div id="members-cards-container">
-                    <p style="color:var(--text-muted); font-size:0.8rem;">Cargando lista de integrantes...</p>
+                    <!-- FILAS DE LA CRONOLOGÍA (FOTO, ROL, BARRAS Y BOTONES) -->
+                    <div id="timeline-chart-rows">
+                        <p style="color:var(--text-muted); font-size:0.75rem;">Generando cronología de integrantes...</p>
+                    </div>
+
+                    <!-- EJE DE AÑOS INFERIOR -->
+                    <div id="timeline-years-axis" class="timeline-years-header"></div>
                 </div>
             </div>
 
@@ -484,15 +455,14 @@
                     </select>
                 </div>
 
-                <!-- SELECCIÓN DE LA ALINEACIÓN / ETAPA -->
                 <div class="admin-form-group">
                     <label>Alineación / Etapa de la Banda *</label>
                     <select id="member_lineup" required>
+                        <option value="Alineación Principal / Actual">Alineación Principal / Actual</option>
                         <option value="Primera Alineación">Primera Alineación</option>
                         <option value="Segunda Alineación">Segunda Alineación</option>
                         <option value="Tercera Alineación">Tercera Alineación</option>
                         <option value="Cuarta Alineación">Cuarta Alineación</option>
-                        <option value="Alineación Actual / Final">Alineación Actual / Final</option>
                     </select>
                 </div>
 
@@ -510,13 +480,8 @@
                 </div>
 
                 <div class="admin-form-group">
-                    <label>Años de Actividad / Período *</label>
-                    <input type="text" id="member_years" placeholder="Ej: 1991 - 1997" required>
-                </div>
-
-                <div class="admin-form-group">
-                    <label>Nota de Reemplazo / Transición (Opcional)</label>
-                    <input type="text" id="member_replacement_note" placeholder="Ej: Reemplazó a Haiji en 1997">
+                    <label>Años de Actividad / Período (Ej: 1991 o 1991 - 1997) *</label>
+                    <input type="text" id="member_years" placeholder="Ej: 1992 - 1992 o 1991 - 1997" required>
                 </div>
 
                 <div class="admin-form-group">
@@ -695,23 +660,20 @@
             loadAlbums();
         }
 
-        /* LÓGICA DE CRONOLOGÍA DE INTEGRANTES + ALINEACIONES */
+        /* LÓGICA DE LA LÍNEA DE TIEMPO CON FOTO, ROL, BARRAS Y BOTONES DE EDICIÓN */
         async function loadMembers() {
             const { data: members, error } = await db.from('members')
                 .select('*')
                 .eq('artist_id', parseInt(artistId));
 
-            const cardsContainer = document.getElementById('members-cards-container');
-            const chartBarsContainer = document.getElementById('timeline-chart-bars');
+            const chartRowsContainer = document.getElementById('timeline-chart-rows');
             const yearsAxisContainer = document.getElementById('timeline-years-axis');
 
-            cardsContainer.innerHTML = '';
-            chartBarsContainer.innerHTML = '';
+            chartRowsContainer.innerHTML = '';
             yearsAxisContainer.innerHTML = '';
 
             if (error || !members || members.length === 0) {
-                chartBarsContainer.innerHTML = '<p style="color:var(--text-muted); font-size:0.75rem;">No hay cronología registrada para esta banda.</p>';
-                cardsContainer.innerHTML = '<p style="color:var(--text-muted); font-size:0.8rem;">No hay integrantes registrados.</p>';
+                chartRowsContainer.innerHTML = '<p style="color:var(--text-muted); font-size:0.75rem;">No hay integrantes registrados en la cronología.</p>';
                 return;
             }
 
@@ -723,7 +685,8 @@
                 const numbers = str.match(/\d{4}/g);
                 if (!numbers) return { start: 1991, end: 2000 };
                 const start = parseInt(numbers[0]);
-                let end = numbers[1] ? parseInt(numbers[1]) : 2026;
+                let end = numbers[1] ? parseInt(numbers[1]) : start; // Si pone solo un año o repetido, abarca el año completo
+                if (end < start) end = start;
                 if (str.toLowerCase().includes('presente') || str.toLowerCase().includes('actual')) {
                     end = 2026;
                 }
@@ -739,113 +702,85 @@
             if (globalMinYear > globalMaxYear) { globalMinYear = 1990; globalMaxYear = 2000; }
             const totalSpan = (globalMaxYear - globalMinYear) || 1;
 
+            // Renderizar eje de años inferior
             for (let y = globalMinYear; y <= globalMaxYear; y += Math.ceil(totalSpan / 8)) {
                 yearsAxisContainer.innerHTML += `<span>${y}</span>`;
             }
 
-            const roleOrder = { 'Vocalista': 1, 'Guitarrista': 2, 'Bajista': 3, 'Baterista': 4, 'Tecladista': 5, 'Miembro de Soporte': 6, 'Líder / Compositor': 7 };
-            members.sort((a, b) => {
-                const rA = roleOrder[a.role] || 99;
-                const rB = roleOrder[b.role] || 99;
-                if (rA !== rB) return rA - rB;
-                return parseYears(a.years_active).start - parseYears(b.years_active).start;
-            });
-
-            // 1. DIBUJAR BARRAS DE LA LÍNEA DE TIEMPO
+            // Agrupar miembros por su Alineación / Etapa
+            const lineupsGrouped = {};
             members.forEach(m => {
-                const { start, end } = parseYears(m.years_active);
-                const leftPercent = ((start - globalMinYear) / totalSpan) * 100;
-                const widthPercent = Math.max(((end - start) / totalSpan) * 100, 3);
-
-                let colorClass = 'role-color-soporte';
-                const rLower = (m.role || '').toLowerCase();
-                if (rLower.includes('vocal')) colorClass = 'role-color-vocalista';
-                else if (rLower.includes('guitar')) colorClass = 'role-color-guitarrista';
-                else if (rLower.includes('bajo') || rLower.includes('baji')) colorClass = 'role-color-bajista';
-                else if (rLower.includes('bater')) colorClass = 'role-color-baterista';
-                else if (rLower.includes('tecla')) colorClass = 'role-color-tecladista';
-
-                chartBarsContainer.innerHTML += `
-                    <div class="timeline-bar-row">
-                        <div class="timeline-label" title="${m.name} (${m.role})">
-                            ${m.name} <span class="mini-role">(${m.role})</span>
-                        </div>
-                        <div class="timeline-track">
-                            <div class="timeline-bar-segment ${colorClass}" 
-                                 style="left: ${leftPercent}%; width: ${widthPercent}%;" 
-                                 title="${m.name}: ${m.years_active || 'Sin fecha'}"></div>
-                        </div>
-                    </div>
-                `;
+                const lName = m.lineup || 'Alineación Principal / Actual';
+                if (!lineupsGrouped[lName]) lineupsGrouped[lName] = [];
+                lineupsGrouped[lName].push(m);
             });
 
-            // 2. RENDEREAR TARJETAS CLASIFICADAS POR ALINEACIÓN
-            const currentMembers = members.filter(m => (m.status || 'actual') === 'actual');
-            const formerMembers = members.filter(m => (m.status || 'actual') === 'ex');
+            const roleOrder = { 'Vocalista': 1, 'Guitarrista': 2, 'Bajista': 3, 'Baterista': 4, 'Tecladista': 5, 'Miembro de Soporte': 6, 'Líder / Compositor': 7 };
 
-            const renderCard = (mem) => {
-                const photoHTML = mem.image_url 
-                    ? `<img src="${mem.image_url}" class="member-photo" alt="${mem.name}">`
-                    : `<div class="member-photo-placeholder">Sin Imagen</div>`;
+            let htmlOutput = '';
 
-                let replacementHTML = mem.replacement_note ? `
-                    <div class="replacement-badge">
-                        <i class="fa-solid fa-right-left"></i> ${mem.replacement_note}
-                    </div>
-                ` : '';
-
-                let adminBtns = isAdmin ? `
-                    <div class="member-admin-actions">
-                        <button class="btn-member-mini" onclick="openEditMemberModal(${mem.id})">✏️</button>
-                        <button class="btn-member-mini" style="color:#ff6b6b;" onclick="deleteMember(${mem.id})">🗑️</button>
-                    </div>
-                ` : '';
-
-                return `
-                    <div class="member-card">
-                        <div>
-                            ${photoHTML}
-                            <div class="member-name">${mem.name}</div>
-                            <div class="member-role">${mem.role}</div>
-                            <div class="member-years">${mem.years_active || 'N/A'}</div>
-                            ${replacementHTML}
-                        </div>
-                        ${adminBtns}
-                    </div>
-                `;
-            };
-
-            let cardsHTML = '';
-
-            if (currentMembers.length > 0) {
-                cardsHTML += `
-                    <div class="lineup-group-title">★ INTEGRANTES / ALINEACIÓN PRINCIPAL Y ACTUAL</div>
-                    <div class="members-grid" style="margin-bottom: 1.5rem;">
-                        ${currentMembers.map(mem => renderCard(mem)).join('')}
-                    </div>
-                `;
-            }
-
-            if (formerMembers.length > 0) {
-                // Agrupar ex-integrantes por su campo lineup
-                const lineupsGrouped = {};
-                formerMembers.forEach(mem => {
-                    const lName = mem.lineup || 'Primera Alineación';
-                    if (!lineupsGrouped[lName]) lineupsGrouped[lName] = [];
-                    lineupsGrouped[lName].push(mem);
+            for (const [lineupName, mems] of Object.entries(lineupsGrouped)) {
+                // Ordenar por rol dentro de su alineación
+                mems.sort((a, b) => {
+                    const rA = roleOrder[a.role] || 99;
+                    const rB = roleOrder[b.role] || 99;
+                    if (rA !== rB) return rA - rB;
+                    return parseYears(a.years_active).start - parseYears(b.years_active).start;
                 });
 
-                for (const [lineupName, mems] of Object.entries(lineupsGrouped)) {
-                    cardsHTML += `
-                        <div class="lineup-group-title">📌 ${lineupName.toUpperCase()}</div>
-                        <div class="members-grid" style="margin-bottom: 1.5rem;">
-                            ${mems.map(mem => renderCard(mem)).join('')}
+                htmlOutput += `<div class="timeline-group-title">📌 ${lineupName.toUpperCase()}</div>`;
+
+                mems.forEach(m => {
+                    const { start, end } = parseYears(m.years_active);
+                    const leftPercent = ((start - globalMinYear) / totalSpan) * 100;
+                    // Asegurar que si es un solo año tenga un ancho visible mínimo (ej. 3% o proporcional)
+                    const widthPercent = Math.max((( (end === start ? start + 0.8 : end) - start) / totalSpan) * 100, 3.5);
+
+                    let colorClass = 'role-color-soporte';
+                    const rLower = (m.role || '').toLowerCase();
+                    if (rLower.includes('vocal')) colorClass = 'role-color-vocalista';
+                    else if (rLower.includes('guitar')) colorClass = 'role-color-guitarrista';
+                    else if (rLower.includes('bajo') || rLower.includes('baji')) colorClass = 'role-color-bajista';
+                    else if (rLower.includes('bater')) colorClass = 'role-color-baterista';
+                    else if (rLower.includes('tecla')) colorClass = 'role-color-tecladista';
+
+                    const avatarHTML = m.image_url 
+                        ? `<img src="${m.image_url}" class="timeline-avatar" alt="${m.name}">`
+                        : `<div class="timeline-avatar-placeholder">Sin Foto</div>`;
+
+                    let adminBtnsHTML = '';
+                    if (isAdmin) {
+                        adminBtnsHTML = `
+                            <div class="timeline-actions">
+                                <button class="btn-timeline-action" title="Editar Integrante" onclick="openEditMemberModal(${m.id})"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn-timeline-action delete" title="Eliminar Integrante" onclick="deleteMember(${m.id})"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        `;
+                    }
+
+                    htmlOutput += `
+                        <div class="timeline-row">
+                            <div class="timeline-member-info">
+                                ${avatarHTML}
+                                <div class="timeline-member-texts">
+                                    <div class="timeline-member-name" title="${m.name}">${m.name}</div>
+                                    <div class="timeline-member-role">${m.role}</div>
+                                </div>
+                            </div>
+                            <div class="timeline-track-area">
+                                <div class="timeline-bar-segment ${colorClass}" 
+                                     style="left: ${leftPercent}%; width: ${widthPercent}%;" 
+                                     title="${m.name} (${m.years_active})">
+                                     ${m.years_active}
+                                </div>
+                            </div>
+                            ${adminBtnsHTML}
                         </div>
                     `;
-                }
+                });
             }
 
-            cardsContainer.innerHTML = cardsHTML;
+            chartRowsContainer.innerHTML = htmlOutput;
         }
 
         function openCreateMemberModal() {
@@ -853,7 +788,7 @@
             document.getElementById('member-form').reset();
             document.getElementById('edit_member_id').value = '';
             document.getElementById('member_status').value = 'actual';
-            document.getElementById('member_lineup').value = 'Primera Alineación';
+            document.getElementById('member_lineup').value = 'Alineación Principal / Actual';
             document.getElementById('member-modal').style.display = 'flex';
         }
 
@@ -865,10 +800,9 @@
             document.getElementById('edit_member_id').value = member.id;
             document.getElementById('member_name').value = member.name;
             document.getElementById('member_status').value = member.status || 'actual';
-            document.getElementById('member_lineup').value = member.lineup || 'Primera Alineación';
+            document.getElementById('member_lineup').value = member.lineup || 'Alineación Principal / Actual';
             document.getElementById('member_role').value = member.role;
             document.getElementById('member_years').value = member.years_active || '';
-            document.getElementById('member_replacement_note').value = member.replacement_note || '';
             document.getElementById('member_image_url').value = member.image_url || '';
             document.getElementById('member-modal').style.display = 'flex';
         }
@@ -888,7 +822,6 @@
                 lineup: document.getElementById('member_lineup').value,
                 role: document.getElementById('member_role').value,
                 years_active: document.getElementById('member_years').value.trim() || null,
-                replacement_note: document.getElementById('member_replacement_note').value.trim() || null,
                 image_url: document.getElementById('member_image_url').value.trim() || null
             };
 
@@ -910,7 +843,7 @@
         });
 
         async function deleteMember(memberId) {
-            if (confirm('¿Eliminar este integrante de la alineación?')) {
+            if (confirm('¿Estás seguro de eliminar este integrante de la cronología?')) {
                 const { error } = await db.from('members').delete().eq('id', memberId);
                 if (error) alert('Error: ' + error.message);
                 else loadMembers();
