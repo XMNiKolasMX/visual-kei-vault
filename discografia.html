@@ -39,7 +39,7 @@
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 1.2rem;
             margin-top: 1rem;
-            justify-content: center;
+            justify-content: start;
         }
         .member-card {
             background: var(--bg-card);
@@ -421,7 +421,7 @@
 
             <!-- SECCIÓN DE INTEGRANTES DE LA BANDA -->
             <div class="members-section">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h3 style="font-family:'Cinzel', serif; color:var(--accent-gold); font-size:1rem; margin:0; letter-spacing:1px; text-transform:uppercase;">
                         Alineación / Integrantes
                     </h3>
@@ -430,8 +430,8 @@
                     </button>
                 </div>
 
-                <div id="members-list" class="members-grid">
-                    <p style="color:var(--text-muted); font-size:0.8rem; grid-column:1/-1;">Cargando integrantes...</p>
+                <div id="members-list">
+                    <p style="color:var(--text-muted); font-size:0.8rem;">Cargando integrantes...</p>
                 </div>
             </div>
 
@@ -492,6 +492,14 @@
                 <div class="admin-form-group">
                     <label>Nombre del Integrante *</label>
                     <input type="text" id="member_name" placeholder="Ej: Yukari, Akihiro, Mana" required>
+                </div>
+
+                <div class="admin-form-group">
+                    <label>Tipo / Clasificación de Integrante *</label>
+                    <select id="member_status" required>
+                        <option value="actual">Integrante Actual / Principal</option>
+                        <option value="ex">Ex-Integrante / Miembro Anterior</option>
+                    </select>
                 </div>
 
                 <div class="admin-form-group">
@@ -704,7 +712,7 @@
             loadAlbums();
         }
 
-        /* LÓGICA DE INTEGRANTES / MIEMBROS DE LA BANDA (ACTUALES Y EX-INTEGRANTES) */
+        /* LÓGICA DE INTEGRANTES (ACTUALES VS EX-INTEGRANTES SEPARADOS) */
         async function loadMembers() {
             const { data: members, error } = await db.from('members')
                 .select('*')
@@ -715,7 +723,7 @@
             container.innerHTML = '';
 
             if (error || !members || members.length === 0) {
-                container.innerHTML = '<p style="color:var(--text-muted); font-size:0.8rem; grid-column:1/-1;">No hay integrantes registrados en la alineación.</p>';
+                container.innerHTML = '<p style="color:var(--text-muted); font-size:0.8rem;">No hay integrantes registrados en la alineación.</p>';
                 return;
             }
 
@@ -723,10 +731,9 @@
             const formerMembers = [];
 
             members.forEach(mem => {
-                const years = (mem.years_active || '').toLowerCase();
-                const isFormer = years.includes('ex') || (years.includes('-') && !years.includes('presente') && !years.includes('actual') && !years.includes('hoy'));
-                
-                if (isFormer) {
+                // Se verifica por el campo status o por texto secundario
+                const status = mem.status || 'actual';
+                if (status === 'ex') {
                     formerMembers.push(mem);
                 } else {
                     currentMembers.push(mem);
@@ -761,18 +768,28 @@
 
             let htmlOutput = '';
 
+            // Bloque 1: Integrantes Actuales / Principales
             if (currentMembers.length > 0) {
-                htmlOutput += `<div style="grid-column:1/-1; color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; font-weight:bold; margin-bottom:0.3rem;">Alineación Principal / Actual:</div>`;
-                currentMembers.forEach(mem => {
-                    htmlOutput += renderCard(mem);
-                });
+                htmlOutput += `
+                    <div style="color:var(--text-white); font-size:0.8rem; text-transform:uppercase; font-weight:bold; margin-bottom:0.5rem; letter-spacing:1px;">
+                        INTEGRANTES / ALINEACIÓN PRINCIPAL:
+                    </div>
+                    <div class="members-grid" style="margin-bottom: 1.5rem;">
+                        ${currentMembers.map(mem => renderCard(mem)).join('')}
+                    </div>
+                `;
             }
 
+            // Bloque 2: Ex-Integrantes
             if (formerMembers.length > 0) {
-                htmlOutput += `<div style="grid-column:1/-1; color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; font-weight:bold; margin-top:1rem; margin-bottom:0.3rem; border-top: 1px dashed var(--border-dark); padding-top: 0.8rem;">Ex-Integrantes / Miembros Anteriores:</div>`;
-                formerMembers.forEach(mem => {
-                    htmlOutput += renderCard(mem);
-                });
+                htmlOutput += `
+                    <div style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase; font-weight:bold; margin-top:1rem; margin-bottom:0.5rem; border-top: 1px dashed var(--border-dark); padding-top: 1rem; letter-spacing:1px;">
+                        EX-INTEGRANTES / MIEMBROS ANTERIORES:
+                    </div>
+                    <div class="members-grid">
+                        ${formerMembers.map(mem => renderCard(mem)).join('')}
+                    </div>
+                `;
             }
 
             container.innerHTML = htmlOutput;
@@ -782,6 +799,7 @@
             document.getElementById('member-modal-title').innerText = 'Agregar Integrante';
             document.getElementById('member-form').reset();
             document.getElementById('edit_member_id').value = '';
+            document.getElementById('member_status').value = 'actual';
             document.getElementById('member-modal').style.display = 'flex';
         }
 
@@ -792,6 +810,7 @@
             document.getElementById('member-modal-title').innerText = 'Editar Integrante';
             document.getElementById('edit_member_id').value = member.id;
             document.getElementById('member_name').value = member.name;
+            document.getElementById('member_status').value = member.status || 'actual';
             document.getElementById('member_role').value = member.role;
             document.getElementById('member_years').value = member.years_active || '';
             document.getElementById('member_image_url').value = member.image_url || '';
@@ -809,6 +828,7 @@
             const memberData = {
                 artist_id: parseInt(artistId),
                 name: document.getElementById('member_name').value.trim(),
+                status: document.getElementById('member_status').value,
                 role: document.getElementById('member_role').value,
                 years_active: document.getElementById('member_years').value.trim() || null,
                 image_url: document.getElementById('member_image_url').value.trim() || null
