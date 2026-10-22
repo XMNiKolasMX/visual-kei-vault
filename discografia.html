@@ -16,7 +16,7 @@
             padding: 2rem;
             margin-bottom: 2rem;
         }
-        .artist-header-center img {
+        .artist-header-center img.artist-avatar {
             width: 150px;
             height: 150px;
             object-fit: cover;
@@ -24,6 +24,87 @@
             border: 2px solid #333;
             margin-bottom: 1rem;
         }
+
+        /* Sección de Integrantes / Alineación de la Banda */
+        .members-section {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #1f1f1f;
+        }
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1.2rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+        .member-card {
+            background: #0f0f0f;
+            border: 1px solid #222;
+            padding: 0.8rem;
+            border-radius: 6px;
+            text-align: center;
+            position: relative;
+            transition: border-color 0.2s ease;
+        }
+        .member-card:hover {
+            border-color: #d4af37;
+        }
+        .member-photo {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 1px solid #333;
+            margin: 0 auto 0.5rem auto;
+            display: block;
+        }
+        .member-photo-placeholder {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 1px dashed #444;
+            background: #141414;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            margin: 0 auto 0.5rem auto;
+        }
+        .member-name {
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.2rem;
+        }
+        .member-role {
+            color: #d4af37;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .member-years {
+            color: #777;
+            font-size: 0.68rem;
+            margin-top: 0.2rem;
+        }
+        .member-admin-actions {
+            margin-top: 0.5rem;
+            display: flex;
+            gap: 0.3rem;
+            justify-content: center;
+        }
+        .btn-member-mini {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #ccc;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            cursor: pointer;
+        }
+        .btn-member-mini:hover { color: #fff; border-color: #666; }
 
         /* Toolbar de Controles */
         .controls-bar {
@@ -74,7 +155,7 @@
             font-weight: bold;
         }
 
-        /* Barra de Filtros por Categoría */
+        /* Barra de Filtros */
         .category-filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -107,7 +188,7 @@
             font-weight: bold;
         }
 
-        /* VISTA 1: Cuadrícula de 5 columnas (5 en 5) */
+        /* VISTA 1: Cuadrícula 5x5 */
         .albums-container.grid-view {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -153,7 +234,7 @@
             width: 100%;
         }
 
-        /* VISTA 2: Lista Detallada Clásica */
+        /* VISTA 2: Lista Detallada */
         .albums-container.detailed-view {
             display: flex;
             flex-direction: column;
@@ -278,7 +359,6 @@
         .btn-delete { background: transparent; border: 1px solid #721c24; color: #f8d7da; padding: 0.4rem 0.8rem; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; }
         .btn-delete:hover { background: #721c24; color: #fff; }
 
-        /* Caja de Asistente de Canciones */
         .song-helper-box {
             background: #10141d;
             border: 1px solid #1e2638;
@@ -299,10 +379,7 @@
             transition: all 0.2s;
             width: 100%;
         }
-        .btn-add-song-note:hover {
-            background: #38daf6;
-            color: #0b0f19;
-        }
+        .btn-add-song-note:hover { background: #38daf6; color: #0b0f19; }
     </style>
 </head>
 <body>
@@ -323,6 +400,24 @@
             <div id="artist-info" class="artist-header-center">
                 <h2 id="artist-name" class="section-title" style="margin: 0; border: none;">DISCOGRAFÍA</h2>
             </div>
+
+            <!-- SECCIÓN DE INTEGRANTES DE LA BANDA -->
+            <div class="members-section">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="font-family:'Cinzel', serif; color:#d4af37; font-size:1rem; margin:0; letter-spacing:1px; text-transform:uppercase;">
+                        Alineación / Integrantes
+                    </h3>
+                    <button id="admin-add-member-btn" class="btn-action" style="display:none; font-size:0.68rem; padding:0.3rem 0.7rem;" onclick="openCreateMemberModal()">
+                        + Agregar Integrante
+                    </button>
+                </div>
+
+                <div id="members-list" class="members-grid">
+                    <p style="color:#666; font-size:0.8rem; grid-column:1/-1;">Cargando integrantes...</p>
+                </div>
+            </div>
+
+            <div style="margin-top:2.5rem;"></div>
 
             <!-- BARRA DE HERRAMIENTAS Y VISTAS -->
             <div class="controls-bar">
@@ -369,6 +464,49 @@
         </section>
     </main>
 
+    <!-- MODAL PARA CREAR / EDITAR INTEGRANTE -->
+    <div id="member-modal" class="modal-bg">
+        <div class="modal-content" style="max-width:450px;">
+            <h3 id="member-modal-title" class="section-title" style="margin-top:0;">Agregar Integrante</h3>
+            <form id="member-form">
+                <input type="hidden" id="edit_member_id">
+
+                <div class="admin-form-group">
+                    <label>Nombre del Integrante *</label>
+                    <input type="text" id="member_name" placeholder="Ej: Yukari, Akihiro, Mana" required>
+                </div>
+
+                <div class="admin-form-group">
+                    <label>Posición / Rol *</label>
+                    <select id="member_role" required>
+                        <option value="Vocalista">Vocalista</option>
+                        <option value="Guitarrista">Guitarrista</option>
+                        <option value="Bajista">Bajista</option>
+                        <option value="Baterista">Baterista</option>
+                        <option value="Tecladista">Tecladista</option>
+                        <option value="Miembro de Soporte">Miembro de Soporte</option>
+                        <option value="Líder / Compositor">Líder / Compositor</option>
+                    </select>
+                </div>
+
+                <div class="admin-form-group">
+                    <label>Años de Actividad con la Banda</label>
+                    <input type="text" id="member_years" placeholder="Ej: 1991 - 1993 o 1994 - Presente">
+                </div>
+
+                <div class="admin-form-group">
+                    <label>URL de la Foto (Opcional)</label>
+                    <input type="url" id="member_image_url" placeholder="https://i.imgur.com/...">
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn-action" style="flex:1;">Guardar Integrante</button>
+                    <button type="button" onclick="closeMemberModal()" style="flex:1; background:#222; border:1px solid #444; color:#fff; cursor:pointer;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL PARA CREAR / EDITAR ÁLBUM -->
     <div id="album-modal" class="modal-bg">
         <div class="modal-content">
@@ -381,7 +519,6 @@
                     <input type="text" id="album_title" placeholder="Ej: Memoire" required>
                 </div>
 
-                <!-- TIPO DE LANZAMIENTO LÍMITE OFICIAL -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="admin-form-group">
                         <label>Tipo de Lanzamiento *</label>
@@ -414,7 +551,6 @@
                     <label>Lista de Canciones (Una por línea)</label>
                     <textarea id="tracklist" rows="5" placeholder="1. De Fleur&#10;2. Speed of Despair"></textarea>
                     
-                    <!-- HERRAMIENTA AUXILIAR DE OBSERVACIONES -->
                     <div class="song-helper-box">
                         <label style="color:#d4af37; font-size:0.75rem; font-weight:bold;">🛠️ Asistente para agregar observaciones a la lista:</label>
                         
@@ -534,20 +670,126 @@
             if (session) {
                 isAdmin = true;
                 document.getElementById('admin-add-album-btn').style.display = 'inline-block';
+                document.getElementById('admin-add-member-btn').style.display = 'inline-block';
             }
 
             const { data: artist } = await db.from('artists').select('*').eq('id', artistId).single();
             if (artist) {
                 document.getElementById('artist-info').innerHTML = `
-                    ${artist.image_url ? `<img src="${artist.image_url}" alt="${artist.name}">` : ''}
+                    ${artist.image_url ? `<img src="${artist.image_url}" class="artist-avatar" alt="${artist.name}">` : ''}
                     <h2 class="section-title" style="margin: 0 0 0.5rem 0; border: none; font-size:1.8rem;">${artist.name.toUpperCase()}</h2>
                     <p style="margin: 0 auto; max-width:650px; color:#aaa; line-height: 1.6;">${artist.description || 'Sin biografía disponible.'}</p>
                 `;
             }
 
+            loadMembers();
             loadAlbums();
         }
 
+        /* LÓGICA DE INTEGRANTES / MIEMBROS DE LA BANDA */
+        async function loadMembers() {
+            const { data: members, error } = await db.from('members')
+                .select('*')
+                .eq('artist_id', parseInt(artistId))
+                .order('created_at', { ascending: true });
+
+            const container = document.getElementById('members-list');
+            container.innerHTML = '';
+
+            if (error || !members || members.length === 0) {
+                container.innerHTML = '<p style="color:#666; font-size:0.8rem; grid-column:1/-1;">No hay integrantes registrados en la alineación.</p>';
+                return;
+            }
+
+            members.forEach(mem => {
+                const photoHTML = mem.image_url 
+                    ? `<img src="${mem.image_url}" class="member-photo" alt="${mem.name}">`
+                    : `<div class="member-photo-placeholder">Sin Imagen</div>`;
+
+                let adminBtns = '';
+                if (isAdmin) {
+                    adminBtns = `
+                        <div class="member-admin-actions">
+                            <button class="btn-member-mini" onclick="openEditMemberModal(${mem.id})">✏️</button>
+                            <button class="btn-member-mini" style="color:#ff6b6b;" onclick="deleteMember(${mem.id})">🗑️</button>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML += `
+                    <div class="member-card">
+                        ${photoHTML}
+                        <div class="member-name">${mem.name}</div>
+                        <div class="member-role">${mem.role}</div>
+                        <div class="member-years">${mem.years_active || 'N/A'}</div>
+                        ${adminBtns}
+                    </div>
+                `;
+            });
+        }
+
+        function openCreateMemberModal() {
+            document.getElementById('member-modal-title').innerText = 'Agregar Integrante';
+            document.getElementById('member-form').reset();
+            document.getElementById('edit_member_id').value = '';
+            document.getElementById('member-modal').style.display = 'flex';
+        }
+
+        async function openEditMemberModal(memberId) {
+            const { data: member } = await db.from('members').select('*').eq('id', memberId).single();
+            if (!member) return;
+
+            document.getElementById('member-modal-title').innerText = 'Editar Integrante';
+            document.getElementById('edit_member_id').value = member.id;
+            document.getElementById('member_name').value = member.name;
+            document.getElementById('member_role').value = member.role;
+            document.getElementById('member_years').value = member.years_active || '';
+            document.getElementById('member_image_url').value = member.image_url || '';
+            document.getElementById('member-modal').style.display = 'flex';
+        }
+
+        function closeMemberModal() {
+            document.getElementById('member-modal').style.display = 'none';
+        }
+
+        document.getElementById('member-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const memberId = document.getElementById('edit_member_id').value;
+
+            const memberData = {
+                artist_id: parseInt(artistId),
+                name: document.getElementById('member_name').value.trim(),
+                role: document.getElementById('member_role').value,
+                years_active: document.getElementById('member_years').value.trim() || null,
+                image_url: document.getElementById('member_image_url').value.trim() || null
+            };
+
+            let error;
+            if (memberId) {
+                const res = await db.from('members').update(memberData).eq('id', parseInt(memberId));
+                error = res.error;
+            } else {
+                const res = await db.from('members').insert([memberData]);
+                error = res.error;
+            }
+
+            if (error) {
+                alert('Error al guardar integrante: ' + error.message);
+            } else {
+                closeMemberModal();
+                loadMembers();
+            }
+        });
+
+        async function deleteMember(memberId) {
+            if (confirm('¿Eliminar este integrante de la alineación?')) {
+                const { error } = await db.from('members').delete().eq('id', memberId);
+                if (error) alert('Error: ' + error.message);
+                else loadMembers();
+            }
+        }
+
+        /* CARGA Y GESTIÓN DE DISCOGRAFÍA */
         async function loadAlbums() {
             const sortVal = document.getElementById('sort-select').value;
             let query = db.from('discography').select('*').eq('artist_id', parseInt(artistId));
