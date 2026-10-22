@@ -34,11 +34,22 @@
             padding-top: 1.5rem;
             border-top: 1px solid var(--border-dark);
         }
+        .lineup-title {
+            color: var(--accent-gold);
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-top: 1.2rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+            border-bottom: 1px dashed var(--border-dark);
+            padding-bottom: 0.3rem;
+        }
         .members-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 1.2rem;
-            margin-top: 1rem;
+            margin-top: 0.8rem;
             justify-content: start;
         }
         .member-card {
@@ -482,7 +493,7 @@
         </section>
     </main>
 
-    <!-- MODAL PARA CREAR / EDITAR INTEGRANTE CON FECHA EXACTA -->
+    <!-- MODAL PARA CREAR / EDITAR INTEGRANTE -->
     <div id="member-modal" class="modal-bg">
         <div class="modal-content" style="max-width:480px;">
             <h3 id="member-modal-title" class="section-title" style="margin-top:0;">Agregar Integrante</h3>
@@ -502,6 +513,18 @@
                     </select>
                 </div>
 
+                <!-- SELECTOR DE ALINEACIÓN / ETAPA -->
+                <div class="admin-form-group">
+                    <label>Alineación / Etapa de la Banda *</label>
+                    <select id="member_lineup" required>
+                        <option value="Primera Alineación">Primera Alineación</option>
+                        <option value="Segunda Alineación">Segunda Alineación</option>
+                        <option value="Tercera Alineación">Tercera Alineación</option>
+                        <option value="Cuarta Alineación">Cuarta Alineación</option>
+                        <option value="Alineación Final / Actual">Alineación Final / Actual</option>
+                    </select>
+                </div>
+
                 <div class="admin-form-group">
                     <label>Posición / Rol *</label>
                     <select id="member_role" required>
@@ -515,21 +538,9 @@
                     </select>
                 </div>
 
-                <!-- FECHAS ESTRUCTURADAS (AÑO, MES Y DÍA) -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
-                    <div class="admin-form-group">
-                        <label>Fecha de Ingreso (Año/Mes/Día)</label>
-                        <input type="date" id="member_start_date">
-                    </div>
-                    <div class="admin-form-group">
-                        <label>Fecha de Salida (Opcional)</label>
-                        <input type="date" id="member_end_date">
-                    </div>
-                </div>
-
                 <div class="admin-form-group">
-                    <label>Texto Secundario / Periodo Manual (Opcional)</label>
-                    <input type="text" id="member_years" placeholder="Ej: 1991 - 1997">
+                    <label>Años de Actividad / Periodo *</label>
+                    <input type="text" id="member_years" placeholder="Ej: 1991 - 1997" required>
                 </div>
 
                 <div class="admin-form-group">
@@ -724,7 +735,7 @@
             loadAlbums();
         }
 
-        /* LÓGICA DE INTEGRANTES (ORDENADOS POR AÑO, MES Y DÍA) */
+        /* LÓGICA DE INTEGRANTES: CLASIFICADOS POR ALINEACIÓN, AGRUPADOS POR ROL Y AÑO */
         async function loadMembers() {
             const { data: members, error } = await db.from('members')
                 .select('*')
@@ -738,63 +749,33 @@
                 return;
             }
 
-            // FUNCIÓN PARA EXTRAER FECHA Y ORDENAR STRICTAMENTE: AÑO -> MES -> DÍA
-            const getSortValue = (mem) => {
-                // 1. Si existe fecha exacta seleccionada (YYYY-MM-DD)
-                if (mem.start_date) {
-                    return new Date(mem.start_date).getTime();
-                }
-                // 2. Si solo escribió el texto en years_active (ej: "1991 - 1997"), busca los primeros 4 dígitos
+            // FUNCIÓN DE ORDENAMIENTO DE AÑO
+            const getYearNum = (mem) => {
                 if (mem.years_active) {
                     const match = mem.years_active.match(/\d{4}/);
-                    if (match) {
-                        return new Date(`${match[0]}-01-01`).getTime();
-                    }
+                    if (match) return parseInt(match[0]);
                 }
-                return 9999999999999; // Si no tiene fecha, lo manda al final
+                return 9999;
             };
 
-            // ORDENAMIENTO EN JAVASCRIPT POR FECHA INICIAL
-            members.sort((a, b) => getSortValue(a) - getSortValue(b));
+            const roleOrder = { 'Vocalista': 1, 'Guitarrista': 2, 'Bajista': 3, 'Baterista': 4, 'Tecladista': 5, 'Miembro de Soporte': 6, 'Líder / Compositor': 7 };
 
-            const currentMembers = [];
-            const formerMembers = [];
+            const sortMembers = (arr) => {
+                return arr.sort((a, b) => {
+                    const rA = roleOrder[a.role] || 99;
+                    const rB = roleOrder[b.role] || 99;
+                    if (rA !== rB) return rA - rB;
+                    return getYearNum(a) - getYearNum(b);
+                });
+            };
 
-            members.forEach(mem => {
-                const status = mem.status || 'actual';
-                if (status === 'ex') {
-                    formerMembers.push(mem);
-                } else {
-                    currentMembers.push(mem);
-                }
-            });
+            const currentMembers = sortMembers(members.filter(m => (m.status || 'actual') === 'actual'));
+            const formerMembers = sortMembers(members.filter(m => (m.status || 'actual') === 'ex'));
 
             const renderCard = (mem) => {
                 const photoHTML = mem.image_url 
                     ? `<img src="${mem.image_url}" class="member-photo" alt="${mem.name}">`
                     : `<div class="member-photo-placeholder">Sin Imagen</div>`;
-
-                let dateDisplay = mem.years_active || 'N/A';
-                if (mem.start_date) {
-                    const startParts = mem.start_date.split('-'); // [YYYY, MM, DD]
-                    let startStr = startParts[0];
-                    if (startParts[1] && startParts[1] !== '01') {
-                        startStr = `${startParts[2] ? startParts[2] + '/' : ''}${startParts[1]}/${startParts[0]}`;
-                    }
-
-                    let endStr = 'Presente';
-                    if (mem.end_date) {
-                        const endParts = mem.end_date.split('-');
-                        endStr = endParts[0];
-                        if (endParts[1] && endParts[1] !== '01') {
-                            endStr = `${endParts[2] ? endParts[2] + '/' : ''}${endParts[1]}/${endParts[0]}`;
-                        }
-                    } else if (mem.status === 'ex') {
-                        endStr = 'Salida';
-                    }
-
-                    dateDisplay = `${startStr} - ${endStr}`;
-                }
 
                 let adminBtns = '';
                 if (isAdmin) {
@@ -811,7 +792,7 @@
                         ${photoHTML}
                         <div class="member-name">${mem.name}</div>
                         <div class="member-role">${mem.role}</div>
-                        <div class="member-years">${dateDisplay}</div>
+                        <div class="member-years">${mem.years_active || 'N/A'}</div>
                         ${adminBtns}
                     </div>
                 `;
@@ -819,6 +800,7 @@
 
             let htmlOutput = '';
 
+            // 1. ALINEACIÓN ACTUAL
             if (currentMembers.length > 0) {
                 htmlOutput += `
                     <div style="color:var(--text-white); font-size:0.8rem; text-transform:uppercase; font-weight:bold; margin-bottom:0.5rem; letter-spacing:1px;">
@@ -830,15 +812,31 @@
                 `;
             }
 
+            // 2. EX-INTEGRANTES AGRUPADOS POR ALINEACIÓN/ETAPA
             if (formerMembers.length > 0) {
                 htmlOutput += `
-                    <div style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase; font-weight:bold; margin-top:1rem; margin-bottom:0.5rem; border-top: 1px dashed var(--border-dark); padding-top: 1rem; letter-spacing:1px;">
+                    <div style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase; font-weight:bold; margin-top:1.5rem; margin-bottom:0.5rem; border-top: 1px dashed var(--border-dark); padding-top: 1rem; letter-spacing:1px;">
                         EX-INTEGRANTES / MIEMBROS ANTERIORES:
                     </div>
-                    <div class="members-grid">
-                        ${formerMembers.map(mem => renderCard(mem)).join('')}
-                    </div>
                 `;
+
+                // Agrupar ex-miembros según su 'lineup'
+                const lineupsGrouped = {};
+                formerMembers.forEach(mem => {
+                    const lName = mem.lineup || 'Primera Alineación';
+                    if (!lineupsGrouped[lName]) lineupsGrouped[lName] = [];
+                    lineupsGrouped[lName].push(mem);
+                });
+
+                // Recorrer las alineaciones guardadas
+                for (const [lineupName, mems] of Object.entries(lineupsGrouped)) {
+                    htmlOutput += `
+                        <div class="lineup-title">📌 ${lineupName.toUpperCase()}</div>
+                        <div class="members-grid" style="margin-bottom: 1rem;">
+                            ${mems.map(mem => renderCard(mem)).join('')}
+                        </div>
+                    `;
+                }
             }
 
             container.innerHTML = htmlOutput;
@@ -849,6 +847,7 @@
             document.getElementById('member-form').reset();
             document.getElementById('edit_member_id').value = '';
             document.getElementById('member_status').value = 'actual';
+            document.getElementById('member_lineup').value = 'Primera Alineación';
             document.getElementById('member-modal').style.display = 'flex';
         }
 
@@ -860,9 +859,8 @@
             document.getElementById('edit_member_id').value = member.id;
             document.getElementById('member_name').value = member.name;
             document.getElementById('member_status').value = member.status || 'actual';
+            document.getElementById('member_lineup').value = member.lineup || 'Primera Alineación';
             document.getElementById('member_role').value = member.role;
-            document.getElementById('member_start_date').value = member.start_date || '';
-            document.getElementById('member_end_date').value = member.end_date || '';
             document.getElementById('member_years').value = member.years_active || '';
             document.getElementById('member_image_url').value = member.image_url || '';
             document.getElementById('member-modal').style.display = 'flex';
@@ -880,9 +878,8 @@
                 artist_id: parseInt(artistId),
                 name: document.getElementById('member_name').value.trim(),
                 status: document.getElementById('member_status').value,
+                lineup: document.getElementById('member_lineup').value,
                 role: document.getElementById('member_role').value,
-                start_date: document.getElementById('member_start_date').value || null,
-                end_date: document.getElementById('member_end_date').value || null,
                 years_active: document.getElementById('member_years').value.trim() || null,
                 image_url: document.getElementById('member_image_url').value.trim() || null
             };
