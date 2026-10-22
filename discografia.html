@@ -28,26 +28,117 @@
             box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
         }
 
-        /* Sección de Integrantes / Alineación de la Banda */
+        /* Sección de Integrantes / Cronología Gráfica */
         .members-section {
             margin-top: 2rem;
             padding-top: 1.5rem;
             border-top: 1px solid var(--border-dark);
         }
-        .lineup-title {
+
+        /* LÍNEA DE TIEMPO VISUAL ESTILO CHART / WIKIPEDIA */
+        .timeline-chart-container {
+            background: #0b0812;
+            border: 1px solid var(--border-accent);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-top: 1rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+        }
+        .timeline-chart-title {
+            color: var(--accent-gold);
+            font-size: 0.82rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .timeline-bar-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.6rem;
+            font-size: 0.75rem;
+        }
+        .timeline-label {
+            width: 140px;
+            flex-shrink: 0;
+            color: #fff;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .timeline-label .mini-role {
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            font-weight: normal;
+        }
+        .timeline-track {
+            flex-grow: 1;
+            height: 18px;
+            background: #140e1e;
+            border-radius: 4px;
+            position: relative;
+            border: 1px solid #1f172e;
+            overflow: hidden;
+        }
+        .timeline-bar-segment {
+            position: absolute;
+            top: 2px;
+            bottom: 2px;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 8px rgba(0,0,0,0.4);
+        }
+        .timeline-bar-segment:hover {
+            filter: brightness(1.3);
+            cursor: pointer;
+        }
+
+        /* Colores por Rol/Instrumento */
+        .role-color-vocalista { background: #ff4d4d; border: 1px solid #ff6666; }
+        .role-color-guitarrista { background: #38daf6; border: 1px solid #5ce1f8; }
+        .role-color-bajista { background: #a855f7; border: 1px solid #c084fc; }
+        .role-color-baterista { background: #f59e0b; border: 1px solid #fbbf24; }
+        .role-color-tecladista { background: #10b981; border: 1px solid #34d399; }
+        .role-color-soporte { background: #6b7280; border: 1px solid #9ca3af; }
+
+        .timeline-years-header {
+            display: flex;
+            margin-left: 140px;
+            border-top: 1px solid var(--border-dark);
+            padding-top: 0.4rem;
+            margin-top: 0.8rem;
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            justify-content: space-between;
+            font-family: monospace;
+        }
+
+        /* TÍTULOS DE CADA ALINEACIÓN ABAJO */
+        .lineup-group-title {
             color: var(--accent-gold);
             font-size: 0.82rem;
             text-transform: uppercase;
             font-weight: bold;
-            margin-top: 1.2rem;
-            margin-bottom: 0.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.6rem;
             letter-spacing: 1px;
             border-bottom: 1px dashed var(--border-dark);
             padding-bottom: 0.3rem;
         }
+
+        /* TARJETAS DE INTEGRANTES */
         .members-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 1.2rem;
             margin-top: 0.8rem;
             justify-content: start;
@@ -55,11 +146,14 @@
         .member-card {
             background: var(--bg-card);
             border: 1px solid var(--border-dark);
-            padding: 0.8rem;
-            border-radius: 6px;
+            padding: 0.9rem;
+            border-radius: 8px;
             text-align: center;
             position: relative;
             transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         .member-card:hover {
             border-color: var(--accent-gold);
@@ -92,7 +186,7 @@
         }
         .member-name {
             color: var(--text-white);
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             font-weight: bold;
             margin-bottom: 0.2rem;
         }
@@ -105,11 +199,23 @@
         }
         .member-years {
             color: var(--text-muted);
-            font-size: 0.68rem;
+            font-size: 0.7rem;
             margin-top: 0.2rem;
+            font-weight: 500;
+        }
+        .replacement-badge {
+            background: rgba(147, 51, 234, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            color: #d8b4fe;
+            font-size: 0.65rem;
+            padding: 4px 6px;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            line-height: 1.3;
+            text-align: center;
         }
         .member-admin-actions {
-            margin-top: 0.5rem;
+            margin-top: 0.6rem;
             display: flex;
             gap: 0.3rem;
             justify-content: center;
@@ -118,8 +224,8 @@
             background: #181122;
             border: 1px solid var(--border-dark);
             color: #ccc;
-            font-size: 0.6rem;
-            padding: 2px 6px;
+            font-size: 0.65rem;
+            padding: 2px 7px;
             cursor: pointer;
             border-radius: 3px;
         }
@@ -175,7 +281,7 @@
             box-shadow: 0 0 10px rgba(56, 218, 246, 0.3);
         }
 
-        /* Barra de Filtros por Categoría */
+        /* Filtros por Categoría */
         .category-filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -207,152 +313,6 @@
             color: var(--accent-gold);
             font-weight: bold;
         }
-
-        /* VISTA 1: Cuadrícula de 5 columnas */
-        .albums-container.grid-view {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 1.2rem;
-        }
-        @media (max-width: 1100px) {
-            .albums-container.grid-view { grid-template-columns: repeat(3, 1fr); }
-        }
-        @media (max-width: 600px) {
-            .albums-container.grid-view { grid-template-columns: repeat(1, 1fr); }
-        }
-
-        .grid-view .album-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-dark);
-            border-radius: 8px;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            transition: transform 0.2s, border-color 0.2s;
-        }
-        .grid-view .album-card:hover {
-            border-color: var(--accent-gold);
-            transform: translateY(-4px);
-        }
-        .grid-view .album-cover {
-            width: 100%;
-            aspect-ratio: 1/1;
-            height: auto;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 1px solid var(--border-dark);
-            margin-bottom: 0.8rem;
-        }
-        .grid-view .tracklist-box { display: none; }
-        .grid-view .album-header {
-            flex-direction: column;
-            border: none;
-            padding: 0;
-            margin-bottom: 0.5rem;
-            width: 100%;
-        }
-
-        /* VISTA 2: Lista Detallada Clásica */
-        .albums-container.detailed-view {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        .detailed-view .album-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-dark);
-            padding: 1.5rem;
-            display: flex;
-            gap: 1.5rem;
-            align-items: flex-start;
-            border-radius: 8px;
-        }
-        .detailed-view .album-cover {
-            width: 140px;
-            height: 140px;
-            object-fit: cover;
-            border: 1px solid var(--border-dark);
-            flex-shrink: 0;
-            border-radius: 4px;
-        }
-        .detailed-view .album-content { flex-grow: 1; }
-        .detailed-view .album-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-dark);
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        .detailed-view .tracklist-box {
-            background: #0d0a12;
-            padding: 1rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: var(--text-body);
-            margin: 1rem 0;
-            border: 1px solid var(--border-dark);
-            border-radius: 4px;
-        }
-
-        /* VISTA 3: Lista Comprimida */
-        .albums-container.compact-view {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .compact-view .album-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-dark);
-            padding: 0.8rem 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-radius: 6px;
-        }
-        .compact-view .album-cover {
-            width: 45px;
-            height: 45px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-        .compact-view .tracklist-box { display: none; }
-        .compact-view .album-header { border: none; padding: 0; margin: 0; }
-
-        /* Badges & Botones */
-        .release-type-badge {
-            display: inline-block;
-            background: rgba(212, 175, 55, 0.15);
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            color: var(--accent-gold);
-            font-size: 0.65rem;
-            padding: 2px 6px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-left: 6px;
-            vertical-align: middle;
-            border-radius: 3px;
-            font-weight: 600;
-        }
-        .btn-terabox {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: #140d1a;
-            border: 1px solid var(--border-accent);
-            color: var(--accent-gold-light);
-            padding: 0.4rem 0.8rem;
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border-radius: 4px;
-        }
-        .btn-terabox:hover { background: var(--accent-cyan); color: #08060a; border-color: var(--accent-cyan); }
-        .no-terabox { color: var(--text-dim); font-size: 0.75rem; font-style: italic; }
 
         /* Modales */
         .modal-bg {
@@ -434,21 +394,33 @@
             <div class="members-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h3 style="font-family:'Cinzel', serif; color:var(--accent-gold); font-size:1rem; margin:0; letter-spacing:1px; text-transform:uppercase;">
-                        Alineación / Integrantes
+                        Cronología e Integrantes de la Banda
                     </h3>
                     <button id="admin-add-member-btn" class="btn-action" style="display:none; font-size:0.68rem; padding:0.3rem 0.7rem;" onclick="openCreateMemberModal()">
                         + Agregar Integrante
                     </button>
                 </div>
 
-                <div id="members-list">
-                    <p style="color:var(--text-muted); font-size:0.8rem;">Cargando integrantes...</p>
+                <!-- DIBUJO DE LA LÍNEA DE TIEMPO VISUAL -->
+                <div class="timeline-chart-container">
+                    <div class="timeline-chart-title">
+                        <i class="fa-solid fa-chart-gantt"></i> Línea de Tiempo de Miembros (Cronología)
+                    </div>
+                    <div id="timeline-chart-bars">
+                        <p style="color:var(--text-muted); font-size:0.75rem;">Generando gráfico de cronología...</p>
+                    </div>
+                    <div id="timeline-years-axis" class="timeline-years-header"></div>
+                </div>
+
+                <!-- TARJETAS CON FOTOS CLASIFICADAS POR ALINEACIÓN -->
+                <div id="members-cards-container">
+                    <p style="color:var(--text-muted); font-size:0.8rem;">Cargando lista de integrantes...</p>
                 </div>
             </div>
 
             <div style="margin-top:2.5rem;"></div>
 
-            <!-- BARRA DE HERRAMIENTAS Y VISTAS -->
+            <!-- BARRA DE HERRAMIENTAS Y VISTAS DE DISCOS -->
             <div class="controls-bar">
                 <select id="sort-select" class="select-sort" onchange="loadAlbums()">
                     <option value="year-asc-release">Año de Lanzamiento (Antiguos primero)</option>
@@ -461,7 +433,6 @@
                         + Agregar Discografía
                     </button>
 
-                    <!-- Selector de Modos de Vista -->
                     <div class="view-switcher">
                         <button class="view-btn active" id="btn-view-grid" onclick="setMode('grid')" title="Vista Cuadrícula 5x5">
                             <i class="fa-solid fa-border-all"></i>
@@ -508,12 +479,12 @@
                 <div class="admin-form-group">
                     <label>Tipo / Clasificación *</label>
                     <select id="member_status" required>
-                        <option value="actual">Integrante Actual / Principal</option>
+                        <option value="actual">Integrante Actual / Alineación Principal</option>
                         <option value="ex">Ex-Integrante / Miembro Anterior</option>
                     </select>
                 </div>
 
-                <!-- SELECTOR DE ALINEACIÓN / ETAPA -->
+                <!-- SELECCIÓN DE LA ALINEACIÓN / ETAPA -->
                 <div class="admin-form-group">
                     <label>Alineación / Etapa de la Banda *</label>
                     <select id="member_lineup" required>
@@ -521,7 +492,7 @@
                         <option value="Segunda Alineación">Segunda Alineación</option>
                         <option value="Tercera Alineación">Tercera Alineación</option>
                         <option value="Cuarta Alineación">Cuarta Alineación</option>
-                        <option value="Alineación Final / Actual">Alineación Final / Actual</option>
+                        <option value="Alineación Actual / Final">Alineación Actual / Final</option>
                     </select>
                 </div>
 
@@ -539,8 +510,13 @@
                 </div>
 
                 <div class="admin-form-group">
-                    <label>Años de Actividad / Periodo *</label>
+                    <label>Años de Actividad / Período *</label>
                     <input type="text" id="member_years" placeholder="Ej: 1991 - 1997" required>
+                </div>
+
+                <div class="admin-form-group">
+                    <label>Nota de Reemplazo / Transición (Opcional)</label>
+                    <input type="text" id="member_replacement_note" placeholder="Ej: Reemplazó a Haiji en 1997">
                 </div>
 
                 <div class="admin-form-group">
@@ -595,7 +571,6 @@
                     <input type="url" id="terabox_link" placeholder="https://terabox.com/s/...">
                 </div>
 
-                <!-- SECCIÓN DE CANCIONES CON ASISTENTE DE OBSERVACIONES -->
                 <div class="admin-form-group">
                     <label>Lista de Canciones (Una por línea)</label>
                     <textarea id="tracklist" rows="5" placeholder="1. De Fleur&#10;2. Speed of Despair"></textarea>
@@ -653,10 +628,8 @@
         function setMode(mode) {
             currentMode = mode;
             const container = document.getElementById('albums-list');
-            
             document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`btn-view-${mode}`).classList.add('active');
-
             container.className = `albums-container ${mode}-view`;
             loadAlbums();
         }
@@ -681,37 +654,24 @@
             const songType = document.getElementById('helper_song_type').value;
             const targetAlbum = document.getElementById('helper_target_album').value;
 
-            if (!songName) {
-                alert('Ingresa el nombre de la canción.');
-                return;
-            }
-            if (!targetAlbum) {
-                alert('Selecciona el álbum o single de referencia.');
+            if (!songName || !targetAlbum) {
+                alert('Completa el nombre de la canción y selecciona el disco.');
                 return;
             }
 
             const tracklistTextarea = document.getElementById('tracklist');
-            let formattedLine = '';
+            let formattedLine = (songType === 'not_included')
+                ? `${songName} (Esta canción no se agregó porque ya está en: "${targetAlbum}")`
+                : `${songName} (Nueva Versión / Remake de: "${targetAlbum}")`;
 
-            if (songType === 'not_included') {
-                formattedLine = `${songName} (Esta canción no se agregó porque ya está en: "${targetAlbum}")`;
-            } else if (songType === 'new_version') {
-                formattedLine = `${songName} (Nueva Versión / Remake de: "${targetAlbum}")`;
-            }
-
-            if (tracklistTextarea.value.trim().length > 0) {
-                tracklistTextarea.value += `\n${formattedLine}`;
-            } else {
-                tracklistTextarea.value = formattedLine;
-            }
-
+            tracklistTextarea.value += (tracklistTextarea.value.trim().length > 0 ? `\n${formattedLine}` : formattedLine);
             document.getElementById('helper_song_name').value = '';
-            alert('¡Observación añadida a la lista!');
+            alert('¡Observación añadida!');
         }
 
         async function init() {
             if (!artistId) {
-                document.getElementById('albums-list').innerHTML = '<p style="color:#ff4d4d; grid-column:1/-1;">No se especificó un artista válido.</p>';
+                document.getElementById('albums-list').innerHTML = '<p style="color:#ff4d4d;">No se especificó un artista válido.</p>';
                 return;
             }
 
@@ -735,92 +695,139 @@
             loadAlbums();
         }
 
-        /* LÓGICA DE INTEGRANTES: CLASIFICADOS POR ALINEACIÓN, AGRUPADOS POR ROL Y AÑO */
+        /* LÓGICA DE CRONOLOGÍA DE INTEGRANTES + ALINEACIONES */
         async function loadMembers() {
             const { data: members, error } = await db.from('members')
                 .select('*')
                 .eq('artist_id', parseInt(artistId));
 
-            const container = document.getElementById('members-list');
-            container.innerHTML = '';
+            const cardsContainer = document.getElementById('members-cards-container');
+            const chartBarsContainer = document.getElementById('timeline-chart-bars');
+            const yearsAxisContainer = document.getElementById('timeline-years-axis');
+
+            cardsContainer.innerHTML = '';
+            chartBarsContainer.innerHTML = '';
+            yearsAxisContainer.innerHTML = '';
 
             if (error || !members || members.length === 0) {
-                container.innerHTML = '<p style="color:var(--text-muted); font-size:0.8rem;">No hay integrantes registrados en la alineación.</p>';
+                chartBarsContainer.innerHTML = '<p style="color:var(--text-muted); font-size:0.75rem;">No hay cronología registrada para esta banda.</p>';
+                cardsContainer.innerHTML = '<p style="color:var(--text-muted); font-size:0.8rem;">No hay integrantes registrados.</p>';
                 return;
             }
 
-            // FUNCIÓN DE ORDENAMIENTO DE AÑO
-            const getYearNum = (mem) => {
-                if (mem.years_active) {
-                    const match = mem.years_active.match(/\d{4}/);
-                    if (match) return parseInt(match[0]);
+            let globalMinYear = 2026;
+            let globalMaxYear = 1990;
+
+            const parseYears = (str) => {
+                if (!str) return { start: 1991, end: 2000 };
+                const numbers = str.match(/\d{4}/g);
+                if (!numbers) return { start: 1991, end: 2000 };
+                const start = parseInt(numbers[0]);
+                let end = numbers[1] ? parseInt(numbers[1]) : 2026;
+                if (str.toLowerCase().includes('presente') || str.toLowerCase().includes('actual')) {
+                    end = 2026;
                 }
-                return 9999;
+                return { start, end };
             };
+
+            members.forEach(m => {
+                const { start, end } = parseYears(m.years_active);
+                if (start < globalMinYear) globalMinYear = start;
+                if (end > globalMaxYear) globalMaxYear = end;
+            });
+
+            if (globalMinYear > globalMaxYear) { globalMinYear = 1990; globalMaxYear = 2000; }
+            const totalSpan = (globalMaxYear - globalMinYear) || 1;
+
+            for (let y = globalMinYear; y <= globalMaxYear; y += Math.ceil(totalSpan / 8)) {
+                yearsAxisContainer.innerHTML += `<span>${y}</span>`;
+            }
 
             const roleOrder = { 'Vocalista': 1, 'Guitarrista': 2, 'Bajista': 3, 'Baterista': 4, 'Tecladista': 5, 'Miembro de Soporte': 6, 'Líder / Compositor': 7 };
+            members.sort((a, b) => {
+                const rA = roleOrder[a.role] || 99;
+                const rB = roleOrder[b.role] || 99;
+                if (rA !== rB) return rA - rB;
+                return parseYears(a.years_active).start - parseYears(b.years_active).start;
+            });
 
-            const sortMembers = (arr) => {
-                return arr.sort((a, b) => {
-                    const rA = roleOrder[a.role] || 99;
-                    const rB = roleOrder[b.role] || 99;
-                    if (rA !== rB) return rA - rB;
-                    return getYearNum(a) - getYearNum(b);
-                });
-            };
+            // 1. DIBUJAR BARRAS DE LA LÍNEA DE TIEMPO
+            members.forEach(m => {
+                const { start, end } = parseYears(m.years_active);
+                const leftPercent = ((start - globalMinYear) / totalSpan) * 100;
+                const widthPercent = Math.max(((end - start) / totalSpan) * 100, 3);
 
-            const currentMembers = sortMembers(members.filter(m => (m.status || 'actual') === 'actual'));
-            const formerMembers = sortMembers(members.filter(m => (m.status || 'actual') === 'ex'));
+                let colorClass = 'role-color-soporte';
+                const rLower = (m.role || '').toLowerCase();
+                if (rLower.includes('vocal')) colorClass = 'role-color-vocalista';
+                else if (rLower.includes('guitar')) colorClass = 'role-color-guitarrista';
+                else if (rLower.includes('bajo') || rLower.includes('baji')) colorClass = 'role-color-bajista';
+                else if (rLower.includes('bater')) colorClass = 'role-color-baterista';
+                else if (rLower.includes('tecla')) colorClass = 'role-color-tecladista';
+
+                chartBarsContainer.innerHTML += `
+                    <div class="timeline-bar-row">
+                        <div class="timeline-label" title="${m.name} (${m.role})">
+                            ${m.name} <span class="mini-role">(${m.role})</span>
+                        </div>
+                        <div class="timeline-track">
+                            <div class="timeline-bar-segment ${colorClass}" 
+                                 style="left: ${leftPercent}%; width: ${widthPercent}%;" 
+                                 title="${m.name}: ${m.years_active || 'Sin fecha'}"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // 2. RENDEREAR TARJETAS CLASIFICADAS POR ALINEACIÓN
+            const currentMembers = members.filter(m => (m.status || 'actual') === 'actual');
+            const formerMembers = members.filter(m => (m.status || 'actual') === 'ex');
 
             const renderCard = (mem) => {
                 const photoHTML = mem.image_url 
                     ? `<img src="${mem.image_url}" class="member-photo" alt="${mem.name}">`
                     : `<div class="member-photo-placeholder">Sin Imagen</div>`;
 
-                let adminBtns = '';
-                if (isAdmin) {
-                    adminBtns = `
-                        <div class="member-admin-actions">
-                            <button class="btn-member-mini" onclick="openEditMemberModal(${mem.id})">✏️</button>
-                            <button class="btn-member-mini" style="color:#ff6b6b;" onclick="deleteMember(${mem.id})">🗑️</button>
-                        </div>
-                    `;
-                }
+                let replacementHTML = mem.replacement_note ? `
+                    <div class="replacement-badge">
+                        <i class="fa-solid fa-right-left"></i> ${mem.replacement_note}
+                    </div>
+                ` : '';
+
+                let adminBtns = isAdmin ? `
+                    <div class="member-admin-actions">
+                        <button class="btn-member-mini" onclick="openEditMemberModal(${mem.id})">✏️</button>
+                        <button class="btn-member-mini" style="color:#ff6b6b;" onclick="deleteMember(${mem.id})">🗑️</button>
+                    </div>
+                ` : '';
 
                 return `
                     <div class="member-card">
-                        ${photoHTML}
-                        <div class="member-name">${mem.name}</div>
-                        <div class="member-role">${mem.role}</div>
-                        <div class="member-years">${mem.years_active || 'N/A'}</div>
+                        <div>
+                            ${photoHTML}
+                            <div class="member-name">${mem.name}</div>
+                            <div class="member-role">${mem.role}</div>
+                            <div class="member-years">${mem.years_active || 'N/A'}</div>
+                            ${replacementHTML}
+                        </div>
                         ${adminBtns}
                     </div>
                 `;
             };
 
-            let htmlOutput = '';
+            let cardsHTML = '';
 
-            // 1. ALINEACIÓN ACTUAL
             if (currentMembers.length > 0) {
-                htmlOutput += `
-                    <div style="color:var(--text-white); font-size:0.8rem; text-transform:uppercase; font-weight:bold; margin-bottom:0.5rem; letter-spacing:1px;">
-                        INTEGRANTES / ALINEACIÓN PRINCIPAL:
-                    </div>
+                cardsHTML += `
+                    <div class="lineup-group-title">★ INTEGRANTES / ALINEACIÓN PRINCIPAL Y ACTUAL</div>
                     <div class="members-grid" style="margin-bottom: 1.5rem;">
                         ${currentMembers.map(mem => renderCard(mem)).join('')}
                     </div>
                 `;
             }
 
-            // 2. EX-INTEGRANTES AGRUPADOS POR ALINEACIÓN/ETAPA
             if (formerMembers.length > 0) {
-                htmlOutput += `
-                    <div style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase; font-weight:bold; margin-top:1.5rem; margin-bottom:0.5rem; border-top: 1px dashed var(--border-dark); padding-top: 1rem; letter-spacing:1px;">
-                        EX-INTEGRANTES / MIEMBROS ANTERIORES:
-                    </div>
-                `;
-
-                // Agrupar ex-miembros según su 'lineup'
+                // Agrupar ex-integrantes por su campo lineup
                 const lineupsGrouped = {};
                 formerMembers.forEach(mem => {
                     const lName = mem.lineup || 'Primera Alineación';
@@ -828,18 +835,17 @@
                     lineupsGrouped[lName].push(mem);
                 });
 
-                // Recorrer las alineaciones guardadas
                 for (const [lineupName, mems] of Object.entries(lineupsGrouped)) {
-                    htmlOutput += `
-                        <div class="lineup-title">📌 ${lineupName.toUpperCase()}</div>
-                        <div class="members-grid" style="margin-bottom: 1rem;">
+                    cardsHTML += `
+                        <div class="lineup-group-title">📌 ${lineupName.toUpperCase()}</div>
+                        <div class="members-grid" style="margin-bottom: 1.5rem;">
                             ${mems.map(mem => renderCard(mem)).join('')}
                         </div>
                     `;
                 }
             }
 
-            container.innerHTML = htmlOutput;
+            cardsContainer.innerHTML = cardsHTML;
         }
 
         function openCreateMemberModal() {
@@ -862,6 +868,7 @@
             document.getElementById('member_lineup').value = member.lineup || 'Primera Alineación';
             document.getElementById('member_role').value = member.role;
             document.getElementById('member_years').value = member.years_active || '';
+            document.getElementById('member_replacement_note').value = member.replacement_note || '';
             document.getElementById('member_image_url').value = member.image_url || '';
             document.getElementById('member-modal').style.display = 'flex';
         }
@@ -881,6 +888,7 @@
                 lineup: document.getElementById('member_lineup').value,
                 role: document.getElementById('member_role').value,
                 years_active: document.getElementById('member_years').value.trim() || null,
+                replacement_note: document.getElementById('member_replacement_note').value.trim() || null,
                 image_url: document.getElementById('member_image_url').value.trim() || null
             };
 
@@ -942,7 +950,6 @@
 
             albums.forEach(album => {
                 const tracks = Array.isArray(album.tracklist) ? album.tracklist.join('<br>') : 'Lista de canciones no disponible.';
-                
                 const teraboxBtn = album.terabox_link 
                     ? `<a href="${album.terabox_link}" target="_blank" class="btn-terabox">📥 Descargar</a>`
                     : '<span class="no-terabox">Sin enlace</span>';
@@ -953,15 +960,12 @@
 
                 const typeTag = album.release_type ? `<span class="release-type-badge">${album.release_type}</span>` : '';
 
-                let adminControlsHTML = '';
-                if (isAdmin) {
-                    adminControlsHTML = `
-                        <div class="admin-actions-bar">
-                            <button class="btn-edit" onclick="openEditModal(${album.id})">✏️ Editar</button>
-                            <button class="btn-delete" onclick="deleteAlbum(${album.id})">🗑️</button>
-                        </div>
-                    `;
-                }
+                let adminControlsHTML = isAdmin ? `
+                    <div class="admin-actions-bar">
+                        <button class="btn-edit" onclick="openEditModal(${album.id})">✏️ Editar</button>
+                        <button class="btn-delete" onclick="deleteAlbum(${album.id})">🗑️</button>
+                    </div>
+                ` : '';
 
                 if (currentMode === 'compact') {
                     container.innerHTML += `
@@ -1060,9 +1064,8 @@
                 error = res.error;
             }
 
-            if (error) {
-                alert('Error al guardar: ' + error.message);
-            } else {
+            if (error) alert('Error al guardar: ' + error.message);
+            else {
                 alert('¡Operación realizada con éxito!');
                 closeAlbumModal();
                 loadAlbums();
@@ -1070,14 +1073,10 @@
         });
 
         async function deleteAlbum(albumId) {
-            if (confirm('¿Estás seguro de eliminar este álbum de la base de datos?')) {
+            if (confirm('¿Estás seguro de eliminar este álbum?')) {
                 const { error } = await db.from('discography').delete().eq('id', parseInt(albumId));
-                if (error) {
-                    alert('Error al eliminar: ' + error.message);
-                } else {
-                    alert('Álbum eliminado correctamente.');
-                    loadAlbums();
-                }
+                if (error) alert('Error al eliminar: ' + error.message);
+                else loadAlbums();
             }
         }
 
