@@ -197,7 +197,7 @@
             font-weight: bold;
         }
 
-        /* VISTA 1: Cuadrícula de 5 columnas (5 en 5) */
+        /* VISTA 1: Cuadrícula de 5 columnas */
         .albums-container.grid-view {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -482,9 +482,9 @@
         </section>
     </main>
 
-    <!-- MODAL PARA CREAR / EDITAR INTEGRANTE -->
+    <!-- MODAL PARA CREAR / EDITAR INTEGRANTE CON FECHA EXACTA -->
     <div id="member-modal" class="modal-bg">
-        <div class="modal-content" style="max-width:450px;">
+        <div class="modal-content" style="max-width:480px;">
             <h3 id="member-modal-title" class="section-title" style="margin-top:0;">Agregar Integrante</h3>
             <form id="member-form">
                 <input type="hidden" id="edit_member_id">
@@ -495,7 +495,7 @@
                 </div>
 
                 <div class="admin-form-group">
-                    <label>Tipo / Clasificación de Integrante *</label>
+                    <label>Tipo / Clasificación *</label>
                     <select id="member_status" required>
                         <option value="actual">Integrante Actual / Principal</option>
                         <option value="ex">Ex-Integrante / Miembro Anterior</option>
@@ -515,9 +515,21 @@
                     </select>
                 </div>
 
+                <!-- FECHAS ESTRUCTURADAS (AÑO, MES Y DÍA) -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+                    <div class="admin-form-group">
+                        <label>Fecha de Ingreso (Año/Mes/Día)</label>
+                        <input type="date" id="member_start_date">
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Fecha de Salida (Opcional)</label>
+                        <input type="date" id="member_end_date">
+                    </div>
+                </div>
+
                 <div class="admin-form-group">
-                    <label>Años de Actividad con la Banda</label>
-                    <input type="text" id="member_years" placeholder="Ej: 1991 - 1993 o 1994 - Presente">
+                    <label>Texto Secundario / Periodo Manual (Opcional)</label>
+                    <input type="text" id="member_years" placeholder="Ej: 1991 - 1997">
                 </div>
 
                 <div class="admin-form-group">
@@ -712,12 +724,11 @@
             loadAlbums();
         }
 
-        /* LÓGICA DE INTEGRANTES (ACTUALES VS EX-INTEGRANTES SEPARADOS) */
+        /* LÓGICA DE INTEGRANTES (ORDENADOS POR AÑO, MES Y DÍA) */
         async function loadMembers() {
             const { data: members, error } = await db.from('members')
                 .select('*')
-                .eq('artist_id', parseInt(artistId))
-                .order('created_at', { ascending: true });
+                .eq('artist_id', parseInt(artistId));
 
             const container = document.getElementById('members-list');
             container.innerHTML = '';
@@ -727,11 +738,29 @@
                 return;
             }
 
+            // FUNCIÓN PARA EXTRAER FECHA Y ORDENAR STRICTAMENTE: AÑO -> MES -> DÍA
+            const getSortValue = (mem) => {
+                // 1. Si existe fecha exacta seleccionada (YYYY-MM-DD)
+                if (mem.start_date) {
+                    return new Date(mem.start_date).getTime();
+                }
+                // 2. Si solo escribió el texto en years_active (ej: "1991 - 1997"), busca los primeros 4 dígitos
+                if (mem.years_active) {
+                    const match = mem.years_active.match(/\d{4}/);
+                    if (match) {
+                        return new Date(`${match[0]}-01-01`).getTime();
+                    }
+                }
+                return 9999999999999; // Si no tiene fecha, lo manda al final
+            };
+
+            // ORDENAMIENTO EN JAVASCRIPT POR FECHA INICIAL
+            members.sort((a, b) => getSortValue(a) - getSortValue(b));
+
             const currentMembers = [];
             const formerMembers = [];
 
             members.forEach(mem => {
-                // Se verifica por el campo status o por texto secundario
                 const status = mem.status || 'actual';
                 if (status === 'ex') {
                     formerMembers.push(mem);
@@ -744,6 +773,28 @@
                 const photoHTML = mem.image_url 
                     ? `<img src="${mem.image_url}" class="member-photo" alt="${mem.name}">`
                     : `<div class="member-photo-placeholder">Sin Imagen</div>`;
+
+                let dateDisplay = mem.years_active || 'N/A';
+                if (mem.start_date) {
+                    const startParts = mem.start_date.split('-'); // [YYYY, MM, DD]
+                    let startStr = startParts[0];
+                    if (startParts[1] && startParts[1] !== '01') {
+                        startStr = `${startParts[2] ? startParts[2] + '/' : ''}${startParts[1]}/${startParts[0]}`;
+                    }
+
+                    let endStr = 'Presente';
+                    if (mem.end_date) {
+                        const endParts = mem.end_date.split('-');
+                        endStr = endParts[0];
+                        if (endParts[1] && endParts[1] !== '01') {
+                            endStr = `${endParts[2] ? endParts[2] + '/' : ''}${endParts[1]}/${endParts[0]}`;
+                        }
+                    } else if (mem.status === 'ex') {
+                        endStr = 'Salida';
+                    }
+
+                    dateDisplay = `${startStr} - ${endStr}`;
+                }
 
                 let adminBtns = '';
                 if (isAdmin) {
@@ -760,7 +811,7 @@
                         ${photoHTML}
                         <div class="member-name">${mem.name}</div>
                         <div class="member-role">${mem.role}</div>
-                        <div class="member-years">${mem.years_active || 'N/A'}</div>
+                        <div class="member-years">${dateDisplay}</div>
                         ${adminBtns}
                     </div>
                 `;
@@ -768,7 +819,6 @@
 
             let htmlOutput = '';
 
-            // Bloque 1: Integrantes Actuales / Principales
             if (currentMembers.length > 0) {
                 htmlOutput += `
                     <div style="color:var(--text-white); font-size:0.8rem; text-transform:uppercase; font-weight:bold; margin-bottom:0.5rem; letter-spacing:1px;">
@@ -780,7 +830,6 @@
                 `;
             }
 
-            // Bloque 2: Ex-Integrantes
             if (formerMembers.length > 0) {
                 htmlOutput += `
                     <div style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase; font-weight:bold; margin-top:1rem; margin-bottom:0.5rem; border-top: 1px dashed var(--border-dark); padding-top: 1rem; letter-spacing:1px;">
@@ -812,6 +861,8 @@
             document.getElementById('member_name').value = member.name;
             document.getElementById('member_status').value = member.status || 'actual';
             document.getElementById('member_role').value = member.role;
+            document.getElementById('member_start_date').value = member.start_date || '';
+            document.getElementById('member_end_date').value = member.end_date || '';
             document.getElementById('member_years').value = member.years_active || '';
             document.getElementById('member_image_url').value = member.image_url || '';
             document.getElementById('member-modal').style.display = 'flex';
@@ -830,6 +881,8 @@
                 name: document.getElementById('member_name').value.trim(),
                 status: document.getElementById('member_status').value,
                 role: document.getElementById('member_role').value,
+                start_date: document.getElementById('member_start_date').value || null,
+                end_date: document.getElementById('member_end_date').value || null,
                 years_active: document.getElementById('member_years').value.trim() || null,
                 image_url: document.getElementById('member_image_url').value.trim() || null
             };
