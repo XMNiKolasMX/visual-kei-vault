@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VISUAL KEI VAULT // DISCOGRAFÍA</title>
+    <title>VISUAL KEI VAULT // DISCOGRÁFÍA</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1078,14 +1078,23 @@
             }
 
             albums.forEach(album => {
-                // Compatible si tracklist es Array (jsonb) o String
+                // Renderiza las canciones limpias línea por línea eliminando corchetes y comillas de JSONB
                 let tracks = 'Lista de canciones no disponible.';
                 if (Array.isArray(album.tracklist)) {
                     tracks = album.tracklist.join('<br>');
                 } else if (typeof album.tracklist === 'string') {
-                    tracks = album.tracklist.replace(/\n/g, '<br>');
+                    try {
+                        const parsed = JSON.parse(album.tracklist);
+                        if (Array.isArray(parsed)) {
+                            tracks = parsed.join('<br>');
+                        } else {
+                            tracks = album.tracklist.replace(/\n/g, '<br>');
+                        }
+                    } catch (e) {
+                        tracks = album.tracklist.replace(/\n/g, '<br>');
+                    }
                 }
-
+                
                 const teraboxBtn = album.terabox_link 
                     ? `<a href="${album.terabox_link}" target="_blank" class="btn-terabox">📥 Descargar</a>`
                     : '<span class="no-terabox">Sin enlace</span>';
@@ -1150,6 +1159,7 @@
             document.getElementById('edit_album_id').value = '';
             document.getElementById('album-modal').style.display = 'flex';
             populateHelperAlbums();
+            updateSongSelectDropdown();
         }
 
         async function openEditModal(albumId) {
@@ -1167,26 +1177,39 @@
             document.getElementById('cover_image').value = album.cover_image || '';
             document.getElementById('terabox_link').value = album.terabox_link || '';
 
+            // Carga correcta del Array JSONB hacia el textarea para el editor
+            let rawTracks = '';
             if (Array.isArray(album.tracklist)) {
-                document.getElementById('tracklist').value = album.tracklist.join('\n');
-            } else {
-                document.getElementById('tracklist').value = album.tracklist || '';
+                rawTracks = album.tracklist.join('\n');
+            } else if (typeof album.tracklist === 'string') {
+                try {
+                    const parsed = JSON.parse(album.tracklist);
+                    if (Array.isArray(parsed)) {
+                        rawTracks = parsed.join('\n');
+                    } else {
+                        rawTracks = album.tracklist;
+                    }
+                } catch (e) {
+                    rawTracks = album.tracklist;
+                }
             }
 
+            document.getElementById('tracklist').value = rawTracks;
+            
             document.getElementById('album-modal').style.display = 'flex';
             populateHelperAlbums();
+            updateSongSelectDropdown();
         }
 
         function closeAlbumModal() {
             document.getElementById('album-modal').style.display = 'none';
         }
 
-        /* GUARDAR EN SUPABASE COMPATIBLE CON CAMPO JSONB */
+        /* GUARDAR EN SUPABASE COMPATIBLE CON JSONB */
         document.getElementById('album-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const albumId = document.getElementById('edit_album_id').value;
-
-            // Convierte las líneas del textarea a un array limpio sin líneas vacías
+            
             const tracklistArray = document.getElementById('tracklist').value
                 .split('\n')
                 .map(t => t.trim())
@@ -1212,10 +1235,9 @@
             }
 
             if (error) {
-                alert('Error al guardar en Supabase: ' + error.message);
+                alert('Error al guardar: ' + error.message);
             } else {
                 closeAlbumModal();
-                // Recarga limpia e inmediata para reflejar los cambios guardados
                 location.reload();
             }
         });
