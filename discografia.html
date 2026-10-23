@@ -436,6 +436,14 @@
             margin-top: 0.2rem;
         }
 
+        /* Ocultar el botón de los tres puntos (descarga y velocidad) en el reproductor nativo */
+        audio::-webkit-media-controls-enclosure {
+            overflow: hidden;
+        }
+        audio::-webkit-media-controls-overflow-button {
+            display: none !important;
+        }
+
         /* Badges & Botones */
         .release-type-badge {
             display: inline-block;
@@ -967,7 +975,7 @@
                             </div>
                             <div>
                                 <span class="audio-label">Escúchalo</span>
-                                <audio controls preload="none">
+                                <audio controls controlsList="nodownload" preload="none">
                                     <source src="${audioLink}" type="audio/mpeg">
                                     Tu navegador no soporta el elemento de audio.
                                 </audio>
