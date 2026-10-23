@@ -747,6 +747,7 @@
 
         function populateHelperAlbums() {
             const select = document.getElementById('helper_target_album');
+            if (!select) return;
             select.innerHTML = '<option value="">-- Seleccionar Disco --</option>';
             artistAlbumsCache.forEach(alb => {
                 select.innerHTML += `<option value="${alb.album_title}">[${alb.release_type || 'Disco'}] ${alb.album_title} (${alb.release_year || 'N/A'})</option>`;
@@ -755,38 +756,46 @@
             updateSongSelectDropdown();
         }
 
-        /* EXTRAE LAS CANCIONES DEL TEXTAREA Y LAS PONE EN EL DESPLEGABLE */
+        /* EXTRAE LAS CANCIONES DEL TEXTAREA PARA EL SELECTOR */
         function updateSongSelectDropdown() {
             const songSelect = document.getElementById('helper_song_select');
-            const tracklistText = document.getElementById('tracklist').value;
+            const tracklistText = document.getElementById('tracklist');
+            if (!songSelect || !tracklistText) return;
             
             songSelect.innerHTML = '<option value="">-- Selecciona una canción del disco --</option>';
 
-            if (!tracklistText.trim()) return;
+            const textValue = tracklistText.value.trim();
+            if (!textValue) return;
 
-            const lines = tracklistText.split('\n');
-            lines.forEach((line, index) => {
+            const lines = textValue.split('\n');
+            lines.forEach((line) => {
                 if (line.trim()) {
-                    songSelect.innerHTML += `<option value="${index}">${line.trim()}</option>`;
+                    songSelect.innerHTML += `<option value="${line.trim()}">${line.trim()}</option>`;
                 }
             });
         }
 
         /* ESCUCHA CAMBIOS EN EL TEXTAREA EN TIEMPO REAL */
-        document.getElementById('tracklist').addEventListener('input', updateSongSelectDropdown);
+        const tracklistElement = document.getElementById('tracklist');
+        if (tracklistElement) {
+            tracklistElement.addEventListener('input', updateSongSelectDropdown);
+        }
 
+        /* FUNCIÓN BLINDADA PARA INSERTAR LA NOTA AUTOMÁTICAMENTE */
         function insertSongNoteToTracklist() {
             const songSelectDropdown = document.getElementById('helper_song_select');
-            const selectedText = songSelectDropdown.options[songSelectDropdown.selectedIndex] ? songSelectDropdown.options[songSelectDropdown.selectedIndex].text : "";
-            
-            const songType = document.getElementById('helper_song_type').value;
-            let targetAlbum = document.getElementById('helper_target_album').value;
-
+            const songTypeSelect = document.getElementById('helper_song_type');
+            const targetAlbumSelect = document.getElementById('helper_target_album');
             const tracklistTextarea = document.getElementById('tracklist');
-            let lines = tracklistTextarea.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
-            if (!selectedText || songSelectDropdown.value === "") {
-                alert('Selecciona una canción de la lista.');
+            if (!songSelectDropdown || !tracklistTextarea) return;
+
+            const selectedSongFullText = songSelectDropdown.value;
+            const songType = songTypeSelect ? songTypeSelect.value : 'not_included';
+            let targetAlbum = targetAlbumSelect ? targetAlbumSelect.value : '';
+
+            if (!selectedSongFullText) {
+                alert('Por favor, selecciona una canción del desplegable superior.');
                 return;
             }
 
@@ -816,32 +825,30 @@
                     break;
             }
 
-            // Busca y reemplaza exactamente la línea que coincide con el texto seleccionado (limpiando paréntesis previos si los hubiera)
-            let found = false;
+            let lines = tracklistTextarea.value.split('\n');
+            let updated = false;
+
             lines = lines.map(line => {
-                let baseName = line.split('(')[0].trim();
-                let selectedBaseName = selectedText.split('(')[0].trim();
-                
-                if (baseName === selectedBaseName) {
-                    found = true;
-                    return `${baseName} ${noteText}`;
+                let cleanLine = line.trim();
+                let baseNameLine = cleanLine.split('(')[0].trim();
+                let baseNameSelected = selectedSongFullText.split('(')[0].trim();
+
+                if (baseNameLine === baseNameSelected) {
+                    updated = true;
+                    return `${baseNameLine} ${noteText}`;
                 }
                 return line;
             });
 
-            if (!found && lines.length > 0) {
-                let lastIdx = lines.length - 1;
-                let baseName = lines[lastIdx].split('(')[0].trim();
-                lines[lastIdx] = `${baseName} ${noteText}`;
+            if (!updated) {
+                alert('No se pudo encontrar la canción exacta en el cuadro de texto.');
+                return;
             }
 
-            // Inyecta el texto modificado en el textarea visible
             tracklistTextarea.value = lines.join('\n');
-
             updateSongSelectDropdown();
-            songSelectDropdown.value = "";
             
-            alert('¡Observación aplicada con éxito en el cuadro de texto! Ahora haz clic en "Guardar Cambios".');
+            alert('¡Listo! La observación se ha añadido al cuadro de texto. Ahora solo presiona "Guardar Cambios".');
         }
 
         async function init() {
@@ -1094,7 +1101,6 @@
             }
 
             albums.forEach(album => {
-                // Renderizado limpio de la lista de canciones en formato jsonb
                 let tracks = 'Lista de canciones no disponible.';
                 if (Array.isArray(album.tracklist)) {
                     tracks = album.tracklist.join('<br>');
@@ -1193,7 +1199,6 @@
             document.getElementById('cover_image').value = album.cover_image || '';
             document.getElementById('terabox_link').value = album.terabox_link || '';
 
-            // Carga correcta del array jsonb hacia el textarea del modal de edición
             let rawTracks = '';
             if (Array.isArray(album.tracklist)) {
                 rawTracks = album.tracklist.join('\n');
@@ -1207,7 +1212,6 @@
             }
 
             document.getElementById('tracklist').value = rawTracks;
-            
             document.getElementById('album-modal').style.display = 'flex';
             
             populateHelperAlbums();
@@ -1223,7 +1227,6 @@
             e.preventDefault();
             const albumId = document.getElementById('edit_album_id').value;
             
-            // Convierte el textarea en un array JSON limpio
             const tracklistArray = document.getElementById('tracklist').value
                 .split('\n')
                 .map(t => t.trim())
