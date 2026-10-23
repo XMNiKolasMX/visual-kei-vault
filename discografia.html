@@ -294,7 +294,7 @@
             font-weight: bold;
         }
 
-        /* VISTA 1: Cuadrícula de 5 columnas (5 en 5) */
+        /* VISTA 1: Cuadrícula de 5 columnas */
         .albums-container.grid-view {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -402,6 +402,65 @@
         .compact-view .tracklist-box { display: none; }
         .compact-view .album-header { border: none; padding: 0; margin: 0; }
 
+        /* Estilos del Reproductor y Canciones con Botón "Escúchalo" */
+        .track-item-row {
+            display: flex;
+            flex-direction: column;
+            padding: 0.4rem 0;
+            border-bottom: 1px dashed #222;
+        }
+        .track-item-row:last-child { border-bottom: none; }
+        .track-main-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .track-name-text {
+            flex-grow: 1;
+            color: #ddd;
+        }
+        .track-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-listen-track {
+            background: rgba(56, 218, 246, 0.15);
+            border: 1px solid #38daf6;
+            color: #38daf6;
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-listen-track:hover {
+            background: #38daf6;
+            color: #000;
+        }
+        .track-player-wrapper {
+            display: none;
+            margin-top: 0.4rem;
+            background: #080808;
+            padding: 0.4rem 0.6rem;
+            border-radius: 4px;
+            border: 1px solid #222;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .track-player-wrapper audio {
+            height: 28px;
+            flex-grow: 1;
+            filter: invert(0.9);
+        }
+
         /* Badges & Botones */
         .release-type-badge {
             display: inline-block;
@@ -463,31 +522,6 @@
         .btn-edit { background: #222; border: 1px solid #444; color: #fff; padding: 0.4rem 0.8rem; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; }
         .btn-delete { background: transparent; border: 1px solid #721c24; color: #f8d7da; padding: 0.4rem 0.8rem; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; }
         .btn-delete:hover { background: #721c24; color: #fff; }
-
-        .song-helper-box {
-            background: #10141d;
-            border: 1px solid #1e2638;
-            padding: 1rem;
-            margin-top: 0.8rem;
-            border-radius: 6px;
-        }
-        .btn-add-song-note {
-            background: #1a2333;
-            border: 1px solid #38daf6;
-            color: #38daf6;
-            padding: 0.4rem 0.8rem;
-            font-size: 0.72rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            margin-top: 0.6rem;
-            border-radius: 4px;
-            transition: all 0.2s;
-            width: 100%;
-        }
-        .btn-add-song-note:hover {
-            background: #38daf6;
-            color: #0b0f19;
-        }
     </style>
 </head>
 <body>
@@ -663,49 +697,14 @@
                 </div>
 
                 <div class="admin-form-group">
-                    <label>Enlace TeraBox</label>
+                    <label>Enlace TeraBox (Descargar el Álbum)</label>
                     <input type="url" id="terabox_link" placeholder="https://terabox.com/s/...">
                 </div>
 
                 <div class="admin-form-group">
-                    <label>Lista de Canciones (Una por línea)</label>
-                    <textarea id="tracklist" rows="5" placeholder="1. De Fleur&#10;2. Speed of Despair"></textarea>
-                    
-                    <div class="song-helper-box">
-                        <label style="color:#d4af37; font-size:0.75rem; font-weight:bold;">🛠️ Asistente para agregar observaciones a la lista:</label>
-                        
-                        <!-- SELECTOR DINÁMICO DE CANCIONES DE ESTE DISCO -->
-                        <div style="margin-top:0.5rem;">
-                            <label style="font-size:0.7rem; color:#aaa;">Seleccionar Canción del Disco:</label>
-                            <select id="helper_song_select">
-                                <option value="">-- Selecciona una canción del disco --</option>
-                            </select>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top:0.5rem;">
-                            <div>
-                                <label style="font-size:0.7rem; color:#aaa;">Motivo / Estado:</label>
-                                <select id="helper_song_type">
-                                    <option value="not_included">Esta canción NO se agregó porque ya está en otro Lanzamiento</option>
-                                    <option value="remix">Esta canción SÍ se incluyó porque es un Remix de...</option>
-                                    <option value="new_version">Esta canción SÍ se incluyó porque es una Nueva Versión de...</option>
-                                    <option value="remake">Esta canción SÍ se incluyó porque es un Remake de...</option>
-                                    <option value="remaster">Esta canción SÍ se incluyó porque es una versión Remasterizada de...</option>
-                                    <option value="not_found">Esta canción NO se incluyó porque no se encontró (Audio Perdido)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label style="font-size:0.7rem; color:#aaa;">Álbum o Single de referencia:</label>
-                                <select id="helper_target_album">
-                                    <option value="">-- Cargar lista de discos --</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <button type="button" class="btn-add-song-note" onclick="insertSongNoteToTracklist()">
-                            + Agregar observación a la Lista de Canciones
-                        </button>
-                    </div>
+                    <label>Lista de Canciones con Enlace de Reproducción (Formato: Nombre de la canción | URL de audio)</label>
+                    <p style="font-size:0.65rem; color:#888; margin-top:2px; margin-bottom:5px;">💡 Consejo: Para agregar reproductor pon un pipe <code>|</code> seguido del link directo de audio, SoundCloud o YouTube. Si no pones enlace, solo saldrá el texto normal.</p>
+                    <textarea id="tracklist" rows="7" placeholder="1. De Fleur | https://example.com/audio.mp3&#10;2. Speed of Despair"></textarea>
                 </div>
 
                 <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
@@ -743,112 +742,6 @@
             document.querySelectorAll('.filter-tag-btn').forEach(b => b.classList.remove('active'));
             btnElement.classList.add('active');
             loadAlbums();
-        }
-
-        function populateHelperAlbums() {
-            const select = document.getElementById('helper_target_album');
-            if (!select) return;
-            select.innerHTML = '<option value="">-- Seleccionar Disco --</option>';
-            artistAlbumsCache.forEach(alb => {
-                select.innerHTML += `<option value="${alb.album_title}">[${alb.release_type || 'Disco'}] ${alb.album_title} (${alb.release_year || 'N/A'})</option>`;
-            });
-
-            updateSongSelectDropdown();
-        }
-
-        /* EXTRAE LAS CANCIONES DEL TEXTAREA PARA EL SELECTOR */
-        function updateSongSelectDropdown() {
-            const songSelect = document.getElementById('helper_song_select');
-            const tracklistText = document.getElementById('tracklist');
-            if (!songSelect || !tracklistText) return;
-            
-            songSelect.innerHTML = '<option value="">-- Selecciona una canción del disco --</option>';
-
-            const textValue = tracklistText.value.trim();
-            if (!textValue) return;
-
-            const lines = textValue.split('\n');
-            lines.forEach((line) => {
-                if (line.trim()) {
-                    songSelect.innerHTML += `<option value="${line.trim()}">${line.trim()}</option>`;
-                }
-            });
-        }
-
-        /* ESCUCHA CAMBIOS EN EL TEXTAREA EN TIEMPO REAL */
-        const tracklistElement = document.getElementById('tracklist');
-        if (tracklistElement) {
-            tracklistElement.addEventListener('input', updateSongSelectDropdown);
-        }
-
-        /* FUNCIÓN BLINDADA PARA INSERTAR LA NOTA AUTOMÁTICAMENTE */
-        function insertSongNoteToTracklist() {
-            const songSelectDropdown = document.getElementById('helper_song_select');
-            const songTypeSelect = document.getElementById('helper_song_type');
-            const targetAlbumSelect = document.getElementById('helper_target_album');
-            const tracklistTextarea = document.getElementById('tracklist');
-
-            if (!songSelectDropdown || !tracklistTextarea) return;
-
-            const selectedSongFullText = songSelectDropdown.value;
-            const songType = songTypeSelect ? songTypeSelect.value : 'not_included';
-            let targetAlbum = targetAlbumSelect ? targetAlbumSelect.value : '';
-
-            if (!selectedSongFullText) {
-                alert('Por favor, selecciona una canción del desplegable superior.');
-                return;
-            }
-
-            if (songType !== 'not_found' && !targetAlbum) {
-                targetAlbum = "Otro lanzamiento";
-            }
-
-            let noteText = '';
-            switch (songType) {
-                case 'not_included':
-                    noteText = `(Esta canción no se agregó porque ya está en: "${targetAlbum}")`;
-                    break;
-                case 'remix':
-                    noteText = `(Esta canción sí se incluyó porque es un Remix de: "${targetAlbum}")`;
-                    break;
-                case 'new_version':
-                    noteText = `(Esta canción sí se incluyó porque es una Nueva Versión de: "${targetAlbum}")`;
-                    break;
-                case 'remake':
-                    noteText = `(Esta canción sí se incluyó porque es un Remake de: "${targetAlbum}")`;
-                    break;
-                case 'remaster':
-                    noteText = `(Esta canción sí se incluyó porque es una versión Remasterizada de: "${targetAlbum}")`;
-                    break;
-                case 'not_found':
-                    noteText = `(Esta canción no se incluyó porque no se encontró / audio perdido)`;
-                    break;
-            }
-
-            let lines = tracklistTextarea.value.split('\n');
-            let updated = false;
-
-            lines = lines.map(line => {
-                let cleanLine = line.trim();
-                let baseNameLine = cleanLine.split('(')[0].trim();
-                let baseNameSelected = selectedSongFullText.split('(')[0].trim();
-
-                if (baseNameLine === baseNameSelected) {
-                    updated = true;
-                    return `${baseNameLine} ${noteText}`;
-                }
-                return line;
-            });
-
-            if (!updated) {
-                alert('No se pudo encontrar la canción exacta en el cuadro de texto.');
-                return;
-            }
-
-            tracklistTextarea.value = lines.join('\n');
-            updateSongSelectDropdown();
-            
-            alert('¡Listo! La observación se ha añadido al cuadro de texto. Ahora solo presiona "Guardar Cambios".');
         }
 
         async function init() {
@@ -1069,6 +962,86 @@
             }
         }
 
+        /* RENDERIZAR TRACKLIST CON REPRODUCTOR INTEGRADO ("ESCÚCHALO") */
+        function formatTracklistHTML(tracklistData) {
+            let lines = [];
+            if (Array.isArray(tracklistData)) {
+                lines = tracklistData;
+            } else if (typeof tracklistData === 'string') {
+                try {
+                    const parsed = JSON.parse(tracklistData);
+                    lines = Array.isArray(parsed) ? parsed : tracklistData.split('\n');
+                } catch (e) {
+                    lines = tracklistData.split('\n');
+                }
+            }
+
+            let htmlOutput = '';
+            lines.forEach((line, index) => {
+                if (!line.trim()) return;
+
+                // Separamos si tiene enlace de audio mediante un pipe "|"
+                let parts = line.split('|');
+                let songTitle = parts[0].trim();
+                let audioLink = parts[1] ? parts[1].trim() : '';
+
+                if (audioLink) {
+                    let playerId = `player_${Math.random().toString(36).substring(2, 9)}`;
+                    htmlOutput += `
+                        <div class="track-item-row">
+                            <div class="track-main-info">
+                                <span class="track-name-text">${songTitle}</span>
+                                <div class="track-actions">
+                                    <button class="btn-listen-track" onclick="toggleTrackPlayer('${playerId}')">
+                                        <i class="fa-solid fa-volume-high"></i> Escúchalo
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="${playerId}" class="track-player-wrapper">
+                                <audio controls preload="none">
+                                    <source src="${audioLink}" type="audio/mpeg">
+                                    Tu navegador no soporta el elemento de audio.
+                                </audio>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    htmlOutput += `
+                        <div class="track-item-row">
+                            <div class="track-main-info">
+                                <span class="track-name-text">${songTitle}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            return htmlOutput || 'Lista de canciones no disponible.';
+        }
+
+        /* CONTROLADOR PARA ABRIR/CERRAR EL REPRODUCTOR DE CADA CANCIÓN */
+        function toggleTrackPlayer(playerId) {
+            // Pausar todos los demás reproductores activos para que no suenen dos a la vez
+            document.querySelectorAll('.track-player-wrapper').forEach(el => {
+                if (el.id !== playerId) {
+                    el.style.display = 'none';
+                    let audio = el.querySelector('audio');
+                    if (audio) audio.pause();
+                }
+            });
+
+            const playerWrapper = document.getElementById(playerId);
+            if (playerWrapper) {
+                if (playerWrapper.style.display === 'flex') {
+                    playerWrapper.style.display = 'none';
+                    let audio = playerWrapper.querySelector('audio');
+                    if (audio) audio.pause();
+                } else {
+                    playerWrapper.style.display = 'flex';
+                }
+            }
+        }
+
         /* CARGA Y GESTIÓN DE DISCOGRAFÍA */
         async function loadAlbums() {
             const sortVal = document.getElementById('sort-select').value;
@@ -1089,7 +1062,6 @@
             const { data: albums, error } = await query;
             if (albums) {
                 artistAlbumsCache = albums;
-                populateHelperAlbums();
             }
 
             const container = document.getElementById('albums-list');
@@ -1101,25 +1073,11 @@
             }
 
             albums.forEach(album => {
-                let tracks = 'Lista de canciones no disponible.';
-                if (Array.isArray(album.tracklist)) {
-                    tracks = album.tracklist.join('<br>');
-                } else if (typeof album.tracklist === 'string') {
-                    try {
-                        const parsed = JSON.parse(album.tracklist);
-                        if (Array.isArray(parsed)) {
-                            tracks = parsed.join('<br>');
-                        } else {
-                            tracks = album.tracklist.replace(/\n/g, '<br>');
-                        }
-                    } catch (e) {
-                        tracks = album.tracklist.replace(/\n/g, '<br>');
-                    }
-                }
+                let tracksHtml = formatTracklistHTML(album.tracklist);
                 
                 const teraboxBtn = album.terabox_link 
-                    ? `<a href="${album.terabox_link}" target="_blank" class="btn-terabox">📥 Descargar</a>`
-                    : '<span class="no-terabox">Sin enlace</span>';
+                    ? `<a href="${album.terabox_link}" target="_blank" class="btn-terabox"><i class="fa-solid fa-download"></i> Descargar álbum</a>`
+                    : '<span class="no-terabox">Sin enlace de álbum</span>';
 
                 const coverImg = album.cover_image 
                     ? `<img src="${album.cover_image}" class="album-cover" alt="${album.album_title}">` 
@@ -1166,7 +1124,7 @@
                                     </h3>
                                     ${teraboxBtn}
                                 </div>
-                                <div class="tracklist-box">${tracks}</div>
+                                <div class="tracklist-box">${tracksHtml}</div>
                                 ${adminControlsHTML}
                             </div>
                         </div>
@@ -1180,8 +1138,6 @@
             document.getElementById('album-form').reset();
             document.getElementById('edit_album_id').value = '';
             document.getElementById('album-modal').style.display = 'flex';
-            populateHelperAlbums();
-            updateSongSelectDropdown();
         }
 
         async function openEditModal(albumId) {
@@ -1213,9 +1169,6 @@
 
             document.getElementById('tracklist').value = rawTracks;
             document.getElementById('album-modal').style.display = 'flex';
-            
-            populateHelperAlbums();
-            updateSongSelectDropdown();
         }
 
         function closeAlbumModal() {
