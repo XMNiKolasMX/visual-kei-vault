@@ -678,7 +678,7 @@
                         <div style="margin-top:0.5rem;">
                             <label style="font-size:0.7rem; color:#aaa;">Seleccionar Canción del Disco:</label>
                             <select id="helper_song_select">
-                                <option value="">-- Primero escribe canciones arriba --</option>
+                                <option value="">-- Selecciona una canción del disco --</option>
                             </select>
                         </div>
 
@@ -697,7 +697,7 @@
                             <div>
                                 <label style="font-size:0.7rem; color:#aaa;">Álbum o Single de referencia:</label>
                                 <select id="helper_target_album">
-                                    <option value="">-- Cargar lista de discos --</option>
+                                    <option value="">-- Seleccionar Disco --</option>
                                 </select>
                             </div>
                         </div>
@@ -778,12 +778,12 @@
         function insertSongNoteToTracklist() {
             let songSelectIndex = document.getElementById('helper_song_select').value;
             const songType = document.getElementById('helper_song_type').value;
-            const targetAlbum = document.getElementById('helper_target_album').value;
+            let targetAlbum = document.getElementById('helper_target_album').value;
 
             const tracklistTextarea = document.getElementById('tracklist');
-            let lines = tracklistTextarea.value.split('\n').filter(l => l.trim().length > 0);
+            let lines = tracklistTextarea.value.split('\n');
 
-            // Blindaje: Si no se seleccionó explícitamente una opción del desplegable, toma la última línea por defecto
+            // BLINDAJE 1: Si no se seleccionó ninguna canción del desplegable, toma por defecto la última línea
             if (songSelectIndex === "" && lines.length > 0) {
                 songSelectIndex = lines.length - 1;
             }
@@ -793,9 +793,9 @@
                 return;
             }
 
+            // BLINDAJE 2: Si el usuario dejó el selector de referencia vacío, asigna un valor por defecto para no bloquear
             if (songType !== 'not_found' && !targetAlbum) {
-                alert('Selecciona el álbum, single o demo de referencia.');
-                return;
+                targetAlbum = "Otro lanzamiento";
             }
 
             let noteText = '';
@@ -823,7 +823,7 @@
             let targetLine = lines[songSelectIndex];
             if (!targetLine) return;
 
-            // Limpia la nota previa si ya tenía una entre paréntesis para evitar duplicados
+            // Limpia notas previas entre paréntesis para evitar duplicar texto
             let baseSongName = targetLine.split('(')[0].trim();
 
             lines[songSelectIndex] = `${baseSongName} ${noteText}`;
@@ -1203,7 +1203,6 @@
             
             document.getElementById('album-modal').style.display = 'flex';
             
-            // Llena y actualiza de forma inmediata los selectores del asistente
             populateHelperAlbums();
             updateSongSelectDropdown();
         }
