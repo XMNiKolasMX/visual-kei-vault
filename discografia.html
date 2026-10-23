@@ -816,7 +816,7 @@
                     break;
             }
 
-            // Busca y reemplaza exactamente la línea que coincide con el texto seleccionado
+            // Busca y reemplaza exactamente la línea que coincide con el texto seleccionado (limpiando paréntesis previos si los hubiera)
             let found = false;
             lines = lines.map(line => {
                 let baseName = line.split('(')[0].trim();
