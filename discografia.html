@@ -776,12 +776,20 @@
         document.getElementById('tracklist').addEventListener('input', updateSongSelectDropdown);
 
         function insertSongNoteToTracklist() {
-            const songSelectIndex = document.getElementById('helper_song_select').value;
+            let songSelectIndex = document.getElementById('helper_song_select').value;
             const songType = document.getElementById('helper_song_type').value;
             const targetAlbum = document.getElementById('helper_target_album').value;
 
-            if (songSelectIndex === "") {
-                alert('Selecciona una canción de la lista.');
+            const tracklistTextarea = document.getElementById('tracklist');
+            let lines = tracklistTextarea.value.split('\n').filter(l => l.trim().length > 0);
+
+            // Blindaje: Si no se seleccionó explícitamente una opción del desplegable, toma la última línea por defecto
+            if (songSelectIndex === "" && lines.length > 0) {
+                songSelectIndex = lines.length - 1;
+            }
+
+            if (songSelectIndex === "" || lines.length === 0) {
+                alert('Primero debe haber al menos una canción en la lista.');
                 return;
             }
 
@@ -789,9 +797,6 @@
                 alert('Selecciona el álbum, single o demo de referencia.');
                 return;
             }
-
-            const tracklistTextarea = document.getElementById('tracklist');
-            let lines = tracklistTextarea.value.split('\n');
 
             let noteText = '';
             switch (songType) {
@@ -818,16 +823,18 @@
             let targetLine = lines[songSelectIndex];
             if (!targetLine) return;
 
-            // Limpia la nota previa en caso de que ya tuviera una entre paréntesis
+            // Limpia la nota previa si ya tenía una entre paréntesis para evitar duplicados
             let baseSongName = targetLine.split('(')[0].trim();
 
             lines[songSelectIndex] = `${baseSongName} ${noteText}`;
 
-            // Actualiza de inmediato el textarea principal con el cambio
+            // Actualiza de inmediato el textarea principal con el cambio aplicado
             tracklistTextarea.value = lines.join('\n');
 
             updateSongSelectDropdown();
             document.getElementById('helper_song_select').value = "";
+            
+            alert('¡Observación agregada con éxito al cuadro de texto! Ahora haz clic en "Guardar Cambios".');
         }
 
         async function init() {
