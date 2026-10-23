@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VISUAL KEI VAULT // DISCOGRAFÍA</title>
+    <title>VISUAL KEI VAULT // DISCOGRÁFÍA</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1200,9 +1200,10 @@
             if (error) {
                 alert('Error al guardar: ' + error.message);
             } else {
-                alert('¡Operación realizada con éxito!');
                 closeAlbumModal();
-                loadAlbums();
+                setTimeout(async () => {
+                    await loadAlbums();
+                }, 300);
             }
         });
 
