@@ -823,7 +823,7 @@
 
             lines[songSelectIndex] = `${baseSongName} ${noteText}`;
 
-            // Actualiza el textarea con la línea modificada
+            // Actualiza de inmediato el textarea principal con el cambio
             tracklistTextarea.value = lines.join('\n');
 
             updateSongSelectDropdown();
@@ -1080,7 +1080,7 @@
             }
 
             albums.forEach(album => {
-                // Renderizado limpio de la lista de canciones para la interfaz visual
+                // Renderizado limpio de la lista de canciones en formato jsonb
                 let tracks = 'Lista de canciones no disponible.';
                 if (Array.isArray(album.tracklist)) {
                     tracks = album.tracklist.join('<br>');
@@ -1179,7 +1179,7 @@
             document.getElementById('cover_image').value = album.cover_image || '';
             document.getElementById('terabox_link').value = album.terabox_link || '';
 
-            // Carga y formatea correctamente el tracklist (sea array jsonb o texto) hacia el textarea
+            // Carga correcta del array jsonb hacia el textarea del modal de edición
             let rawTracks = '';
             if (Array.isArray(album.tracklist)) {
                 rawTracks = album.tracklist.join('\n');
@@ -1194,7 +1194,6 @@
 
             document.getElementById('tracklist').value = rawTracks;
             
-            // Abre el modal de edición
             document.getElementById('album-modal').style.display = 'flex';
             
             // Llena y actualiza de forma inmediata los selectores del asistente
@@ -1211,7 +1210,7 @@
             e.preventDefault();
             const albumId = document.getElementById('edit_album_id').value;
             
-            // Convierte las líneas del textarea en un array JSON limpio
+            // Convierte el textarea en un array JSON limpio
             const tracklistArray = document.getElementById('tracklist').value
                 .split('\n')
                 .map(t => t.trim())
