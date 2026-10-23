@@ -674,8 +674,12 @@
                     <div class="song-helper-box">
                         <label style="color:#d4af37; font-size:0.75rem; font-weight:bold;">🛠️ Asistente para agregar observaciones a la lista:</label>
                         
+                        <!-- SELECTOR DINÁMICO DE CANCIONES DE ESTE DISCO -->
                         <div style="margin-top:0.5rem;">
-                            <input type="text" id="helper_song_name" placeholder="Nombre de la canción (Ej: Daraku)">
+                            <label style="font-size:0.7rem; color:#aaa;">Seleccionar Canción del Disco:</label>
+                            <select id="helper_song_select">
+                                <option value="">-- Primero escribe canciones arriba --</option>
+                            </select>
                         </div>
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top:0.5rem;">
@@ -747,15 +751,37 @@
             artistAlbumsCache.forEach(alb => {
                 select.innerHTML += `<option value="${alb.album_title}">[${alb.release_type || 'Disco'}] ${alb.album_title} (${alb.release_year || 'N/A'})</option>`;
             });
+
+            updateSongSelectDropdown();
         }
 
+        /* EXTRAE LAS CANCIONES DEL TEXTAREA Y LAS PONE EN EL DESPLEGABLE */
+        function updateSongSelectDropdown() {
+            const songSelect = document.getElementById('helper_song_select');
+            const tracklistText = document.getElementById('tracklist').value;
+            
+            songSelect.innerHTML = '<option value="">-- Selecciona una canción del disco --</option>';
+
+            if (!tracklistText.trim()) return;
+
+            const lines = tracklistText.split('\n');
+            lines.forEach((line, index) => {
+                if (line.trim()) {
+                    songSelect.innerHTML += `<option value="${index}">${line.trim()}</option>`;
+                }
+            });
+        }
+
+        /* ESCUCHA CAMBIOS EN EL TEXTAREA EN TIEMPO REAL */
+        document.getElementById('tracklist').addEventListener('input', updateSongSelectDropdown);
+
         function insertSongNoteToTracklist() {
-            const songName = document.getElementById('helper_song_name').value.trim();
+            const songSelectIndex = document.getElementById('helper_song_select').value;
             const songType = document.getElementById('helper_song_type').value;
             const targetAlbum = document.getElementById('helper_target_album').value;
 
-            if (!songName) {
-                alert('Ingresa el nombre de la canción.');
+            if (songSelectIndex === "") {
+                alert('Selecciona una canción de la lista.');
                 return;
             }
 
@@ -789,29 +815,17 @@
                     break;
             }
 
-            let formattedLine = `${songName} ${noteText}`;
-            let lineFound = false;
+            let targetLine = lines[songSelectIndex];
+            if (!targetLine) return;
 
-            let updatedLines = lines.map(line => {
-                if (line.toLowerCase().includes(songName.toLowerCase())) {
-                    lineFound = true;
-                    return `${line} ${noteText}`;
-                }
-                return line;
-            });
+            // Limpia la nota previa en caso de que ya tuviera una
+            let baseSongName = targetLine.split('(')[0].trim();
 
-            if (lineFound) {
-                tracklistTextarea.value = updatedLines.join('\n');
-            } else {
-                if (tracklistTextarea.value.trim().length > 0) {
-                    tracklistTextarea.value += `\n${formattedLine}`;
-                } else {
-                    tracklistTextarea.value = formattedLine;
-                }
-            }
+            lines[songSelectIndex] = `${baseSongName} ${noteText}`;
 
-            document.getElementById('helper_song_name').value = '';
-            tracklistTextarea.focus();
+            tracklistTextarea.value = lines.join('\n');
+            updateSongSelectDropdown();
+            document.getElementById('helper_song_select').value = "";
         }
 
         async function init() {
