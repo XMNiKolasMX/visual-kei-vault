@@ -823,7 +823,9 @@
 
             lines[songSelectIndex] = `${baseSongName} ${noteText}`;
 
+            // Actualiza el textarea con la línea modificada
             tracklistTextarea.value = lines.join('\n');
+
             updateSongSelectDropdown();
             document.getElementById('helper_song_select').value = "";
         }
@@ -1078,7 +1080,7 @@
             }
 
             albums.forEach(album => {
-                // Renderiza las canciones limpias línea por línea eliminando corchetes y comillas de JSONB
+                // Renderizado limpio de la lista de canciones para la interfaz visual
                 let tracks = 'Lista de canciones no disponible.';
                 if (Array.isArray(album.tracklist)) {
                     tracks = album.tracklist.join('<br>');
@@ -1177,18 +1179,14 @@
             document.getElementById('cover_image').value = album.cover_image || '';
             document.getElementById('terabox_link').value = album.terabox_link || '';
 
-            // Carga correcta del Array JSONB hacia el textarea para el editor
+            // Carga y formatea correctamente el tracklist (sea array jsonb o texto) hacia el textarea
             let rawTracks = '';
             if (Array.isArray(album.tracklist)) {
                 rawTracks = album.tracklist.join('\n');
             } else if (typeof album.tracklist === 'string') {
                 try {
                     const parsed = JSON.parse(album.tracklist);
-                    if (Array.isArray(parsed)) {
-                        rawTracks = parsed.join('\n');
-                    } else {
-                        rawTracks = album.tracklist;
-                    }
+                    rawTracks = Array.isArray(parsed) ? parsed.join('\n') : album.tracklist;
                 } catch (e) {
                     rawTracks = album.tracklist;
                 }
@@ -1196,7 +1194,10 @@
 
             document.getElementById('tracklist').value = rawTracks;
             
+            // Abre el modal de edición
             document.getElementById('album-modal').style.display = 'flex';
+            
+            // Llena y actualiza de forma inmediata los selectores del asistente
             populateHelperAlbums();
             updateSongSelectDropdown();
         }
@@ -1210,6 +1211,7 @@
             e.preventDefault();
             const albumId = document.getElementById('edit_album_id').value;
             
+            // Convierte las líneas del textarea en un array JSON limpio
             const tracklistArray = document.getElementById('tracklist').value
                 .split('\n')
                 .map(t => t.trim())
