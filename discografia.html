@@ -402,63 +402,38 @@
         .compact-view .tracklist-box { display: none; }
         .compact-view .album-header { border: none; padding: 0; margin: 0; }
 
-        /* Estilos del Reproductor y Canciones con Botón "Escúchalo" */
+        /* Estilos de Canciones y Reproductor Directo con Etiqueta Superior */
         .track-item-row {
             display: flex;
             flex-direction: column;
-            padding: 0.4rem 0;
+            margin-bottom: 0.8rem;
             border-bottom: 1px dashed #222;
+            padding-bottom: 0.6rem;
         }
-        .track-item-row:last-child { border-bottom: none; }
+        .track-item-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .track-main-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.5rem;
+            margin-bottom: 0.2rem;
         }
         .track-name-text {
-            flex-grow: 1;
             color: #ddd;
+            font-weight: 600;
         }
-        .track-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .btn-listen-track {
-            background: rgba(56, 218, 246, 0.15);
-            border: 1px solid #38daf6;
-            color: #38daf6;
+        .audio-label {
             font-size: 0.65rem;
-            padding: 2px 8px;
-            border-radius: 3px;
-            cursor: pointer;
+            color: #d4af37;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.2s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+            display: block;
+            margin-bottom: 0.2rem;
+            letter-spacing: 1px;
+            font-weight: bold;
         }
-        .btn-listen-track:hover {
-            background: #38daf6;
-            color: #000;
-        }
-        .track-player-wrapper {
-            display: none;
-            margin-top: 0.4rem;
-            background: #080808;
-            padding: 0.4rem 0.6rem;
-            border-radius: 4px;
-            border: 1px solid #222;
-            align-items: center;
-            gap: 0.8rem;
-        }
-        .track-player-wrapper audio {
-            height: 28px;
-            flex-grow: 1;
+        .track-item-row audio {
+            width: 100%;
+            height: 30px;
             filter: invert(0.9);
+            background: #141414;
+            border-radius: 4px;
+            margin-top: 0.2rem;
         }
 
         /* Badges & Botones */
@@ -703,8 +678,8 @@
 
                 <div class="admin-form-group">
                     <label>Lista de Canciones con Enlace de Reproducción (Formato: Nombre de la canción | URL de audio)</label>
-                    <p style="font-size:0.65rem; color:#888; margin-top:2px; margin-bottom:5px;">💡 Consejo: Para agregar reproductor pon un pipe <code>|</code> seguido del link directo de audio, SoundCloud o YouTube. Si no pones enlace, solo saldrá el texto normal.</p>
-                    <textarea id="tracklist" rows="7" placeholder="1. De Fleur | https://example.com/audio.mp3&#10;2. Speed of Despair"></textarea>
+                    <p style="font-size:0.65rem; color:#888; margin-top:2px; margin-bottom:5px;">💡 Consejo: Para agregar reproductor pon un pipe <code>|</code> seguido del link directo de audio. Si no pones enlace, solo saldrá el texto normal.</p>
+                    <textarea id="tracklist" rows="7" placeholder="1. Misty | https://ia601902.us.archive.org/16/items/canary-misty/CANARY-Misty.mp3&#10;2. Kioku no Iro"></textarea>
                 </div>
 
                 <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
@@ -873,9 +848,9 @@
                             </div>
                             <div class="timeline-track-area">
                                 <div class="timeline-bar-segment ${colorClass}" 
-                                     style="left: ${leftPercent}%; width: ${widthPercent}%;" 
-                                     title="${m.name} (${m.years_active})">
-                                     ${m.years_active}
+                                   style="left: ${leftPercent}%; width: ${widthPercent}%;" 
+                                   title="${m.name} (${m.years_active})">
+                                   ${m.years_active}
                                 </div>
                             </div>
                             ${adminBtnsHTML}
@@ -962,7 +937,7 @@
             }
         }
 
-        /* RENDERIZAR TRACKLIST CON REPRODUCTOR INTEGRADO ("ESCÚCHALO") */
+        /* RENDERIZAR TRACKLIST CON REPRODUCTOR DIRECTO Y ETIQUETA SUPERIOR */
         function formatTracklistHTML(tracklistData) {
             let lines = [];
             if (Array.isArray(tracklistData)) {
@@ -977,27 +952,21 @@
             }
 
             let htmlOutput = '';
-            lines.forEach((line, index) => {
+            lines.forEach((line) => {
                 if (!line.trim()) return;
 
-                // Separamos si tiene enlace de audio mediante un pipe "|"
                 let parts = line.split('|');
                 let songTitle = parts[0].trim();
                 let audioLink = parts[1] ? parts[1].trim() : '';
 
                 if (audioLink) {
-                    let playerId = `player_${Math.random().toString(36).substring(2, 9)}`;
                     htmlOutput += `
                         <div class="track-item-row">
                             <div class="track-main-info">
                                 <span class="track-name-text">${songTitle}</span>
-                                <div class="track-actions">
-                                    <button class="btn-listen-track" onclick="toggleTrackPlayer('${playerId}')">
-                                        <i class="fa-solid fa-volume-high"></i> Escúchalo
-                                    </button>
-                                </div>
                             </div>
-                            <div id="${playerId}" class="track-player-wrapper">
+                            <div>
+                                <span class="audio-label">Escúchalo</span>
                                 <audio controls preload="none">
                                     <source src="${audioLink}" type="audio/mpeg">
                                     Tu navegador no soporta el elemento de audio.
@@ -1017,29 +986,6 @@
             });
 
             return htmlOutput || 'Lista de canciones no disponible.';
-        }
-
-        /* CONTROLADOR PARA ABRIR/CERRAR EL REPRODUCTOR DE CADA CANCIÓN */
-        function toggleTrackPlayer(playerId) {
-            // Pausar todos los demás reproductores activos para que no suenen dos a la vez
-            document.querySelectorAll('.track-player-wrapper').forEach(el => {
-                if (el.id !== playerId) {
-                    el.style.display = 'none';
-                    let audio = el.querySelector('audio');
-                    if (audio) audio.pause();
-                }
-            });
-
-            const playerWrapper = document.getElementById(playerId);
-            if (playerWrapper) {
-                if (playerWrapper.style.display === 'flex') {
-                    playerWrapper.style.display = 'none';
-                    let audio = playerWrapper.querySelector('audio');
-                    if (audio) audio.pause();
-                } else {
-                    playerWrapper.style.display = 'flex';
-                }
-            }
         }
 
         /* CARGA Y GESTIÓN DE DISCOGRAFÍA */
