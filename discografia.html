@@ -675,15 +675,16 @@
                         <label style="color:#d4af37; font-size:0.75rem; font-weight:bold;">🛠️ Asistente para agregar observaciones a la lista:</label>
                         
                         <div style="margin-top:0.5rem;">
-                            <input type="text" id="helper_song_name" placeholder="Nombre de la canción (Ej: Transylvania)">
+                            <input type="text" id="helper_song_name" placeholder="Nombre de la canción (Ej: Daraku)">
                         </div>
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top:0.5rem;">
                             <div>
                                 <label style="font-size:0.7rem; color:#aaa;">Motivo / Estado:</label>
                                 <select id="helper_song_type">
-                                    <option value="not_included">Esta canción NO está (Ya incluida en otro álbum/single)</option>
-                                    <option value="new_version">Esta canción es una NUEVA VERSIÓN / REMAKE de...</option>
+                                    <option value="not_included">1. Esta canción NO se agregó porque ya está en otro Lanzamiento</option>
+                                    <option value="remix_version">2. Esta canción SÍ se incluyó porque es un Remix / Nueva Versión / Remake / Remaster</option>
+                                    <option value="not_found">3. Esta canción NO está porque no se encontró (Audio Perdido)</option>
                                 </select>
                             </div>
                             <div>
@@ -754,19 +755,47 @@
                 alert('Ingresa el nombre de la canción.');
                 return;
             }
-            if (!targetAlbum) {
-                alert('Selecciona el álbum o single de referencia.');
+
+            if (songType !== 'not_found' && !targetAlbum) {
+                alert('Selecciona el álbum, single o demo de referencia.');
                 return;
             }
 
             const tracklistTextarea = document.getElementById('tracklist');
-            let formattedLine = (songType === 'not_included')
-                ? `${songName} (Esta canción no se agregó porque ya está en: "${targetAlbum}")`
-                : `${songName} (Nueva Versión / Remake de: "${targetAlbum}")`;
+            let lines = tracklistTextarea.value.split('\n');
 
-            tracklistTextarea.value += (tracklistTextarea.value.trim().length > 0 ? `\n${formattedLine}` : formattedLine);
+            let noteText = '';
+            if (songType === 'not_included') {
+                noteText = `(Esta canción no se agregó porque ya está en: "${targetAlbum}")`;
+            } else if (songType === 'remix_version') {
+                noteText = `(Esta canción sí se incluyó porque es un Remix / Nueva Versión / Remake / Remaster de: "${targetAlbum}")`;
+            } else if (songType === 'not_found') {
+                noteText = `(Esta canción no se incluyó porque no se encontró / audio perdido)`;
+            }
+
+            let formattedLine = `${songName} ${noteText}`;
+            let lineFound = false;
+
+            let updatedLines = lines.map(line => {
+                if (line.toLowerCase().includes(songName.toLowerCase())) {
+                    lineFound = true;
+                    return `${line} ${noteText}`;
+                }
+                return line;
+            });
+
+            if (lineFound) {
+                tracklistTextarea.value = updatedLines.join('\n');
+            } else {
+                if (tracklistTextarea.value.trim().length > 0) {
+                    tracklistTextarea.value += `\n${formattedLine}`;
+                } else {
+                    tracklistTextarea.value = formattedLine;
+                }
+            }
+
             document.getElementById('helper_song_name').value = '';
-            alert('¡Observación añadida a la lista!');
+            tracklistTextarea.focus();
         }
 
         async function init() {
