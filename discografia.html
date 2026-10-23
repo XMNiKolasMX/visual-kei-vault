@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VISUAL KEI VAULT // DISCOGRÁFÍA</title>
+    <title>VISUAL KEI VAULT // DISCOGRAFÍA</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -818,7 +818,7 @@
             let targetLine = lines[songSelectIndex];
             if (!targetLine) return;
 
-            // Limpia la nota previa en caso de que ya tuviera una
+            // Limpia la nota previa en caso de que ya tuviera una entre paréntesis
             let baseSongName = targetLine.split('(')[0].trim();
 
             lines[songSelectIndex] = `${baseSongName} ${noteText}`;
@@ -1078,8 +1078,14 @@
             }
 
             albums.forEach(album => {
-                const tracks = Array.isArray(album.tracklist) ? album.tracklist.join('<br>') : 'Lista de canciones no disponible.';
-                
+                // Compatible si tracklist es Array (jsonb) o String
+                let tracks = 'Lista de canciones no disponible.';
+                if (Array.isArray(album.tracklist)) {
+                    tracks = album.tracklist.join('<br>');
+                } else if (typeof album.tracklist === 'string') {
+                    tracks = album.tracklist.replace(/\n/g, '<br>');
+                }
+
                 const teraboxBtn = album.terabox_link 
                     ? `<a href="${album.terabox_link}" target="_blank" class="btn-terabox">📥 Descargar</a>`
                     : '<span class="no-terabox">Sin enlace</span>';
@@ -1160,8 +1166,13 @@
             document.getElementById('release_year').value = album.release_year || '';
             document.getElementById('cover_image').value = album.cover_image || '';
             document.getElementById('terabox_link').value = album.terabox_link || '';
-            document.getElementById('tracklist').value = Array.isArray(album.tracklist) ? album.tracklist.join('\n') : '';
-            
+
+            if (Array.isArray(album.tracklist)) {
+                document.getElementById('tracklist').value = album.tracklist.join('\n');
+            } else {
+                document.getElementById('tracklist').value = album.tracklist || '';
+            }
+
             document.getElementById('album-modal').style.display = 'flex';
             populateHelperAlbums();
         }
@@ -1170,9 +1181,12 @@
             document.getElementById('album-modal').style.display = 'none';
         }
 
+        /* GUARDAR EN SUPABASE COMPATIBLE CON CAMPO JSONB */
         document.getElementById('album-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const albumId = document.getElementById('edit_album_id').value;
+
+            // Convierte las líneas del textarea a un array limpio sin líneas vacías
             const tracklistArray = document.getElementById('tracklist').value
                 .split('\n')
                 .map(t => t.trim())
@@ -1198,12 +1212,11 @@
             }
 
             if (error) {
-                alert('Error al guardar: ' + error.message);
+                alert('Error al guardar en Supabase: ' + error.message);
             } else {
                 closeAlbumModal();
-                setTimeout(async () => {
-                    await loadAlbums();
-                }, 300);
+                // Recarga limpia e inmediata para reflejar los cambios guardados
+                location.reload();
             }
         });
 
