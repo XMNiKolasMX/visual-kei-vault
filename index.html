@@ -77,7 +77,7 @@
     </header>
 
     <main>
-        <!-- SECCIÓN 1: ÚLTIMAS ACTUALIZACIONES -->
+        <!-- SECCIÓN 1: ÚLTIMAS ACTUALIZACIONES (DINÁMICA DE BANDAS) -->
         <section style="margin-bottom: 4rem;">
             <div class="section-header">
                 <h2 class="section-title">Últimas Actualizaciones</h2>
@@ -86,9 +86,9 @@
 
             <div id="news-container" class="news-list">
                 <div class="news-item">
-                    <span class="news-date">2026.10.19</span>
-                    <span class="news-tag">BOLETÍN</span>
-                    <span class="news-text">Sincronización de registros y enlaces de descarga activa.</span>
+                    <span class="news-date">--.--.--</span>
+                    <span class="news-tag">CATÁLOGO</span>
+                    <span class="news-text">Cargando registros recientes de bandas...</span>
                 </div>
             </div>
         </section>
@@ -227,7 +227,9 @@
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            const { data: artists, error: errArtists } = await db.from('artists').select('*');
+            const { data: artists, error: errArtists } = await db.from('artists')
+                .select('*')
+                .order('created_at', { ascending: false });
 
             globalArtists = artists || [];
             globalAlbums = albums || [];
@@ -261,20 +263,24 @@
                 releasesContainer.appendChild(card);
             });
 
-            // Cargar Noticias Dinámicas
-            if (albums.length > 0) {
-                const primerRegistro = albums[0];
-                const bandName = artistsMap[primerRegistro.artist_id] || 'Artista Desconocido';
-                const fecha = new Date(primerRegistro.created_at).toISOString().split('T')[0].replace(/-/g, '.');
-
+            // Cargar Noticias Dinámicas con las Bandas Agregadas Recientemente
+            if (artists && artists.length > 0) {
+                newsContainer.innerHTML = '';
+                // Mostrar las últimas 3 bandas agregadas
+                artists.slice(0, 3).forEach(art => {
+                    const fecha = art.created_at ? new Date(art.created_at).toISOString().split('T')[0].replace(/-/g, '.') : '2026.10.23';
+                    newsContainer.innerHTML += `
+                        <div class="news-item">
+                            <span class="news-date">${fecha}</span>
+                            <span class="news-tag">NUEVO INGRESO</span>
+                            <span class="news-text">Nueva banda agregada al archivo: <strong style="color: var(--accent-gold);">${art.name.toUpperCase()}</strong></span>
+                        </div>
+                    `;
+                });
+            } else {
                 newsContainer.innerHTML = `
                     <div class="news-item">
-                        <span class="news-date">${fecha}</span>
-                        <span class="news-tag">NUEVO INGRESO</span>
-                        <span class="news-text">Nueva banda agregada: <strong>${bandName}</strong></span>
-                    </div>
-                    <div class="news-item">
-                        <span class="news-date">2026.10.19</span>
+                        <span class="news-date">2026.10.23</span>
                         <span class="news-tag">BOLETÍN</span>
                         <span class="news-text">Sincronización del catálogo e índice de búsquedas completada.</span>
                     </div>
@@ -307,7 +313,7 @@
 
         function openFeaturedModal() {
             const selectArtist = document.getElementById('select_artist');
-            selectArtist.innerHTML = '<option value="">-- Selecciona un Artista --</option>';
+            select_artist.innerHTML = '<option value="">-- Selecciona un Artista --</option>';
 
             globalArtists.forEach(art => {
                 selectArtist.innerHTML += `<option value="${art.id}">${art.name}</option>`;
