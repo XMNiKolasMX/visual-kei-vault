@@ -697,7 +697,7 @@
                             <div>
                                 <label style="font-size:0.7rem; color:#aaa;">Álbum o Single de referencia:</label>
                                 <select id="helper_target_album">
-                                    <option value="">-- Seleccionar Disco --</option>
+                                    <option value="">-- Cargar lista de discos --</option>
                                 </select>
                             </div>
                         </div>
@@ -776,24 +776,20 @@
         document.getElementById('tracklist').addEventListener('input', updateSongSelectDropdown);
 
         function insertSongNoteToTracklist() {
-            let songSelectIndex = document.getElementById('helper_song_select').value;
+            const songSelectDropdown = document.getElementById('helper_song_select');
+            const selectedText = songSelectDropdown.options[songSelectDropdown.selectedIndex] ? songSelectDropdown.options[songSelectDropdown.selectedIndex].text : "";
+            
             const songType = document.getElementById('helper_song_type').value;
             let targetAlbum = document.getElementById('helper_target_album').value;
 
             const tracklistTextarea = document.getElementById('tracklist');
-            let lines = tracklistTextarea.value.split('\n');
+            let lines = tracklistTextarea.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
-            // BLINDAJE 1: Si no se seleccionó ninguna canción del desplegable, toma por defecto la última línea
-            if (songSelectIndex === "" && lines.length > 0) {
-                songSelectIndex = lines.length - 1;
-            }
-
-            if (songSelectIndex === "" || lines.length === 0) {
-                alert('Primero debe haber al menos una canción en la lista.');
+            if (!selectedText || songSelectDropdown.value === "") {
+                alert('Selecciona una canción de la lista.');
                 return;
             }
 
-            // BLINDAJE 2: Si el usuario dejó el selector de referencia vacío, asigna un valor por defecto para no bloquear
             if (songType !== 'not_found' && !targetAlbum) {
                 targetAlbum = "Otro lanzamiento";
             }
@@ -820,21 +816,32 @@
                     break;
             }
 
-            let targetLine = lines[songSelectIndex];
-            if (!targetLine) return;
+            // Busca y reemplaza exactamente la línea que coincide con el texto seleccionado
+            let found = false;
+            lines = lines.map(line => {
+                let baseName = line.split('(')[0].trim();
+                let selectedBaseName = selectedText.split('(')[0].trim();
+                
+                if (baseName === selectedBaseName) {
+                    found = true;
+                    return `${baseName} ${noteText}`;
+                }
+                return line;
+            });
 
-            // Limpia notas previas entre paréntesis para evitar duplicar texto
-            let baseSongName = targetLine.split('(')[0].trim();
+            if (!found && lines.length > 0) {
+                let lastIdx = lines.length - 1;
+                let baseName = lines[lastIdx].split('(')[0].trim();
+                lines[lastIdx] = `${baseName} ${noteText}`;
+            }
 
-            lines[songSelectIndex] = `${baseSongName} ${noteText}`;
-
-            // Actualiza de inmediato el textarea principal con el cambio aplicado
+            // Inyecta el texto modificado en el textarea visible
             tracklistTextarea.value = lines.join('\n');
 
             updateSongSelectDropdown();
-            document.getElementById('helper_song_select').value = "";
+            songSelectDropdown.value = "";
             
-            alert('¡Observación agregada con éxito al cuadro de texto! Ahora haz clic en "Guardar Cambios".');
+            alert('¡Observación aplicada con éxito en el cuadro de texto! Ahora haz clic en "Guardar Cambios".');
         }
 
         async function init() {
