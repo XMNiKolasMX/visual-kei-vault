@@ -1121,12 +1121,13 @@
             document.getElementById('album-modal').style.display = 'none';
         }
 
-        /* GUARDAR EN SUPABASE COMPATIBLE CON JSONB */
+        /* GUARDAR EN SUPABASE CONSERVANDO LAS LÍNEAS CON PIPES Y ENLACES */
         document.getElementById('album-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const albumId = document.getElementById('edit_album_id').value;
             
-            const tracklistArray = document.getElementById('tracklist').value
+            const tracklistRaw = document.getElementById('tracklist').value;
+            const tracklistArray = tracklistRaw
                 .split('\n')
                 .map(t => t.trim())
                 .filter(t => t.length > 0);
