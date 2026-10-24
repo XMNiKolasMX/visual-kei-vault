@@ -217,6 +217,7 @@
             right: 8px;
             display: flex;
             gap: 4px;
+            z-index: 10;
         }
         .btn-card-admin {
             background: #181124;
@@ -484,12 +485,17 @@
         }
 
         function getBandGenre(artist) {
+            const desc = (artist.description || '').toLowerCase();
+            const tagMatch = desc.match(/\[géneros: (.*?)\]/);
+            if (tagMatch) {
+                return tagMatch[1];
+            }
+
             const nameKey = (artist.name || '').trim();
             if (bandGenreMap[nameKey]) {
                 return bandGenreMap[nameKey];
             }
             
-            const desc = (artist.description || '').toLowerCase();
             const knownSubgenres = [
                 '80s', '90s', '2000s', 'koteosa kei', 'art kei', 'cosplay kei', 'iryou kei', 'kirakira kei',
                 'kote kei', 'kurofuku kei', 'loud kei', 'menhera kei', 'misshitsu kei',
@@ -566,6 +572,9 @@
                     `;
                 }
 
+                // Limpiar descripción para vista del usuario (ocultando el tag interno [Géneros: ...])
+                const displayDesc = (artist.description || '').replace(/\[Géneros: (.*?)\]/g, '').trim() || 'Sin biografía disponible.';
+
                 if (currentMode === 'compact') {
                     container.innerHTML += `
                         <div class="artist-card">
@@ -588,7 +597,7 @@
                             <div class="artist-content">
                                 <h3 style="color:#fff; margin:0 0 0.2rem 0; font-size:1.1rem;">${artist.name}</h3>
                                 <span class="detected-genre-badge">${autoGenre}</span>
-                                <p style="color:#aaa; font-size:0.88rem; margin:0.5rem 0 0.8rem 0; line-height:1.5;">${artist.description || 'Sin biografía disponible.'}</p>
+                                <p style="color:#aaa; font-size:0.88rem; margin:0.5rem 0 0.8rem 0; line-height:1.5;">${displayDesc}</p>
                                 <a href="discografia.html?banda=${artist.id}" class="btn-ver-discografia">${buttonText}</a>
                             </div>
                         </div>
@@ -617,18 +626,17 @@
             document.getElementById('new_artist_name').value = artist.name || '';
             document.getElementById('new_artist_image').value = artist.image_url || '';
 
-            // Extraer descripción limpia y géneros
-            let cleanDesc = artist.description || '';
-            const tagMatch = cleanDesc.match(/\[Géneros: (.*?)\]/);
-            if (tagMatch) {
-                const genresList = tagMatch[1].split(',').map(g => g.trim());
-                document.querySelectorAll('input[name="artist_genre_cb"]').forEach(cb => {
-                    cb.checked = genresList.includes(cb.value);
-                });
-                cleanDesc = cleanDesc.replace(tagMatch[0], '').trim();
-            } else {
-                document.querySelectorAll('input[name="artist_genre_cb"]').forEach(cb => cb.checked = false);
-            }
+            // 1. Obtener la cadena completa de géneros (ya sea del tag [Géneros: ...] o del diccionario local)
+            const activeGenreStr = getBandGenre(artist).toLowerCase();
+
+            // 2. Marcar automáticamente las casillas correspondientes
+            document.querySelectorAll('input[name="artist_genre_cb"]').forEach(cb => {
+                const cbVal = cb.value.toLowerCase();
+                cb.checked = activeGenreStr.includes(cbVal);
+            });
+
+            // 3. Dejar solo la biografía en el campo de texto de la descripción
+            let cleanDesc = (artist.description || '').replace(/\[Géneros: (.*?)\]/gi, '').trim();
             document.getElementById('new_artist_desc').value = cleanDesc;
 
             document.getElementById('artist-modal').style.display = 'flex';
