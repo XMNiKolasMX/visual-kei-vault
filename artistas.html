@@ -13,18 +13,29 @@
         .view-switcher { display: flex; gap: 0.5rem; }
         .view-btn { background: #141824; border: 1px solid #2a2f3f; color: #8a99ad; width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .view-btn.active { background: #38daf6; color: #0b0f19; border-color: #38daf6; font-weight: bold; }
+        
         .genre-filter-bar { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 2rem; justify-content: center; }
         .filter-tag-btn { background: #101010; border: 1px solid #2a2a2a; color: #aaa; padding: 0.35rem 0.8rem; font-size: 0.7rem; text-transform: uppercase; cursor: pointer; border-radius: 4px; }
         .filter-tag-btn.active { background: rgba(212, 175, 55, 0.15); border-color: #d4af37; color: #d4af37; font-weight: bold; }
+
+        /* Estilos de Cuadrícula Originales */
         .artists-container.grid-view { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.2rem; }
         @media (max-width: 1100px) { .artists-container.grid-view { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 600px) { .artists-container.grid-view { grid-template-columns: repeat(1, 1fr); } }
+        
         .grid-view .artist-card { background: #0d0d0d; border: 1px solid #222; border-radius: 8px; padding: 1.2rem; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
         .grid-view .artist-cover { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 6px; border: 1px solid #222; margin-bottom: 0.8rem; }
         .btn-ver-discografia { display: inline-block; background: #141414; border: 1px solid #333; color: #d4af37; padding: 0.5rem 1rem; font-size: 0.72rem; text-transform: uppercase; text-decoration: none; margin-top: 0.8rem; width: 100%; box-sizing: border-box; text-align: center; }
+        
+        /* Vista Detallada Original */
+        .artists-container.detailed-view { display: flex; flex-direction: column; gap: 1.5rem; }
+        .detailed-view .artist-card { background: #0d0d0d; border: 1px solid #222; padding: 1.5rem; display: flex; gap: 1.5rem; align-items: flex-start; position: relative; }
+        .detailed-view .artist-cover { width: 140px; height: 140px; object-fit: cover; border: 1px solid #222; flex-shrink: 0; border-radius: 6px; }
+
         .detected-genre-badge { display: inline-block; background: rgba(56, 218, 246, 0.12); border: 1px solid #38daf6; color: #38daf6; font-size: 0.65rem; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; margin-top: 4px; font-weight: bold; }
         .admin-card-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; z-index: 10; }
         .btn-card-admin { background: #181124; border: 1px solid #333; color: #ccc; width: 26px; height: 26px; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.7rem; }
+        
         .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: #0d0d0d; border: 1px solid #333; padding: 2rem; max-width: 520px; width: 90%; max-height: 90vh; overflow-y: auto; }
         .admin-form-group { margin-bottom: 1rem; text-align: left; }
@@ -241,16 +252,30 @@
                         <button class="btn-card-admin delete" onclick="deleteArtist(${artist.id})"><i class="fa-solid fa-trash"></i></button>
                     </div>` : '';
 
-                container.innerHTML += `
-                    <div class="artist-card">
-                        ${adminActions}
-                        ${coverImg}
-                        <div class="artist-content" style="width:100%;">
-                            <h3 style="color:#fff; margin:0 0 0.2rem 0; font-size:1.1rem;">${artist.name}</h3>
-                            <span class="detected-genre-badge">${autoGenre}</span>
-                            <a href="discografia.html?banda=${artist.id}" class="btn-ver-discografia">Ver Discografía</a>
-                        </div>
-                    </div>`;
+                if (currentMode === 'detailed') {
+                    container.innerHTML += `
+                        <div class="artist-card">
+                            ${adminActions}
+                            ${coverImg}
+                            <div class="artist-content" style="width:100%; text-align:left;">
+                                <h3 style="color:#fff; margin:0 0 0.3rem 0; font-size:1.2rem;">${artist.name}</h3>
+                                <span class="detected-genre-badge">${autoGenre}</span>
+                                <p style="color:#aaa; font-size:0.85rem; margin:0.8rem 0;">${(artist.description || '').replace(/\[Géneros: (.*?)\]/gi, '').trim() || 'Sin biografía.'}</p>
+                                <a href="discografia.html?banda=${artist.id}" class="btn-ver-discografia" style="width:auto; display:inline-block; padding:0.4rem 1rem;">Ver Discografía</a>
+                            </div>
+                        </div>`;
+                } else {
+                    container.innerHTML += `
+                        <div class="artist-card">
+                            ${adminActions}
+                            ${coverImg}
+                            <div class="artist-content" style="width:100%;">
+                                <h3 style="color:#fff; margin:0 0 0.2rem 0; font-size:1.1rem;">${artist.name}</h3>
+                                <span class="detected-genre-badge">${autoGenre}</span>
+                                <a href="discografia.html?banda=${artist.id}" class="btn-ver-discografia">Ver Discografía</a>
+                            </div>
+                        </div>`;
+                }
             });
         }
 
