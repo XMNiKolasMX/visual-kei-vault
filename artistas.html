@@ -351,12 +351,11 @@
                 </div>
             </div>
 
-            <!-- FILTROS DE SUBGÉNEROS -->
+            <!-- FILTROS DE SUBGÉNEROS (SIN 80'S Y 90'S, CON 2000'S Y NO VISUAL KEI) -->
             <div class="genre-filter-bar">
                 <button class="filter-tag-btn active" onclick="filterGenre('todos', this)">TODOS</button>
-                <button class="filter-tag-btn" onclick="filterGenre('80s', this)">80'S</button>
-                <button class="filter-tag-btn" onclick="filterGenre('90s', this)">90'S</button>
                 <button class="filter-tag-btn" onclick="filterGenre('2000s', this)">2000'S</button>
+                <button class="filter-tag-btn" onclick="filterGenre('no visual kei', this)">No Visual Kei</button>
                 <button class="filter-tag-btn" onclick="filterGenre('art kei', this)">Art Kei</button>
                 <button class="filter-tag-btn" onclick="filterGenre('cosplay kei', this)">Cosplay Kei</button>
                 <button class="filter-tag-btn" onclick="filterGenre('iryou kei', this)">Iryou Kei</button>
@@ -400,9 +399,8 @@
                 <div class="admin-form-group">
                     <label>¿A qué género(s) o época(s) pertenece? *</label>
                     <div class="genres-checkbox-grid">
-                        <label><input type="checkbox" name="artist_genre_cb" value="80'S"> 80'S</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="90'S"> 90'S</label>
                         <label><input type="checkbox" name="artist_genre_cb" value="2000'S"> 2000'S</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="No Visual Kei"> No Visual Kei</label>
                         <label><input type="checkbox" name="artist_genre_cb" value="Art Kei"> Art Kei</label>
                         <label><input type="checkbox" name="artist_genre_cb" value="Cosplay Kei"> Cosplay Kei</label>
                         <label><input type="checkbox" name="artist_genre_cb" value="Iryou Kei"> Iryou Kei</label>
@@ -470,7 +468,6 @@
             loadArtists();
         }
 
-        // LEER LOS GÉNEROS GUARDADOS EN SUPABASE (CAMPO DESCRIPTION)
         function getBandGenre(artist) {
             const desc = (artist.description || '');
             const tagMatch = desc.match(/\[Géneros: (.*?)\]/i);
