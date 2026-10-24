@@ -18,7 +18,6 @@
         .filter-tag-btn { background: #101010; border: 1px solid #2a2a2a; color: #aaa; padding: 0.35rem 0.8rem; font-size: 0.7rem; text-transform: uppercase; cursor: pointer; border-radius: 4px; }
         .filter-tag-btn.active { background: rgba(212, 175, 55, 0.15); border-color: #d4af37; color: #d4af37; font-weight: bold; }
 
-        /* Estilos de Cuadrícula Originales */
         .artists-container.grid-view { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.2rem; }
         @media (max-width: 1100px) { .artists-container.grid-view { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 600px) { .artists-container.grid-view { grid-template-columns: repeat(1, 1fr); } }
@@ -27,7 +26,6 @@
         .grid-view .artist-cover { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 6px; border: 1px solid #222; margin-bottom: 0.8rem; }
         .btn-ver-discografia { display: inline-block; background: #141414; border: 1px solid #333; color: #d4af37; padding: 0.5rem 1rem; font-size: 0.72rem; text-transform: uppercase; text-decoration: none; margin-top: 0.8rem; width: 100%; box-sizing: border-box; text-align: center; }
         
-        /* Vista Detallada Original */
         .artists-container.detailed-view { display: flex; flex-direction: column; gap: 1.5rem; }
         .detailed-view .artist-card { background: #0d0d0d; border: 1px solid #222; padding: 1.5rem; display: flex; gap: 1.5rem; align-items: flex-start; position: relative; }
         .detailed-view .artist-cover { width: 140px; height: 140px; object-fit: cover; border: 1px solid #222; flex-shrink: 0; border-radius: 6px; }
@@ -47,19 +45,10 @@
 
         /* MINI-REPRODUCTOR FLOTANTE GLOBAL PERSISTENTE */
         #global-floating-player {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #0d0d0d;
-            border: 1px solid #d4af37;
-            border-radius: 8px;
-            padding: 10px 15px;
-            width: 300px;
-            z-index: 9999;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
-            display: none;
-            align-items: center;
-            gap: 10px;
+            position: fixed; bottom: 20px; right: 20px; background: #0d0d0d;
+            border: 1px solid #d4af37; border-radius: 8px; padding: 10px 15px;
+            width: 300px; z-index: 9999; box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+            display: none; align-items: center; gap: 10px;
         }
         #global-floating-player .player-info { overflow: hidden; flex-grow: 1; }
         #global-floating-player .player-song-title { color: #fff; font-size: 0.75rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -328,12 +317,24 @@
             }
         }
 
+        document.addEventListener('DOMContentLoaded', () => {
+            const globalAudio = document.getElementById('global-audio-element');
+            if (globalAudio) {
+                globalAudio.addEventListener('timeupdate', () => {
+                    if (!globalAudio.paused) {
+                        localStorage.setItem('vk_audio_time', globalAudio.currentTime);
+                    }
+                });
+            }
+        });
+
         function closeFloatingPlayer() {
             const globalAudio = document.getElementById('global-audio-element');
             globalAudio.pause();
             localStorage.removeItem('vk_audio_url');
             localStorage.removeItem('vk_song_title');
             localStorage.removeItem('vk_band_name');
+            localStorage.removeItem('vk_audio_time');
             document.getElementById('global-floating-player').style.display = 'none';
         }
 
@@ -341,6 +342,7 @@
             const savedUrl = localStorage.getItem('vk_audio_url');
             const savedTitle = localStorage.getItem('vk_song_title');
             const savedBand = localStorage.getItem('vk_band_name');
+            const savedTime = localStorage.getItem('vk_audio_time');
 
             if (savedUrl) {
                 const floatBox = document.getElementById('global-floating-player');
@@ -351,6 +353,10 @@
                 
                 if (globalAudio.src !== savedUrl) {
                     globalAudio.src = savedUrl;
+                    globalAudio.addEventListener('loadedmetadata', () => {
+                        if (savedTime) globalAudio.currentTime = parseFloat(savedTime);
+                        globalAudio.play().catch(e => console.log("Autoplay prevenido"));
+                    }, { once: true });
                 }
                 floatBox.style.display = 'flex';
             }
