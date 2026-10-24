@@ -288,7 +288,7 @@
             font-weight: bold;
         }
 
-        /* Barra de Filtros por Categoría */
+        /* Barra de Filtros por Categoría con MINI-ÁLBUM y OMNIBUS */
         .category-filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -429,7 +429,7 @@
         .compact-view .tracklist-box { display: none; }
         .compact-view .album-header { border: none; padding: 0; margin: 0; }
 
-        /* Estilos de Canciones y Reproductor Directo con Etiqueta Superior */
+        /* Estilos de Canciones y Reproductor Directo */
         .track-item-row {
             display: flex;
             flex-direction: column;
@@ -604,14 +604,16 @@
                 </div>
             </div>
 
-            <!-- FILTROS POR CATEGORÍA -->
+            <!-- FILTROS POR CATEGORÍA CON MINI-ÁLBUM Y OMNIBUS -->
             <div class="category-filter-bar">
                 <button class="filter-tag-btn active" onclick="filterCategory('todos', this)">TODOS</button>
                 <button class="filter-tag-btn" onclick="filterCategory('Álbum', this)">ÁLBUM</button>
+                <button class="filter-tag-btn" onclick="filterCategory('Mini-Álbum', this)">MINI-ÁLBUM</button>
                 <button class="filter-tag-btn" onclick="filterCategory('Single', this)">SINGLE</button>
                 <button class="filter-tag-btn" onclick="filterCategory('Maxi-Single', this)">MAXI-SINGLE</button>
                 <button class="filter-tag-btn" onclick="filterCategory('Demo', this)">DEMO</button>
-                <button class="filter-tag-btn" onclick="filterCategory('Recopilatorio', this)">RECOPILATORIO (BEST)</button>
+                <button class="filter-tag-btn" onclick="filterCategory('Omnibus', this)">OMNIBUS</button>
+                <button class="filter-tag-btn" onclick="filterCategory('Recopilatorio', this)">RECOPILATORIO</button>
             </div>
 
             <!-- CONTENEDOR DE DISCOS -->
@@ -690,10 +692,12 @@
                         <label>Tipo de Lanzamiento *</label>
                         <select id="release_type" required>
                             <option value="Álbum">Álbum de Estudio</option>
+                            <option value="Mini-Álbum">Mini-Álbum</option>
                             <option value="Single">Single / Sencillo</option>
                             <option value="Maxi-Single">Maxi-Single</option>
                             <option value="Demo">Demo / Maqueta</option>
-                            <option value="Recopilatorio">Recopilatorio (Best)</option>
+                            <option value="Omnibus">Omnibus (Recopilatorio de varias bandas)</option>
+                            <option value="Recopilatorio">Recopilatorio (Best Album)</option>
                         </select>
                     </div>
                     <div class="admin-form-group">
