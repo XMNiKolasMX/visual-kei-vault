@@ -400,29 +400,29 @@
                 <div class="admin-form-group">
                     <label>¿A qué género(s) o época(s) pertenece? *</label>
                     <div class="genres-checkbox-grid">
-                        <label><input type="checkbox" name="artist_genre_cb" value="80s"> 80'S</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="90s"> 90'S</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="2000s"> 2000'S</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="art kei"> Art Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="cosplay kei"> Cosplay Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="iryou kei"> Iryou Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="kirakira kei"> Kirakira Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="kote kei"> Kote Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="koteosa kei"> Koteosa Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="kurofuku kei"> Kurofuku Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="loud kei"> Loud Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="menhera kei"> Menhera Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="misshitsu kei"> Misshitsu Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="nagoya kei"> Nagoya Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="okeshou kei"> Okeshou Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="osare kei"> Osare Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="pikopiko kei"> Pikopiko Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="shiro kei"> Shiro Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="shironuri kei"> Shironuri Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="showa kayou kei"> Showa Kayou Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="soft visual"> Soft Visual</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="tanbi kei"> Tanbi Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="wafuu kei"> Wafuu Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="80'S"> 80'S</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="90'S"> 90'S</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="2000'S"> 2000'S</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Art Kei"> Art Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Cosplay Kei"> Cosplay Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Iryou Kei"> Iryou Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Kirakira Kei"> Kirakira Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Kote Kei"> Kote Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Koteosa Kei"> Koteosa Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Kurofuku Kei"> Kurofuku Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Loud Kei"> Loud Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Menhera Kei"> Menhera Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Misshitsu Kei"> Misshitsu Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Nagoya Kei"> Nagoya Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Okeshou Kei"> Okeshou Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Osare Kei"> Osare Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Pikopiko Kei"> Pikopiko Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Shiro Kei"> Shiro Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Shironuri Kei"> Shironuri Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Showa Kayou Kei"> Showa Kayou Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Soft Visual"> Soft Visual</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Tanbi Kei"> Tanbi Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="Wafuu Kei"> Wafuu Kei</label>
                     </div>
                 </div>
 
@@ -470,29 +470,16 @@
             loadArtists();
         }
 
-        // LEER ÚNICAMENTE DE LA BASE DE DATOS SUPABASE (CAMPO DESCRIPTION)
+        // LEER LOS GÉNEROS GUARDADOS EN SUPABASE (CAMPO DESCRIPTION)
         function getBandGenre(artist) {
-            const desc = (artist.description || '').toLowerCase();
-            const tagMatch = desc.match(/\[géneros: (.*?)\]/i);
+            const desc = (artist.description || '');
+            const tagMatch = desc.match(/\[Géneros: (.*?)\]/i);
             
             if (tagMatch) {
                 return tagMatch[1];
             }
 
-            // Si no tiene la etiqueta guardada de casillas, busca palabras dentro del texto biográfico
-            const knownSubgenres = [
-                '80s', '90s', '2000s', 'koteosa kei', 'art kei', 'cosplay kei', 'iryou kei', 'kirakira kei',
-                'kote kei', 'kurofuku kei', 'loud kei', 'menhera kei', 'misshitsu kei',
-                'nagoya kei', 'okeshou kei', 'osare kei', 'pikopiko kei', 'shiro kei',
-                'shironuri kei', 'showa kayou kei', 'soft visual', 'tanbi kei', 'wafuu kei'
-            ];
-
-            const found = [];
-            for (const sub of knownSubgenres) {
-                if (desc.includes(sub)) found.push(sub);
-            }
-
-            return found.length > 0 ? found.join(' / ') : 'Visual Kei';
+            return 'Visual Kei';
         }
 
         async function loadArtists() {
@@ -527,11 +514,7 @@
                 const detectedGenre = getBandGenre(artist).toLowerCase();
                 const desc = (artist.description || '').toLowerCase();
 
-                if (selectedFilter === '80s') return desc.includes('198') || desc.includes('80') || detectedGenre.includes('80s');
-                if (selectedFilter === '90s') return desc.includes('199') || desc.includes('90') || detectedGenre.includes('90s');
-                if (selectedFilter === '2000s') return desc.includes('200') || desc.includes('2000') || detectedGenre.includes('2000s');
-                
-                return detectedGenre.includes(selectedFilter) || desc.includes(selectedFilter);
+                return detectedGenre.includes(selectedFilter.toLowerCase()) || desc.includes(selectedFilter.toLowerCase());
             });
 
             if (filteredArtists.length === 0) {
