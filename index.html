@@ -6,10 +6,8 @@
     <title>VISUAL KEI VAULT // ARCHIVO</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Cliente Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Sección Hero de Bienvenida al Archivo */
         .archive-welcome-hero {
             background: linear-gradient(180deg, #0d0d0d 0%, #050505 100%);
             border: 1px solid #222;
@@ -81,6 +79,29 @@
             letter-spacing: 1px;
             margin-top: 0.3rem;
         }
+
+        /* MINI-REPRODUCTOR FLOTANTE GLOBAL PERSISTENTE */
+        #global-floating-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #0d0d0d;
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            padding: 10px 15px;
+            width: 300px;
+            z-index: 9999;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        #global-floating-player .player-info { overflow: hidden; flex-grow: 1; }
+        #global-floating-player .player-song-title { color: #fff; font-size: 0.75rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #global-floating-player .player-band-name { color: #d4af37; font-size: 0.65rem; text-transform: uppercase; display: block; }
+        #global-floating-player audio { width: 100%; height: 28px; margin-top: 5px; filter: invert(0.9); }
+        .btn-close-player { background: transparent; border: none; color: #888; cursor: pointer; font-size: 0.8rem; }
+        .btn-close-player:hover { color: #fff; }
     </style>
 </head>
 <body>
@@ -95,13 +116,11 @@
     </header>
 
     <main>
-        <!-- SECCIÓN 1: ÚLTIMAS ACTUALIZACIONES -->
         <section style="margin-bottom: 4rem;">
             <div class="section-header">
                 <h2 class="section-title">Últimas Actualizaciones</h2>
                 <a href="artistas.html" class="btn-view-all">Ver Todo</a>
             </div>
-
             <div id="news-container" class="news-list">
                 <div class="news-item">
                     <span class="news-date">--.--.--</span>
@@ -111,21 +130,19 @@
             </div>
         </section>
 
-        <!-- SECCIÓN 2: ARCHIVO SONORO (ORIGENES Y ESCENA ACTUAL) -->
         <section class="archive-welcome-hero">
             <div class="hero-badge-tag">
                 <i class="fa-solid fa-compact-disc"></i> ARCHIVO SONORO Y DOCUMENTAL
             </div>
             <h2 class="hero-main-title">DOCUMENTACIÓN DEL VISUAL KEI: DESDE LOS ORÍGENES HASTA LA ERA MODERNA</h2>
             <p class="hero-main-text">
-                Base de datos dedicada a la catalogación, preservación digital y resguardo de la escena Visual Kei. Centrados en las raíces históricas de los años 80 y 90, el archivo extiende su cobertura a proyectos del 2000 en adelante y la escena contemporánea actual. Explora discografías, listas de canciones estructuradas y alineaciones con cronología gráfica.
+                Base de datos dedicada a la catalogación, preservación digital y resguardo de la escena Visual Kei. Centrados en las raíces históricas de los años 80 y 90, el archivo extiende su cobertura a proyectos del 2000 en adelante y la escena contemporánea actual.
             </p>
             <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
                 <a href="artistas.html" class="terabox-btn" style="padding: 12px 28px; text-decoration: none; font-size: 0.85rem;">
                     <i class="fa-solid fa-users"></i> Explorar Catálogo de Artistas
                 </a>
             </div>
-
             <div class="hero-stats-row">
                 <div class="hero-stat-item">
                     <span class="hero-stat-number" id="stat-artists-count">--</span>
@@ -142,124 +159,65 @@
             </div>
         </section>
 
-        <!-- SECCIÓN 3: INCORPORACIONES RECIENTES -->
         <section style="margin-bottom: 4rem;">
             <div class="section-header">
                 <h2 class="section-title">Incorporaciones Recientes</h2>
             </div>
-
             <div id="releases-container" class="releases-grid">
                 <p style="color: var(--text-muted); grid-column: 1/-1;">Cargando registros del catálogo...</p>
             </div>
         </section>
-
-        <!-- SECCIÓN 4: FORMATOS DISCOGRÁFICOS -->
-        <section style="background: var(--bg-surface); border: 1px solid var(--border-dark); padding: 2.5rem; margin-bottom: 4rem;">
-            <div class="section-header" style="margin-bottom: 1.5rem;">
-                <h2 class="section-title">Formatos Discográficos</h2>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
-                <div>
-                    <h3 style="font-family: 'Cinzel', serif; color: var(--accent-gold); font-size: 1rem; margin-bottom: 0.5rem; text-transform: uppercase;">Álbumes, Mini-Álbumes & EPs</h3>
-                    <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.7;">
-                        Lanzamientos oficiales de larga duración y minialbumes preservados en alta fidelidad sonora, clasificados por año, sello discográfico y subgénero.
-                    </p>
-                </div>
-                <div>
-                    <h3 style="font-family: 'Cinzel', serif; color: var(--accent-gold); font-size: 1rem; margin-bottom: 0.5rem; text-transform: uppercase;">Sencillos, Demos & Omnibus</h3>
-                    <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.7;">
-                        Maquetas de distribución limitada en cassette, sencillos promocionales y álbumes recopilatorios omnibus que reúnen múltiples bandas de la época.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECCIÓN 5: PROPÓSITO DEL ARCHIVO -->
-        <section style="background: var(--bg-surface); border: 1px solid var(--border-dark); padding: 2.5rem;">
-            <h2 class="section-title" style="margin-bottom: 1rem;">Propósito del Archivo</h2>
-            <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.8;">
-                Recopilación, documentación y resguardo digital de discografías completas en servidores externos, organizadas con metadatos y listas de temas estructuradas para consulta pública.
-            </p>
-        </section>
     </main>
+
+    <!-- MINI-REPRODUCTOR FLOTANTE GLOBAL PERSISTENTE -->
+    <div id="global-floating-player">
+        <div class="player-info">
+            <span class="player-band-name" id="float-band">Banda</span>
+            <div class="player-song-title" id="float-title">Canción</div>
+            <audio id="global-audio-element" controls controlsList="nodownload"></audio>
+        </div>
+        <button class="btn-close-player" onclick="closeFloatingPlayer()" title="Cerrar">✖</button>
+    </div>
 
     <footer>
         <p>© 2026 VISUAL KEI VAULT // TODOS LOS DERECHOS RESERVADOS.</p>
     </footer>
 
-    <!-- Scripts de Supabase -->
     <script src="js/config.js"></script>
     <script>
-        if (localStorage.getItem('vk_featured_custom')) {
-            localStorage.removeItem('vk_featured_custom');
+        async function cargarInicio() {
+            const { data: albums } = await db.from('discography').select('*');
+            const { data: artists } = await db.from('artists').select('*');
+            if (artists) document.getElementById('stat-artists-count').innerText = artists.length;
+            if (albums) document.getElementById('stat-albums-count').innerText = albums.length;
+            restorePersistentPlayer();
         }
 
-        async function cargarInicio() {
-            const releasesContainer = document.getElementById('releases-container');
-            const newsContainer = document.getElementById('news-container');
+        function closeFloatingPlayer() {
+            const globalAudio = document.getElementById('global-audio-element');
+            globalAudio.pause();
+            localStorage.removeItem('vk_audio_url');
+            localStorage.removeItem('vk_song_title');
+            localStorage.removeItem('vk_band_name');
+            document.getElementById('global-floating-player').style.display = 'none';
+        }
 
-            const { data: albums, error: errAlbums } = await db.from('discography')
-                .select('*')
-                .order('created_at', { ascending: false });
+        function restorePersistentPlayer() {
+            const savedUrl = localStorage.getItem('vk_audio_url');
+            const savedTitle = localStorage.getItem('vk_song_title');
+            const savedBand = localStorage.getItem('vk_band_name');
 
-            const { data: artists, error: errArtists } = await db.from('artists')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (artists) {
-                document.getElementById('stat-artists-count').innerText = artists.length;
-            }
-            if (albums) {
-                document.getElementById('stat-albums-count').innerText = albums.length;
-            }
-
-            if (errAlbums || !albums || albums.length === 0) {
-                releasesContainer.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1;">No se encontraron registros en el catálogo.</p>`;
-                return;
-            }
-
-            const artistsMap = {};
-            if (artists) {
-                artists.forEach(art => {
-                    artistsMap[art.id] = art.name;
-                });
-            }
-
-            releasesContainer.innerHTML = '';
-            albums.slice(0, 4).forEach(item => {
-                const bandName = artistsMap[item.artist_id] || 'Artista Desconocido';
-                const card = document.createElement('div');
-                card.className = 'release-card';
-                card.innerHTML = `
-                    <div>
-                        <div class="band-name">${bandName}</div>
-                        <div class="album-name">${item.album_title} (${item.release_year || 'N/A'})</div>
-                    </div>
-                    ${item.terabox_link ? `<a href="${item.terabox_link}" target="_blank" class="terabox-btn" style="text-align:center;">Descargar</a>` : '<span style="font-size:0.8rem; color:var(--text-muted);">Sin enlace</span>'}
-                `;
-                releasesContainer.appendChild(card);
-            });
-
-            if (artists && artists.length > 0) {
-                newsContainer.innerHTML = '';
-                artists.slice(0, 3).forEach(art => {
-                    const fecha = art.created_at ? new Date(art.created_at).toISOString().split('T')[0].replace(/-/g, '.') : '2026.10.23';
-                    newsContainer.innerHTML += `
-                        <div class="news-item">
-                            <span class="news-date">${fecha}</span>
-                            <span class="news-tag">NUEVO INGRESO</span>
-                            <span class="news-text">Nueva banda agregada al archivo: <strong style="color: var(--accent-gold);">${art.name.toUpperCase()}</strong></span>
-                        </div>
-                    `;
-                });
-            } else {
-                newsContainer.innerHTML = `
-                    <div class="news-item">
-                        <span class="news-date">2026.10.23</span>
-                        <span class="news-tag">BOLETÍN</span>
-                        <span class="news-text">Sincronización del catálogo e índice de búsquedas completada.</span>
-                    </div>
-                `;
+            if (savedUrl) {
+                const floatBox = document.getElementById('global-floating-player');
+                const globalAudio = document.getElementById('global-audio-element');
+                
+                document.getElementById('float-band').innerText = savedBand || 'Banda';
+                document.getElementById('float-title').innerText = savedTitle || 'Canción';
+                
+                if (globalAudio.src !== savedUrl) {
+                    globalAudio.src = savedUrl;
+                }
+                floatBox.style.display = 'flex';
             }
         }
 
