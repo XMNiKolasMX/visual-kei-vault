@@ -484,9 +484,10 @@
             loadArtists();
         }
 
+        // PRIORIZAR LO QUE ESTÁ GUARDADO EN SUPABASE (CASILLAS), LUEGO DICCIONARIO
         function getBandGenre(artist) {
             const desc = (artist.description || '').toLowerCase();
-            const tagMatch = desc.match(/\[géneros: (.*?)\]/);
+            const tagMatch = desc.match(/\[géneros: (.*?)\]/i);
             if (tagMatch) {
                 return tagMatch[1];
             }
@@ -572,8 +573,7 @@
                     `;
                 }
 
-                // Limpiar descripción para vista del usuario (ocultando el tag interno [Géneros: ...])
-                const displayDesc = (artist.description || '').replace(/\[Géneros: (.*?)\]/g, '').trim() || 'Sin biografía disponible.';
+                const displayDesc = (artist.description || '').replace(/\[Géneros: (.*?)\]/gi, '').trim() || 'Sin biografía disponible.';
 
                 if (currentMode === 'compact') {
                     container.innerHTML += `
@@ -626,16 +626,13 @@
             document.getElementById('new_artist_name').value = artist.name || '';
             document.getElementById('new_artist_image').value = artist.image_url || '';
 
-            // 1. Obtener la cadena completa de géneros (ya sea del tag [Géneros: ...] o del diccionario local)
             const activeGenreStr = getBandGenre(artist).toLowerCase();
 
-            // 2. Marcar automáticamente las casillas correspondientes
             document.querySelectorAll('input[name="artist_genre_cb"]').forEach(cb => {
                 const cbVal = cb.value.toLowerCase();
                 cb.checked = activeGenreStr.includes(cbVal);
             });
 
-            // 3. Dejar solo la biografía en el campo de texto de la descripción
             let cleanDesc = (artist.description || '').replace(/\[Géneros: (.*?)\]/gi, '').trim();
             document.getElementById('new_artist_desc').value = cleanDesc;
 
@@ -646,7 +643,6 @@
             document.getElementById('artist-modal').style.display = 'none';
         }
 
-        // Guardar o Actualizar Artista
         document.getElementById('artist-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const artistId = document.getElementById('edit_artist_id').value;
