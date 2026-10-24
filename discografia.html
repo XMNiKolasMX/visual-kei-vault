@@ -212,6 +212,33 @@
             font-weight: bold;
         }
 
+        /* Checkboxes para selección de múltiples roles */
+        .roles-checkbox-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            background: #141414;
+            padding: 0.8rem;
+            border: 1px solid #2a2a2a;
+            border-radius: 4px;
+            margin-top: 0.3rem;
+        }
+        .roles-checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #ddd;
+            font-size: 0.78rem;
+            cursor: pointer;
+            text-transform: none;
+            margin-bottom: 0;
+        }
+        .roles-checkbox-group input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+            accent-color: #d4af37;
+        }
+
         /* Toolbar de Controles */
         .controls-bar {
             display: flex;
@@ -614,22 +641,23 @@
                     </select>
                 </div>
 
+                <!-- SELECCIÓN MÚLTIPLE DE ROLES / INSTRUMENTOS -->
                 <div class="admin-form-group">
-                    <label>Posición / Rol *</label>
-                    <select id="member_role" required>
-                        <option value="Vocalista">Vocalista</option>
-                        <option value="Guitarrista">Guitarrista</option>
-                        <option value="Bajista">Bajista</option>
-                        <option value="Baterista">Baterista</option>
-                        <option value="Tecladista">Tecladista</option>
-                        <option value="Miembro de Soporte">Miembro de Soporte</option>
-                        <option value="Líder / Compositor">Líder / Compositor</option>
-                    </select>
+                    <label>Posición / Rol (Puedes seleccionar varios) *</label>
+                    <div class="roles-checkbox-group">
+                        <label><input type="checkbox" name="member_role_cb" value="Vocalista"> Vocalista</label>
+                        <label><input type="checkbox" name="member_role_cb" value="Guitarrista"> Guitarrista</label>
+                        <label><input type="checkbox" name="member_role_cb" value="Bajista"> Bajista</label>
+                        <label><input type="checkbox" name="member_role_cb" value="Baterista"> Baterista</label>
+                        <label><input type="checkbox" name="member_role_cb" value="Tecladista"> Tecladista</label>
+                        <label><input type="checkbox" name="member_role_cb" value="Líder / Compositor"> Líder / Compositor</label>
+                        <label><input type="checkbox" name="member_role_cb" value="Miembro de Soporte"> Miembro de Soporte</label>
+                    </div>
                 </div>
 
                 <div class="admin-form-group">
-                    <label>Años de Actividad / Período (Ej: 1992 o 1991 - 1997) *</label>
-                    <input type="text" id="member_years" placeholder="Ej: 1992 o 1991 - 1997" required>
+                    <label>Años de Actividad / Período (Ej: 1992 o 1980 - 1985 / 1994 - Presente) *</label>
+                    <input type="text" id="member_years" placeholder="Ej: 1980 - 1985 / 1994 - Presente" required>
                 </div>
 
                 <div class="admin-form-group">
@@ -753,7 +781,7 @@
             loadAlbums();
         }
 
-        /* LÓGICA DE CRONOLOGÍA DE INTEGRANTES */
+        /* LÓGICA DE CRONOLOGÍA DE INTEGRANTES CORREGIDA CON SOPORTE MULTI-ROL */
         async function loadMembers() {
             const { data: members, error } = await db.from('members')
                 .select('*')
@@ -770,19 +798,24 @@
                 return;
             }
 
-            let globalMinYear = 2026;
-            let globalMaxYear = 1990;
+            const currentYear = new Date().getFullYear();
+            let globalMinYear = currentYear;
+            let globalMaxYear = 1980;
 
             const parseYears = (str) => {
-                if (!str) return { start: 1991, end: 2000 };
+                if (!str) return { start: 1991, end: currentYear };
                 const numbers = str.match(/\d{4}/g);
-                if (!numbers) return { start: 1991, end: 2000 };
+                if (!numbers || numbers.length === 0) return { start: 1991, end: currentYear };
+                
                 const start = parseInt(numbers[0]);
-                let end = numbers[1] ? parseInt(numbers[1]) : start;
-                if (end < start) end = start;
-                if (str.toLowerCase().includes('presente') || str.toLowerCase().includes('actual')) {
-                    end = 2026;
+                let end = numbers[numbers.length - 1] ? parseInt(numbers[numbers.length - 1]) : start;
+
+                const strLower = str.toLowerCase();
+                if (strLower.includes('presente') || strLower.includes('actual') || strLower.includes('actividad')) {
+                    end = currentYear;
                 }
+
+                if (end < start) end = start;
                 return { start, end };
             };
 
@@ -792,7 +825,7 @@
                 if (end > globalMaxYear) globalMaxYear = end;
             });
 
-            if (globalMinYear > globalMaxYear) { globalMinYear = 1990; globalMaxYear = 2000; }
+            if (globalMinYear > globalMaxYear) { globalMinYear = 1980; globalMaxYear = currentYear; }
             const totalSpan = (globalMaxYear - globalMinYear) || 1;
 
             for (let y = globalMinYear; y <= globalMaxYear; y += Math.ceil(totalSpan / 8)) {
@@ -805,8 +838,10 @@
             const roleOrder = { 'Vocalista': 1, 'Guitarrista': 2, 'Bajista': 3, 'Baterista': 4, 'Tecladista': 5, 'Miembro de Soporte': 6, 'Líder / Compositor': 7 };
 
             const sortFunc = (a, b) => {
-                const rA = roleOrder[a.role] || 99;
-                const rB = roleOrder[b.role] || 99;
+                const mainRoleA = (a.role || '').split(',')[0].trim();
+                const mainRoleB = (b.role || '').split(',')[0].trim();
+                const rA = roleOrder[mainRoleA] || 99;
+                const rB = roleOrder[mainRoleB] || 99;
                 if (rA !== rB) return rA - rB;
                 return parseYears(a.years_active).start - parseYears(b.years_active).start;
             };
@@ -886,6 +921,7 @@
             document.getElementById('member-form').reset();
             document.getElementById('edit_member_id').value = '';
             document.getElementById('member_status').value = 'actual';
+            document.querySelectorAll('input[name="member_role_cb"]').forEach(cb => cb.checked = false);
             document.getElementById('member-modal').style.display = 'flex';
         }
 
@@ -897,9 +933,15 @@
             document.getElementById('edit_member_id').value = member.id;
             document.getElementById('member_name').value = member.name;
             document.getElementById('member_status').value = member.status || 'actual';
-            document.getElementById('member_role').value = member.role;
             document.getElementById('member_years').value = member.years_active || '';
             document.getElementById('member_image_url').value = member.image_url || '';
+
+            // Marcar checkboxes guardados
+            const savedRoles = (member.role || '').split(',').map(r => r.trim());
+            document.querySelectorAll('input[name="member_role_cb"]').forEach(cb => {
+                cb.checked = savedRoles.includes(cb.value);
+            });
+
             document.getElementById('member-modal').style.display = 'flex';
         }
 
@@ -907,15 +949,25 @@
             document.getElementById('member-modal').style.display = 'none';
         }
 
+        /* GUARDAR INTEGRANTE MULTI-ROL CON AVISO DE CONFIRMACIÓN */
         document.getElementById('member-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const memberId = document.getElementById('edit_member_id').value;
+
+            // Obtener roles seleccionados
+            const selectedRoles = Array.from(document.querySelectorAll('input[name="member_role_cb"]:checked'))
+                .map(cb => cb.value);
+
+            if (selectedRoles.length === 0) {
+                alert('Por favor, selecciona al menos un rol o instrumento.');
+                return;
+            }
 
             const memberData = {
                 artist_id: parseInt(artistId),
                 name: document.getElementById('member_name').value.trim(),
                 status: document.getElementById('member_status').value,
-                role: document.getElementById('member_role').value,
+                role: selectedRoles.join(', '),
                 years_active: document.getElementById('member_years').value.trim() || null,
                 image_url: document.getElementById('member_image_url').value.trim() || null
             };
@@ -932,6 +984,7 @@
             if (error) {
                 alert('Error al guardar integrante: ' + error.message);
             } else {
+                alert('Integrante guardado correctamente.');
                 closeMemberModal();
                 loadMembers();
             }
