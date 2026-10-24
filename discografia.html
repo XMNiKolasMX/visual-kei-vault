@@ -463,7 +463,7 @@
             margin-top: 0.2rem;
         }
 
-        /* Ocultar el botón de los tres puntos (descarga y velocidad) en el reproductor nativo */
+        /* Ocultar el menú de los tres puntos en el reproductor nativo */
         audio::-webkit-media-controls-enclosure {
             overflow: hidden;
         }
@@ -781,7 +781,7 @@
             loadAlbums();
         }
 
-        /* LÓGICA DE CRONOLOGÍA DE INTEGRANTES CORREGIDA CON SOPORTE MULTI-ROL */
+        /* LÓGICA DE CRONOLOGÍA DE INTEGRANTES CON EJE HASTA EL AÑO ACTUAL */
         async function loadMembers() {
             const { data: members, error } = await db.from('members')
                 .select('*')
@@ -828,9 +828,16 @@
             if (globalMinYear > globalMaxYear) { globalMinYear = 1980; globalMaxYear = currentYear; }
             const totalSpan = (globalMaxYear - globalMinYear) || 1;
 
-            for (let y = globalMinYear; y <= globalMaxYear; y += Math.ceil(totalSpan / 8)) {
-                yearsAxisContainer.innerHTML += `<span>${y}</span>`;
+            // Generar marcas dinámicas en el eje inferior incluyendo el año actual
+            const stepCount = 6;
+            const stepSize = totalSpan / stepCount;
+            let yearsAxisHTML = '';
+            
+            for (let i = 0; i <= stepCount; i++) {
+                const y = Math.round(globalMinYear + (stepSize * i));
+                yearsAxisHTML += `<span>${y}</span>`;
             }
+            yearsAxisContainer.innerHTML = yearsAxisHTML;
 
             const currentMembers = members.filter(m => (m.status || 'actual') === 'actual');
             const formerMembers = members.filter(m => (m.status || 'actual') === 'ex');
@@ -936,7 +943,6 @@
             document.getElementById('member_years').value = member.years_active || '';
             document.getElementById('member_image_url').value = member.image_url || '';
 
-            // Marcar checkboxes guardados
             const savedRoles = (member.role || '').split(',').map(r => r.trim());
             document.querySelectorAll('input[name="member_role_cb"]').forEach(cb => {
                 cb.checked = savedRoles.includes(cb.value);
@@ -954,7 +960,6 @@
             e.preventDefault();
             const memberId = document.getElementById('edit_member_id').value;
 
-            // Obtener roles seleccionados
             const selectedRoles = Array.from(document.querySelectorAll('input[name="member_role_cb"]:checked'))
                 .map(cb => cb.value);
 
