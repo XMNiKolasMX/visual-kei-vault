@@ -5,63 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VISUAL KEI VAULT // ARCHIVO</title>
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Cliente Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Estilos del Modal del Administrador */
-        .modal-bg {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            justify-content: center;
+        /* Sección Hero de Bienvenida al Archivo */
+        .archive-welcome-hero {
+            background: linear-gradient(180deg, #0d0d0d 0%, #050505 100%);
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 3.5rem 2rem;
+            text-align: center;
+            margin-bottom: 4rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            position: relative;
+            overflow: hidden;
+        }
+        .archive-welcome-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%; transform: translateX(-50%);
+            width: 200px; height: 2px;
+            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+        }
+        .hero-badge-tag {
+            display: inline-flex;
             align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background: #0d0d0d;
-            border: 1px solid #333;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            color: #fff;
-        }
-        .admin-form-group {
-            margin-bottom: 1rem;
-        }
-        .admin-form-group label {
-            display: block;
-            font-size: 0.75rem;
-            color: #888;
-            margin-bottom: 0.3rem;
-            text-transform: uppercase;
-        }
-        .admin-form-group input, 
-        .admin-form-group textarea, 
-        .admin-form-group select {
-            width: 100%;
-            background: #141414;
-            border: 1px solid #2a2a2a;
-            color: #fff;
-            padding: 0.6rem;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-        .btn-admin-edit {
-            background: #141414;
-            border: 1px solid #d4af37;
+            gap: 0.5rem;
             color: #d4af37;
-            padding: 0.4rem 0.8rem;
             font-size: 0.75rem;
             text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            font-weight: bold;
         }
-        .btn-admin-edit:hover {
-            background: #d4af37;
-            color: #000;
+        .hero-main-title {
+            font-size: 2.2rem;
+            color: #fff;
+            margin: 0 0 1.2rem 0;
+            font-family: inherit;
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+        .hero-main-text {
+            color: #aaa;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            max-width: 750px;
+            margin: 0 auto 2.5rem auto;
+        }
+        .hero-stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #1a1a1a;
+            flex-wrap: wrap;
+        }
+        .hero-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .hero-stat-number {
+            color: #38daf6;
+            font-size: 1.5rem;
+            font-weight: bold;
+            font-family: monospace;
+        }
+        .hero-stat-label {
+            color: #777;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.3rem;
         }
     </style>
 </head>
@@ -93,22 +111,34 @@
             </div>
         </section>
 
-        <!-- SECCIÓN 2: MATERIAL DESTACADO -->
-        <section class="featured-release" style="position: relative;">
-            <div id="admin-featured-controls" style="position: absolute; top: 1rem; right: 1rem; display: none;">
-                <button class="btn-admin-edit" onclick="openFeaturedModal()">⚙️ Editar Destacado</button>
+        <!-- SECCIÓN 2: NUEVO HERO / BANNER DE NAVEGACIÓN Y PRESERVACIÓN (REEMPLAZA EL DESTACADO VIEJO) -->
+        <section class="archive-welcome-hero">
+            <div class="hero-badge-tag">
+                <i class="fa-solid fa-compact-disc"></i> ARCHIVO SONORO Y DOCUMENTAL
+            </div>
+            <h2 class="hero-main-title">PRESERVACIÓN DIGITAL DE LA ÉPOCA DORADA (1980–1999)</h2>
+            <p class="hero-main-text">
+                Base de datos independiente dedicada al resguardo, catalogación y documentación técnica de la escena Visual Kei clásica. Explora discografías completas, alineaciones de integrantes con cronologías interactivas y maquetas de distribución limitada.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <a href="artistas.html" class="terabox-btn" style="padding: 12px 28px; text-decoration: none; font-size: 0.85rem;">
+                    <i class="fa-solid fa-users"></i> Explorar Catálogo de Artistas
+                </a>
             </div>
 
-            <div class="featured-cover" id="featured-cover-box">
-                <span class="featured-cover-text" id="featured-tag">ARCHIVO HISTÓRICO</span>
-            </div>
-            <div class="featured-info">
-                <div class="release-label" id="featured-label">PRESERVACIÓN SONORA 1980–1999</div>
-                <h2 id="featured-title">REGISTRO & DOCUMENTACIÓN UNDERGROUND</h2>
-                <p id="featured-desc">
-                    Catálogo dedicado a la preservación digital de maquetas de estudio, cassettes independientes, sencillos raros y álbumes clave de la escena Visual Kei clásica.
-                </p>
-                <a href="artistas.html" id="featured-link" class="terabox-btn" style="padding: 12px 28px;">Explorar Archivo</a>
+            <div class="hero-stats-row">
+                <div class="hero-stat-item">
+                    <span class="hero-stat-number" id="stat-artists-count">--</span>
+                    <span class="hero-stat-label">Bandas Archivadas</span>
+                </div>
+                <div class="hero-stat-item">
+                    <span class="hero-stat-number" id="stat-albums-count">--</span>
+                    <span class="hero-stat-label">Lanzamientos Registrados</span>
+                </div>
+                <div class="hero-stat-item">
+                    <span class="hero-stat-number">1980–1999</span>
+                    <span class="hero-stat-label">Periodo Histórico</span>
+                </div>
             </div>
         </section>
 
@@ -153,55 +183,6 @@
         </section>
     </main>
 
-    <!-- MODAL DE ADMINISTRACIÓN -->
-    <div id="featured-modal" class="modal-bg">
-        <div class="modal-content">
-            <h3 class="section-title" style="margin-top:0;">Configurar Material Destacado</h3>
-            <form id="featured-form">
-                <div class="admin-form-group">
-                    <label>Etiqueta Superior (Categoría)</label>
-                    <select id="input_featured_label">
-                        <option value="COLECCIÓN RARA">Colección Rara</option>
-                        <option value="DIFÍCIL DE CONSEGUIR">Difícil de Conseguir</option>
-                        <option value="DEMO & MATERIAL INDEPENDIENTE">Demos & Material Independiente</option>
-                        <option value="EDICIÓN LIMITADA EN CASSETTE">Edición Limitada en Cassette</option>
-                        <option value="RESCATE DISCOGRÁFICO">Rescate Discográfico</option>
-                        <option value="PRESERVACIÓN SONORA 1980–1999">Preservación Sonora 1980–1999</option>
-                    </select>
-                </div>
-
-                <div class="admin-form-group">
-                    <label>1. Seleccionar Artista *</label>
-                    <select id="select_artist" onchange="onArtistSelected()" required>
-                        <option value="">Cargando artistas...</option>
-                    </select>
-                </div>
-
-                <div class="admin-form-group">
-                    <label>2. Seleccionar Disco / Lanzamiento</label>
-                    <select id="select_album">
-                        <option value="">-- Selecciona primero un artista --</option>
-                    </select>
-                </div>
-
-                <div class="admin-form-group">
-                    <label>Texto de Portada (Sello)</label>
-                    <input type="text" id="input_featured_tag" placeholder="Ej: COLECCIÓN ESPECIAL">
-                </div>
-
-                <div class="admin-form-group">
-                    <label>Descripción del Material Destacado</label>
-                    <textarea id="input_featured_desc" rows="3" placeholder="Escribe un detalle de por qué esta pieza es rara o valiosa..."></textarea>
-                </div>
-
-                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                    <button type="submit" class="btn-action" style="flex:1;">Guardar Cambios</button>
-                    <button type="button" onclick="closeFeaturedModal()" style="flex:1; background:#222; border:1px solid #444; color:#fff; cursor:pointer;">Cancelar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <footer>
         <p>© 2026 VISUAL KEI VAULT // TODOS LOS DERECHOS RESERVADOS.</p>
     </footer>
@@ -209,23 +190,16 @@
     <!-- Scripts de Supabase -->
     <script src="js/config.js"></script>
     <script>
-        // Limpiar caché vieja de CANARY automáticamente la primera vez
-        if (localStorage.getItem('vk_featured_custom') && localStorage.getItem('vk_featured_custom').includes('CANARY')) {
+        // Limpiar cualquier configuración vieja de destacados
+        if (localStorage.getItem('vk_featured_custom')) {
             localStorage.removeItem('vk_featured_custom');
         }
-
-        let globalArtists = [];
-        let globalAlbums = [];
 
         async function cargarInicio() {
             const releasesContainer = document.getElementById('releases-container');
             const newsContainer = document.getElementById('news-container');
 
-            const { data: { session } } = await db.auth.getSession();
-            if (session) {
-                document.getElementById('admin-featured-controls').style.display = 'block';
-            }
-
+            // Consultar álbumes y artistas
             const { data: albums, error: errAlbums } = await db.from('discography')
                 .select('*')
                 .order('created_at', { ascending: false });
@@ -234,8 +208,13 @@
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            globalArtists = artists || [];
-            globalAlbums = albums || [];
+            // Actualizar contadores dinámicos del Hero
+            if (artists) {
+                document.getElementById('stat-artists-count').innerText = artists.length;
+            }
+            if (albums) {
+                document.getElementById('stat-albums-count').innerText = albums.length;
+            }
 
             if (errAlbums || !albums || albums.length === 0) {
                 releasesContainer.innerHTML = `<p style="color:var(--text-muted); grid-column: 1/-1;">No se encontraron registros en el catálogo.</p>`;
@@ -249,6 +228,7 @@
                 });
             }
 
+            // Cargar Lanzamientos Recientes (primeros 4)
             releasesContainer.innerHTML = '';
             albums.slice(0, 4).forEach(item => {
                 const bandName = artistsMap[item.artist_id] || 'Artista Desconocido';
@@ -264,6 +244,7 @@
                 releasesContainer.appendChild(card);
             });
 
+            // Cargar Noticias Dinámicas con las últimas bandas ingresadas
             if (artists && artists.length > 0) {
                 newsContainer.innerHTML = '';
                 artists.slice(0, 3).forEach(art => {
@@ -285,94 +266,7 @@
                     </div>
                 `;
             }
-
-            renderFeaturedSection(albums, artistsMap);
         }
-
-        function renderFeaturedSection(albums, artistsMap) {
-            const savedFeatured = JSON.parse(localStorage.getItem('vk_featured_custom'));
-
-            if (savedFeatured) {
-                document.getElementById('featured-label').innerText = savedFeatured.label;
-                document.getElementById('featured-tag').innerText = savedFeatured.tag;
-                document.getElementById('featured-title').innerText = savedFeatured.title.toUpperCase();
-                document.getElementById('featured-desc').innerText = savedFeatured.desc;
-                if (savedFeatured.artistId) {
-                    document.getElementById('featured-link').href = `discografia.html?banda=${savedFeatured.artistId}`;
-                }
-            } else {
-                // Texto predeterminado nuevo (sin rastro de Canary)
-                document.getElementById('featured-label').innerText = "PRESERVACIÓN SONORA 1980–1999";
-                document.getElementById('featured-tag').innerText = "ARCHIVO HISTÓRICO";
-                document.getElementById('featured-title').innerText = "REGISTRO & DOCUMENTACIÓN UNDERGROUND";
-                document.getElementById('featured-desc').innerText = "Catálogo dedicado a la preservación digital de maquetas de estudio, cassettes independientes, sencillos raros y álbumes clave de la escena Visual Kei clásica.";
-                document.getElementById('featured-link').href = "artistas.html";
-            }
-        }
-
-        function openFeaturedModal() {
-            const selectArtist = document.getElementById('select_artist');
-            selectArtist.innerHTML = '<option value="">-- Selecciona un Artista --</option>';
-
-            globalArtists.forEach(art => {
-                selectArtist.innerHTML += `<option value="${art.id}">${art.name}</option>`;
-            });
-
-            document.getElementById('featured-modal').style.display = 'flex';
-        }
-
-        function closeFeaturedModal() {
-            document.getElementById('featured-modal').style.display = 'none';
-        }
-
-        function onArtistSelected() {
-            const artistId = document.getElementById('select_artist').value;
-            const selectAlbum = document.getElementById('select_album');
-            selectAlbum.innerHTML = '<option value="">-- Todos los Discos / Selección General --</option>';
-
-            if (!artistId) return;
-
-            const artistAlbums = globalAlbums.filter(alb => alb.artist_id == artistId);
-            artistAlbums.forEach(alb => {
-                selectAlbum.innerHTML += `<option value="${alb.id}">${alb.album_title} (${alb.release_year || 'N/A'})</option>`;
-            });
-        }
-
-        document.getElementById('featured-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const artistId = document.getElementById('select_artist').value;
-            const albumId = document.getElementById('select_album').value;
-            const label = document.getElementById('input_featured_label').value;
-            const tag = document.getElementById('input_featured_tag').value.trim() || 'COLECCIÓN ESPECIAL';
-            const customDesc = document.getElementById('input_featured_desc').value.trim();
-
-            const selectedArtist = globalArtists.find(a => a.id == artistId);
-            const selectedAlbum = globalAlbums.find(alb => alb.id == albumId);
-
-            let title = selectedArtist ? selectedArtist.name : 'REGISTRO & DOCUMENTACIÓN UNDERGROUND';
-            let desc = customDesc;
-
-            if (!desc && selectedAlbum) {
-                desc = `Material raro destacado: "${selectedAlbum.album_title}" (${selectedAlbum.release_year || 'N/A'}). Resguardado en el archivo digital.`;
-            } else if (!desc && selectedArtist) {
-                desc = `${selectedArtist.name}: ${selectedArtist.description || 'Colección de maquetas de estudio y discos descontinuados.'}`;
-            }
-
-            const featuredData = {
-                artistId: artistId,
-                albumId: albumId,
-                label: label,
-                tag: tag,
-                title: title,
-                desc: desc
-            };
-
-            localStorage.setItem('vk_featured_custom', JSON.stringify(featuredData));
-            alert('¡Material destacado actualizado con éxito!');
-            closeFeaturedModal();
-            location.reload();
-        });
 
         window.onload = cargarInicio;
     </script>
