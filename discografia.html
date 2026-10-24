@@ -656,7 +656,7 @@
                 </div>
 
                 <div class="admin-form-group">
-                    <label>Años de Actividad / Período (Ej: 1992 o 1980 - 1985 / 1994 - Presente) *</label>
+                    <label>Años de Actividad / Período (Ej: 1980 - 1985 / 1994 - Presente) *</label>
                     <input type="text" id="member_years" placeholder="Ej: 1980 - 1985 / 1994 - Presente" required>
                 </div>
 
@@ -781,7 +781,7 @@
             loadAlbums();
         }
 
-        /* LÓGICA DE CRONOLOGÍA DE INTEGRANTES CON EJE HASTA EL AÑO ACTUAL */
+        /* LÓGICA DE CRONOLOGÍA DE INTEGRANTES CON SEGMENTOS DISCONTINUOS (SOPORTE PARA '/') */
         async function loadMembers() {
             const { data: members, error } = await db.from('members')
                 .select('*')
@@ -802,37 +802,44 @@
             let globalMinYear = currentYear;
             let globalMaxYear = 1980;
 
-            const parseYears = (str) => {
-                if (!str) return { start: 1991, end: currentYear };
-                const numbers = str.match(/\d{4}/g);
-                if (!numbers || numbers.length === 0) return { start: 1991, end: currentYear };
-                
-                const start = parseInt(numbers[0]);
-                let end = numbers[numbers.length - 1] ? parseInt(numbers[numbers.length - 1]) : start;
+            const parsePeriods = (str) => {
+                if (!str) return [{ start: 1991, end: currentYear }];
+                const rawPeriods = str.split('/');
+                const periods = [];
 
-                const strLower = str.toLowerCase();
-                if (strLower.includes('presente') || strLower.includes('actual') || strLower.includes('actividad')) {
-                    end = currentYear;
-                }
+                rawPeriods.forEach(p => {
+                    const numbers = p.match(/\d{4}/g);
+                    if (numbers && numbers.length > 0) {
+                        const start = parseInt(numbers[0]);
+                        let end = numbers[1] ? parseInt(numbers[1]) : start;
 
-                if (end < start) end = start;
-                return { start, end };
+                        const strLower = p.toLowerCase();
+                        if (strLower.includes('presente') || strLower.includes('actual') || strLower.includes('actividad')) {
+                            end = currentYear;
+                        }
+
+                        if (end < start) end = start;
+                        periods.push({ start, end });
+                    }
+                });
+
+                return periods.length > 0 ? periods : [{ start: 1991, end: currentYear }];
             };
 
             members.forEach(m => {
-                const { start, end } = parseYears(m.years_active);
-                if (start < globalMinYear) globalMinYear = start;
-                if (end > globalMaxYear) globalMaxYear = end;
+                const periods = parsePeriods(m.years_active);
+                periods.forEach(p => {
+                    if (p.start < globalMinYear) globalMinYear = p.start;
+                    if (p.end > globalMaxYear) globalMaxYear = p.end;
+                });
             });
 
             if (globalMinYear > globalMaxYear) { globalMinYear = 1980; globalMaxYear = currentYear; }
             const totalSpan = (globalMaxYear - globalMinYear) || 1;
 
-            // Generar marcas dinámicas en el eje inferior incluyendo el año actual
             const stepCount = 6;
             const stepSize = totalSpan / stepCount;
             let yearsAxisHTML = '';
-            
             for (let i = 0; i <= stepCount; i++) {
                 const y = Math.round(globalMinYear + (stepSize * i));
                 yearsAxisHTML += `<span>${y}</span>`;
@@ -850,7 +857,7 @@
                 const rA = roleOrder[mainRoleA] || 99;
                 const rB = roleOrder[mainRoleB] || 99;
                 if (rA !== rB) return rA - rB;
-                return parseYears(a.years_active).start - parseYears(b.years_active).start;
+                return parsePeriods(a.years_active)[0].start - parsePeriods(b.years_active)[0].start;
             };
 
             currentMembers.sort(sortFunc);
@@ -861,9 +868,7 @@
             const renderRows = (list) => {
                 let rowsHTML = '';
                 list.forEach(m => {
-                    const { start, end } = parseYears(m.years_active);
-                    const leftPercent = ((start - globalMinYear) / totalSpan) * 100;
-                    const widthPercent = Math.max((( (end === start ? start + 0.8 : end) - start) / totalSpan) * 100, 4);
+                    const periods = parsePeriods(m.years_active);
 
                     let colorClass = 'role-color-soporte';
                     const rLower = (m.role || '').toLowerCase();
@@ -887,6 +892,22 @@
                         `;
                     }
 
+                    let segmentsHTML = '';
+                    periods.forEach(p => {
+                        const leftPercent = ((p.start - globalMinYear) / totalSpan) * 100;
+                        const widthPercent = Math.max((( (p.end === p.start ? p.start + 0.8 : p.end) - p.start) / totalSpan) * 100, 3);
+                        
+                        const textPeriod = (p.end === currentYear) ? `${p.start} - Presente` : `${p.start} - ${p.end}`;
+
+                        segmentsHTML += `
+                            <div class="timeline-bar-segment ${colorClass}" 
+                               style="left: ${leftPercent}%; width: ${widthPercent}%;" 
+                               title="${m.name} (${textPeriod})">
+                               ${widthPercent > 8 ? textPeriod : ''}
+                            </div>
+                        `;
+                    });
+
                     rowsHTML += `
                         <div class="timeline-row">
                             <div class="timeline-member-info">
@@ -897,11 +918,7 @@
                                 </div>
                             </div>
                             <div class="timeline-track-area">
-                                <div class="timeline-bar-segment ${colorClass}" 
-                                   style="left: ${leftPercent}%; width: ${widthPercent}%;" 
-                                   title="${m.name} (${m.years_active})">
-                                   ${m.years_active}
-                                </div>
+                                ${segmentsHTML}
                             </div>
                             ${adminBtnsHTML}
                         </div>
