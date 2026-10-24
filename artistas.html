@@ -56,7 +56,7 @@
             font-weight: bold;
         }
 
-        /* Barra de Filtros Completa con Subgéneros y Épocas */
+        /* Barra de Filtros por Subgéneros y Épocas */
         .genre-filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -193,18 +193,19 @@
             color: #fff;
         }
 
-        /* Enlaces externos a VK.gy / VKDD */
-        .vk-links-lookup {
-            font-size: 0.65rem;
-            color: #888;
-            margin-top: 4px;
-        }
-        .vk-links-lookup a {
+        .detected-genre-badge {
+            display: inline-block;
+            background: rgba(56, 218, 246, 0.12);
+            border: 1px solid #38daf6;
             color: #38daf6;
-            text-decoration: none;
-            margin: 0 3px;
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+            font-weight: bold;
         }
-        .vk-links-lookup a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -243,11 +244,12 @@
                 </div>
             </div>
 
-            <!-- FILTROS CON TODOS LOS SUBGÉNEROS Y ÉPOCAS -->
+            <!-- FILTROS DE SUBGÉNEROS -->
             <div class="genre-filter-bar">
                 <button class="filter-tag-btn active" onclick="filterGenre('todos', this)">TODOS</button>
                 <button class="filter-tag-btn" onclick="filterGenre('80s', this)">80'S</button>
                 <button class="filter-tag-btn" onclick="filterGenre('90s', this)">90'S</button>
+                <button class="filter-tag-btn" onclick="filterGenre('2000s', this)">2000'S</button>
                 <button class="filter-tag-btn" onclick="filterGenre('art kei', this)">Art Kei</button>
                 <button class="filter-tag-btn" onclick="filterGenre('cosplay kei', this)">Cosplay Kei</button>
                 <button class="filter-tag-btn" onclick="filterGenre('iryou kei', this)">Iryou Kei</button>
@@ -285,6 +287,21 @@
         let currentMode = 'grid';
         let selectedFilter = 'todos';
 
+        // DICCIONARIO LOCAL DE SUBGÉNEROS SEGÚN NOMBRE DE BANDA
+        const bandGenreMap = {
+            'AUTO-MOD': 'gothic / post-punk',
+            'BAISER': 'kote kei',
+            'CANARY': 'kote kei',
+            'CANARY (カナリヤ)': 'kote kei',
+            'DIR EN GREY': 'nagoya kei / kote kei',
+            'NIGHTMARE': 'koteosa kei',
+            'MALICE MIZER': 'tanbi kei',
+            'LAPUTA': 'nagoya kei',
+            'ROUAGE': 'nagoya kei',
+            'LUNA SEA': '90s / kurofuku kei',
+            'X JAPAN': '80s / 90s / heavy metal'
+        };
+
         function setMode(mode) {
             currentMode = mode;
             const container = document.getElementById('artists-list');
@@ -299,6 +316,28 @@
             document.querySelectorAll('.filter-tag-btn').forEach(b => b.classList.remove('active'));
             btnElement.classList.add('active');
             loadArtists();
+        }
+
+        // Obtiene el género según el diccionario local o analiza la descripción de Supabase
+        function getBandGenre(artist) {
+            const nameKey = (artist.name || '').trim();
+            if (bandGenreMap[nameKey]) {
+                return bandGenreMap[nameKey];
+            }
+            
+            const desc = (artist.description || '').toLowerCase();
+            const knownSubgenres = [
+                '80s', '90s', '2000s', 'koteosa kei', 'art kei', 'cosplay kei', 'iryou kei', 'kirakira kei',
+                'kote kei', 'kurofuku kei', 'loud kei', 'menhera kei', 'misshitsu kei',
+                'nagoya kei', 'okeshou kei', 'osare kei', 'pikopiko kei', 'shiro kei',
+                'shironuri kei', 'showa kayou kei', 'soft visual', 'tanbi kei', 'wafuu kei'
+            ];
+
+            for (const sub of knownSubgenres) {
+                if (desc.includes(sub)) return sub;
+            }
+
+            return 'Visual Kei';
         }
 
         async function loadArtists() {
@@ -325,14 +364,15 @@
 
             const filteredArtists = artists.filter(artist => {
                 if (selectedFilter === 'todos') return true;
-                const desc = (artist.description || '').toLowerCase();
-                const name = (artist.name || '').toLowerCase();
-
-                if (selectedFilter === '80s') return desc.includes('198') || desc.includes('80');
-                if (selectedFilter === '90s') return desc.includes('199') || desc.includes('90');
                 
-                // Búsqueda inteligente por subgénero exacto en la descripción
-                return desc.includes(selectedFilter) || name.includes(selectedFilter);
+                const detectedGenre = getBandGenre(artist).toLowerCase();
+                const desc = (artist.description || '').toLowerCase();
+
+                if (selectedFilter === '80s') return desc.includes('198') || desc.includes('80') || detectedGenre.includes('80s');
+                if (selectedFilter === '90s') return desc.includes('199') || desc.includes('90') || detectedGenre.includes('90s');
+                if (selectedFilter === '2000s') return desc.includes('200') || desc.includes('2000') || detectedGenre.includes('2000s');
+                
+                return detectedGenre.includes(selectedFilter) || desc.includes(selectedFilter);
             });
 
             if (filteredArtists.length === 0) {
@@ -346,17 +386,7 @@
                     : `<img src="https://via.placeholder.com/140?text=No+Image" class="artist-cover" alt="Sin imagen">`;
 
                 const buttonText = isAdmin ? 'Ver / Gestionar Discografía' : 'Ver Discografía';
-                
-                // Enlaces automáticos de ayuda a VK.gy y VKDD basados en el nombre de la banda
-                const encodedBandName = encodeURIComponent(artist.name);
-                const vkGyUrl = `https://vk.gy/artists/${encodedBandName.toLowerCase()}`;
-                const vkDdUrl = `https://vkdd.jp/search?q=${encodedBandName}`;
-
-                const lookupLinks = `
-                    <div class="vk-links-lookup">
-                        Buscar en: <a href="${vkGyUrl}" target="_blank">VK.gy</a> | <a href="${vkDdUrl}" target="_blank">VKDD</a>
-                    </div>
-                `;
+                const autoGenre = getBandGenre(artist);
 
                 if (currentMode === 'compact') {
                     container.innerHTML += `
@@ -365,7 +395,7 @@
                                 ${coverImg}
                                 <div>
                                     <h3 style="color:#fff; margin:0; font-size:1.05rem;">${artist.name}</h3>
-                                    ${lookupLinks}
+                                    <span class="detected-genre-badge">${autoGenre}</span>
                                 </div>
                             </div>
                             <a href="discografia.html?banda=${artist.id}" class="btn-ver-discografia" style="width:auto; margin:0;">${buttonText}</a>
@@ -377,7 +407,7 @@
                             ${coverImg}
                             <div class="artist-content">
                                 <h3 style="color:#fff; margin:0 0 0.2rem 0; font-size:1.1rem;">${artist.name}</h3>
-                                ${lookupLinks}
+                                <span class="detected-genre-badge">${autoGenre}</span>
                                 <p style="color:#aaa; font-size:0.88rem; margin:0.5rem 0 0.8rem 0; line-height:1.5;">${artist.description || 'Sin biografía disponible.'}</p>
                                 <a href="discografia.html?banda=${artist.id}" class="btn-ver-discografia">${buttonText}</a>
                             </div>
