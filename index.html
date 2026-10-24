@@ -79,22 +79,19 @@
             letter-spacing: 1px;
             margin-top: 0.3rem;
         }
+        .news-list { display: flex; flex-direction: column; gap: 0.8rem; }
+        .news-item { background: #0d0d0d; border: 1px solid #222; border-radius: 6px; padding: 1rem 1.2rem; display: flex; align-items: center; gap: 1rem; text-decoration: none; transition: border-color 0.2s; }
+        .news-item:hover { border-color: #d4af37; }
+        .news-date { color: #888; font-family: monospace; font-size: 0.8rem; }
+        .news-tag { background: rgba(212, 175, 55, 0.15); border: 1px solid rgba(212, 175, 55, 0.4); color: #d4af37; font-size: 0.65rem; padding: 2px 6px; text-transform: uppercase; border-radius: 3px; }
+        .news-text { color: #ddd; font-size: 0.9rem; }
 
         /* MINI-REPRODUCTOR FLOTANTE GLOBAL PERSISTENTE */
         #global-floating-player {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #0d0d0d;
-            border: 1px solid #d4af37;
-            border-radius: 8px;
-            padding: 10px 15px;
-            width: 300px;
-            z-index: 9999;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
-            display: none;
-            align-items: center;
-            gap: 10px;
+            position: fixed; bottom: 20px; right: 20px; background: #0d0d0d;
+            border: 1px solid #d4af37; border-radius: 8px; padding: 10px 15px;
+            width: 300px; z-index: 9999; box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+            display: none; align-items: center; gap: 10px;
         }
         #global-floating-player .player-info { overflow: hidden; flex-grow: 1; }
         #global-floating-player .player-song-title { color: #fff; font-size: 0.75rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -131,9 +128,7 @@
         </section>
 
         <section class="archive-welcome-hero">
-            <div class="hero-badge-tag">
-                <i class="fa-solid fa-compact-disc"></i> ARCHIVO SONORO Y DOCUMENTAL
-            </div>
+            <div class="hero-badge-tag"><i class="fa-solid fa-compact-disc"></i> ARCHIVO SONORO Y DOCUMENTAL</div>
             <h2 class="hero-main-title">DOCUMENTACIÓN DEL VISUAL KEI: DESDE LOS ORÍGENES HASTA LA ERA MODERNA</h2>
             <p class="hero-main-text">
                 Base de datos dedicada a la catalogación, preservación digital y resguardo de la escena Visual Kei. Centrados en las raíces históricas de los años 80 y 90, el archivo extiende su cobertura a proyectos del 2000 en adelante y la escena contemporánea actual.
@@ -144,27 +139,9 @@
                 </a>
             </div>
             <div class="hero-stats-row">
-                <div class="hero-stat-item">
-                    <span class="hero-stat-number" id="stat-artists-count">--</span>
-                    <span class="hero-stat-label">Bandas Archivadas</span>
-                </div>
-                <div class="hero-stat-item">
-                    <span class="hero-stat-number" id="stat-albums-count">--</span>
-                    <span class="hero-stat-label">Lanzamientos Registrados</span>
-                </div>
-                <div class="hero-stat-item">
-                    <span class="hero-stat-number">1980–Actualidad</span>
-                    <span class="hero-stat-label">Cobertura Temporal</span>
-                </div>
-            </div>
-        </section>
-
-        <section style="margin-bottom: 4rem;">
-            <div class="section-header">
-                <h2 class="section-title">Incorporaciones Recientes</h2>
-            </div>
-            <div id="releases-container" class="releases-grid">
-                <p style="color: var(--text-muted); grid-column: 1/-1;">Cargando registros del catálogo...</p>
+                <div class="hero-stat-item"><span class="hero-stat-number" id="stat-artists-count">--</span><span class="hero-stat-label">Bandas Archivadas</span></div>
+                <div class="hero-stat-item"><span class="hero-stat-number" id="stat-albums-count">--</span><span class="hero-stat-label">Lanzamientos Registrados</span></div>
+                <div class="hero-stat-item"><span class="hero-stat-number">1980–Actualidad</span><span class="hero-stat-label">Cobertura Temporal</span></div>
             </div>
         </section>
     </main>
@@ -186,12 +163,41 @@
     <script src="js/config.js"></script>
     <script>
         async function cargarInicio() {
+            const { data: artists } = await db.from('artists').select('*').order('id', { ascending: false });
             const { data: albums } = await db.from('discography').select('*');
-            const { data: artists } = await db.from('artists').select('*');
+
             if (artists) document.getElementById('stat-artists-count').innerText = artists.length;
             if (albums) document.getElementById('stat-albums-count').innerText = albums.length;
+
+            const newsContainer = document.getElementById('news-container');
+            if (artists && artists.length > 0) {
+                newsContainer.innerHTML = '';
+                artists.slice(0, 5).forEach(artist => {
+                    newsContainer.innerHTML += `
+                        <a href="discografia.html?banda=${artist.id}" class="news-item">
+                            <span class="news-date">Nuevo</span>
+                            <span class="news-tag">ARTISTA</span>
+                            <span class="news-text">Se ha agregado la banda <strong>${artist.name}</strong> al archivo sonoro.</span>
+                        </a>
+                    `;
+                });
+            } else {
+                newsContainer.innerHTML = '<p style="color:#888; font-size:0.85rem;">No hay actualizaciones recientes.</p>';
+            }
+
             restorePersistentPlayer();
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const globalAudio = document.getElementById('global-audio-element');
+            if (globalAudio) {
+                globalAudio.addEventListener('timeupdate', () => {
+                    if (!globalAudio.paused) {
+                        localStorage.setItem('vk_audio_time', globalAudio.currentTime);
+                    }
+                });
+            }
+        });
 
         function closeFloatingPlayer() {
             const globalAudio = document.getElementById('global-audio-element');
@@ -199,6 +205,7 @@
             localStorage.removeItem('vk_audio_url');
             localStorage.removeItem('vk_song_title');
             localStorage.removeItem('vk_band_name');
+            localStorage.removeItem('vk_audio_time');
             document.getElementById('global-floating-player').style.display = 'none';
         }
 
@@ -206,6 +213,7 @@
             const savedUrl = localStorage.getItem('vk_audio_url');
             const savedTitle = localStorage.getItem('vk_song_title');
             const savedBand = localStorage.getItem('vk_band_name');
+            const savedTime = localStorage.getItem('vk_audio_time');
 
             if (savedUrl) {
                 const floatBox = document.getElementById('global-floating-player');
@@ -216,6 +224,10 @@
                 
                 if (globalAudio.src !== savedUrl) {
                     globalAudio.src = savedUrl;
+                    globalAudio.addEventListener('loadedmetadata', () => {
+                        if (savedTime) globalAudio.currentTime = parseFloat(savedTime);
+                        globalAudio.play().catch(e => console.log("Autoplay prevenido"));
+                    }, { once: true });
                 }
                 floatBox.style.display = 'flex';
             }
