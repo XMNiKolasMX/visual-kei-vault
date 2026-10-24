@@ -101,13 +101,13 @@
             </div>
 
             <div class="featured-cover" id="featured-cover-box">
-                <span class="featured-cover-text" id="featured-tag">COLECCIÓN ESPECIAL</span>
+                <span class="featured-cover-text" id="featured-tag">ARCHIVO HISTÓRICO</span>
             </div>
             <div class="featured-info">
-                <div class="release-label" id="featured-label">DEMOS & MATERIAL INDEPENDIENTE</div>
-                <h2 id="featured-title">RESCATE DISCOGRÁFICO</h2>
+                <div class="release-label" id="featured-label">PRESERVACIÓN SONORA 1980–1999</div>
+                <h2 id="featured-title">REGISTRO & DOCUMENTACIÓN UNDERGROUND</h2>
                 <p id="featured-desc">
-                    Digitalización y resguardo de ediciones limitadas, maquetas de estudio y discografías de audio pertenecientes al circuito subterráneo.
+                    Catálogo dedicado a la preservación digital de maquetas de estudio, cassettes independientes, sencillos raras y álbumes clave de la escena Visual Kei clásica.
                 </p>
                 <a href="artistas.html" id="featured-link" class="terabox-btn" style="padding: 12px 28px;">Explorar Archivo</a>
             </div>
@@ -131,15 +131,15 @@
             </div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
                 <div>
-                    <h3 style="font-family: 'Cinzel', serif; color: var(--accent-gold); font-size: 1rem; margin-bottom: 0.5rem; text-transform: uppercase;">Álbumes de Estudio & EPs</h3>
+                    <h3 style="font-family: 'Cinzel', serif; color: var(--accent-gold); font-size: 1rem; margin-bottom: 0.5rem; text-transform: uppercase;">Álbumes, Mini-Álbumes & EPs</h3>
                     <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.7;">
-                        Lanzamientos oficiales de larga duración y minialbumes preservados en alta fidelidad sonora, clasificados por año y sello discográfico.
+                        Lanzamientos oficiales de larga duración y minialbumes preservados en alta fidelidad sonora, clasificados por año, sello discográfico y subgénero.
                     </p>
                 </div>
                 <div>
-                    <h3 style="font-family: 'Cinzel', serif; color: var(--accent-gold); font-size: 1rem; margin-bottom: 0.5rem; text-transform: uppercase;">Sencillos & Demos de Colección</h3>
+                    <h3 style="font-family: 'Cinzel', serif; color: var(--accent-gold); font-size: 1rem; margin-bottom: 0.5rem; text-transform: uppercase;">Sencillos, Demos & Omnibus</h3>
                     <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.7;">
-                        Maquetas en cassette de distribución limitada, sencillos promocionales e interpretaciones de estudio raras de la era independiente.
+                        Maquetas de distribución limitada en cassette, sencillos promocionales y álbumes recopilatorios omnibus que reúnen múltiples bandas de la época.
                     </p>
                 </div>
             </div>
@@ -167,6 +167,7 @@
                         <option value="DEMO & MATERIAL INDEPENDIENTE">Demos & Material Independiente</option>
                         <option value="EDICIÓN LIMITADA EN CASSETTE">Edición Limitada en Cassette</option>
                         <option value="RESCATE DISCOGRÁFICO">Rescate Discográfico</option>
+                        <option value="PRESERVACIÓN SONORA 1980–1999">Preservación Sonora 1980–1999</option>
                     </select>
                 </div>
 
@@ -306,14 +307,14 @@
                 const primerRegistro = albums[0];
                 const bandName = artistsMap[primerRegistro.artist_id] || 'Artista Desconocido';
                 document.getElementById('featured-title').innerText = `${bandName.toUpperCase()}`;
-                document.getElementById('featured-desc').innerText = `Último ingreso en el catálogo: "${primerRegistro.album_title}" (${primerRegistro.release_year || 'N/A'}). Resguardado con lista de temas comprobada.`;
+                document.getElementById('featured-desc').innerText = `Último ingreso registrado en el archivo: "${primerRegistro.album_title}" (${primerRegistro.release_year || 'N/A'}). Resguardado en el catálogo.`;
                 document.getElementById('featured-link').href = `discografia.html?banda=${primerRegistro.artist_id}`;
             }
         }
 
         function openFeaturedModal() {
             const selectArtist = document.getElementById('select_artist');
-            select_artist.innerHTML = '<option value="">-- Selecciona un Artista --</option>';
+            selectArtist.innerHTML = '<option value="">-- Selecciona un Artista --</option>';
 
             globalArtists.forEach(art => {
                 selectArtist.innerHTML += `<option value="${art.id}">${art.name}</option>`;
@@ -351,13 +352,13 @@
             const selectedArtist = globalArtists.find(a => a.id == artistId);
             const selectedAlbum = globalAlbums.find(alb => alb.id == albumId);
 
-            let title = selectedArtist ? selectedArtist.name : 'RESCATE DISCOGRÁFICO';
+            let title = selectedArtist ? selectedArtist.name : 'REGISTRO & DOCUMENTACIÓN UNDERGROUND';
             let desc = customDesc;
 
             if (!desc && selectedAlbum) {
                 desc = `Material raro destacado: "${selectedAlbum.album_title}" (${selectedAlbum.release_year || 'N/A'}). Resguardado en el archivo digital.`;
             } else if (!desc && selectedArtist) {
-                desc = `${selectedArtist.name}: ${selectedArtist.description || 'Colección rara de material independiente y maquetas de estudio.'}`;
+                desc = `${selectedArtist.name}: ${selectedArtist.description || 'Colección de maquetas de estudio y discos descontinuados.'}`;
             }
 
             const featuredData = {
