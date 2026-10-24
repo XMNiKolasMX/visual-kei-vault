@@ -51,7 +51,7 @@
             color: #aaa;
             font-size: 0.95rem;
             line-height: 1.8;
-            max-width: 750px;
+            max-width: 780px;
             margin: 0 auto 2.5rem auto;
         }
         .hero-stats-row {
@@ -86,7 +86,7 @@
 <body>
     <header>
         <h1 class="glitch-title">VISUAL KEI VAULT</h1>
-        <p class="header-subtitle">Proyecto de Archivo Sonoro y Discográfico 1980–1999</p>
+        <p class="header-subtitle">Proyecto de Archivo Sonoro y Discográfico 1980–Actualidad</p>
         <nav>
             <a href="index.html" class="active">Inicio</a>
             <a href="artistas.html">Artistas</a>
@@ -111,14 +111,14 @@
             </div>
         </section>
 
-        <!-- SECCIÓN 2: NUEVO HERO / BANNER DE NAVEGACIÓN Y PRESERVACIÓN (REEMPLAZA EL DESTACADO VIEJO) -->
+        <!-- SECCIÓN 2: ARCHIVO SONORO (ORIGENES Y ESCENA ACTUAL) -->
         <section class="archive-welcome-hero">
             <div class="hero-badge-tag">
                 <i class="fa-solid fa-compact-disc"></i> ARCHIVO SONORO Y DOCUMENTAL
             </div>
-            <h2 class="hero-main-title">PRESERVACIÓN DIGITAL DE LA ÉPOCA DORADA (1980–1999)</h2>
+            <h2 class="hero-main-title">DOCUMENTACIÓN DEL VISUAL KEI: DESDE LOS ORÍGENES HASTA LA ERA MODERNA</h2>
             <p class="hero-main-text">
-                Base de datos independiente dedicada al resguardo, catalogación y documentación técnica de la escena Visual Kei clásica. Explora discografías completas, alineaciones de integrantes con cronologías interactivas y maquetas de distribución limitada.
+                Base de datos dedicada a la catalogación, preservación digital y resguardo de la escena Visual Kei. Centrados en las raíces históricas de los años 80 y 90, el archivo extiende su cobertura a proyectos del 2000 en adelante y la escena contemporánea actual. Explora discografías, listas de canciones estructuradas y alineaciones con cronología gráfica.
             </p>
             <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
                 <a href="artistas.html" class="terabox-btn" style="padding: 12px 28px; text-decoration: none; font-size: 0.85rem;">
@@ -136,8 +136,8 @@
                     <span class="hero-stat-label">Lanzamientos Registrados</span>
                 </div>
                 <div class="hero-stat-item">
-                    <span class="hero-stat-number">1980–1999</span>
-                    <span class="hero-stat-label">Periodo Histórico</span>
+                    <span class="hero-stat-number">1980–Actualidad</span>
+                    <span class="hero-stat-label">Cobertura Temporal</span>
                 </div>
             </div>
         </section>
@@ -190,7 +190,6 @@
     <!-- Scripts de Supabase -->
     <script src="js/config.js"></script>
     <script>
-        // Limpiar cualquier configuración vieja de destacados
         if (localStorage.getItem('vk_featured_custom')) {
             localStorage.removeItem('vk_featured_custom');
         }
@@ -199,7 +198,6 @@
             const releasesContainer = document.getElementById('releases-container');
             const newsContainer = document.getElementById('news-container');
 
-            // Consultar álbumes y artistas
             const { data: albums, error: errAlbums } = await db.from('discography')
                 .select('*')
                 .order('created_at', { ascending: false });
@@ -208,7 +206,6 @@
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            // Actualizar contadores dinámicos del Hero
             if (artists) {
                 document.getElementById('stat-artists-count').innerText = artists.length;
             }
@@ -228,7 +225,6 @@
                 });
             }
 
-            // Cargar Lanzamientos Recientes (primeros 4)
             releasesContainer.innerHTML = '';
             albums.slice(0, 4).forEach(item => {
                 const bandName = artistsMap[item.artist_id] || 'Artista Desconocido';
@@ -244,7 +240,6 @@
                 releasesContainer.appendChild(card);
             });
 
-            // Cargar Noticias Dinámicas con las últimas bandas ingresadas
             if (artists && artists.length > 0) {
                 newsContainer.innerHTML = '';
                 artists.slice(0, 3).forEach(art => {
