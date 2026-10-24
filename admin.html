@@ -31,7 +31,8 @@
         }
 
         .admin-form-group input,
-        .admin-form-group textarea {
+        .admin-form-group textarea,
+        .admin-form-group select {
             width: 100%;
             background: #141414;
             border: 1px solid #2a2a2a;
@@ -45,7 +46,39 @@
         .admin-form-group input:focus,
         .admin-form-group textarea:focus {
             outline: none;
-            border-color: #721c24;
+            border-color: #d4af37;
+        }
+
+        /* Bloque de Selección Múltiple de Géneros y Épocas */
+        .genres-checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            background: #141414;
+            padding: 0.8rem;
+            border: 1px solid #2a2a2a;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 0.3rem;
+        }
+
+        .genres-checkbox-grid label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #ccc;
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-transform: none;
+            margin-bottom: 0;
+            letter-spacing: 0;
+        }
+
+        .genres-checkbox-grid input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+            accent-color: #d4af37;
         }
 
         .header-bar {
@@ -126,8 +159,10 @@
             background: #0d0d0d;
             border: 1px solid #333;
             padding: 2rem;
-            max-width: 500px;
+            max-width: 520px;
             width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .error-message {
@@ -197,7 +232,7 @@
                 <input type="hidden" id="selected_artist_id">
 
                 <div class="admin-form-group">
-                    <label>Título del Álbum / Demo *</label>
+                    <label>Título del Álbum / Single / Demo *</label>
                     <input type="text" id="album_title" placeholder="Ej: Memoire" required>
                 </div>
 
@@ -222,7 +257,7 @@
         </div>
     </main>
 
-    <!-- MODAL PARA AGREGAR NUEVO ARTISTA -->
+    <!-- MODAL PARA AGREGAR NUEVO ARTISTA CON SELECCIÓN DE SUBGÉNEROS Y ÉPOCAS -->
     <div id="artist-modal" class="modal-bg">
         <div class="modal-content">
             <h3 class="section-title" style="margin-top:0;">Nuevo Artista / Banda</h3>
@@ -231,9 +266,40 @@
                     <label>Nombre de la Banda *</label>
                     <input type="text" id="new_artist_name" placeholder="Ej: Dir En Grey" required>
                 </div>
+
+                <!-- NUEVA SECCIÓN: CASILLAS PARA SUBGÉNEROS Y DÉCADAS -->
                 <div class="admin-form-group">
-                    <label>Breve Descripción</label>
-                    <textarea id="new_artist_desc" rows="3" placeholder="Banda pionera formada en Osaka en 1997..."></textarea>
+                    <label>¿A qué género(s) o época(s) pertenece esta banda? *</label>
+                    <div class="genres-checkbox-grid">
+                        <label><input type="checkbox" name="artist_genre_cb" value="80s"> 80'S</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="90s"> 90'S</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="2000s"> 2000'S</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="art kei"> Art Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="cosplay kei"> Cosplay Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="iryou kei"> Iryou Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="kirakira kei"> Kirakira Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="kote kei"> Kote Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="koteosa kei"> Koteosa Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="kurofuku kei"> Kurofuku Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="loud kei"> Loud Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="menhera kei"> Menhera Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="misshitsu kei"> Misshitsu Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="nagoya kei"> Nagoya Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="okeshou kei"> Okeshou Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="osare kei"> Osare Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="pikopiko kei"> Pikopiko Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="shiro kei"> Shiro Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="shironuri kei"> Shironuri Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="showa kayou kei"> Showa Kayou Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="soft visual"> Soft Visual</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="tanbi kei"> Tanbi Kei</label>
+                        <label><input type="checkbox" name="artist_genre_cb" value="wafuu kei"> Wafuu Kei</label>
+                    </div>
+                </div>
+
+                <div class="admin-form-group">
+                    <label>Breve Descripción / Biografía</label>
+                    <textarea id="new_artist_desc" rows="3" placeholder="Banda pionera formada en Osaka..."></textarea>
                 </div>
                 <div class="admin-form-group">
                     <label>URL de Foto del Artista</label>
@@ -290,7 +356,7 @@
             verificarSesion();
         });
 
-        // Mostrar Vista de Artistas y Cargarlos
+        // Mostrar Vista de Artistas
         async function showArtistsView() {
             discographyView.style.display = 'none';
             artistsView.style.display = 'block';
@@ -322,12 +388,26 @@
         function openArtistModal() { artistModal.style.display = 'flex'; }
         function closeArtistModal() { artistModal.style.display = 'none'; }
 
-        // Crear Nuevo Artista
+        // Crear Nuevo Artista con subgéneros seleccionados
         document.getElementById('add-artist-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            // Recopilar géneros marcados
+            const selectedGenres = Array.from(document.querySelectorAll('input[name="artist_genre_cb"]:checked'))
+                .map(cb => cb.value);
+
+            if (selectedGenres.length === 0) {
+                alert('Por favor, selecciona al menos un género o época para la banda.');
+                return;
+            }
+
+            const rawDesc = document.getElementById('new_artist_desc').value.trim();
+            const genreTagText = `[Géneros: ${selectedGenres.join(', ')}]`;
+            const finalDescription = rawDesc ? `${rawDesc} ${genreTagText}` : genreTagText;
+
             const newArtist = {
                 name: document.getElementById('new_artist_name').value.trim(),
-                description: document.getElementById('new_artist_desc').value.trim() || null,
+                description: finalDescription,
                 image_url: document.getElementById('new_artist_image').value.trim() || null
             };
 
