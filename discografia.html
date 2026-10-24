@@ -212,7 +212,6 @@
             font-weight: bold;
         }
 
-        /* Checkboxes para selección de múltiples roles */
         .roles-checkbox-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -288,7 +287,6 @@
             font-weight: bold;
         }
 
-        /* Barra de Filtros por Categoría con MINI-ÁLBUM y OMNIBUS */
         .category-filter-bar {
             display: flex;
             flex-wrap: wrap;
@@ -321,7 +319,6 @@
             font-weight: bold;
         }
 
-        /* VISTA 1: Cuadrícula de 5 columnas */
         .albums-container.grid-view {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -343,6 +340,7 @@
             align-items: center;
             text-align: center;
             transition: transform 0.2s, border-color 0.2s;
+            position: relative;
         }
         .grid-view .album-card:hover {
             border-color: #d4af37;
@@ -351,22 +349,13 @@
         .grid-view .album-cover {
             width: 100%;
             aspect-ratio: 1/1;
-            height: auto;
             object-fit: cover;
             border-radius: 6px;
             border: 1px solid #222;
             margin-bottom: 0.8rem;
         }
         .grid-view .tracklist-box { display: none; }
-        .grid-view .album-header {
-            flex-direction: column;
-            border: none;
-            padding: 0;
-            margin-bottom: 0.5rem;
-            width: 100%;
-        }
 
-        /* VISTA 2: Lista Detallada Clásica */
         .albums-container.detailed-view {
             display: flex;
             flex-direction: column;
@@ -379,6 +368,7 @@
             display: flex;
             gap: 1.5rem;
             align-items: flex-start;
+            position: relative;
         }
         .detailed-view .album-cover {
             width: 140px;
@@ -388,14 +378,6 @@
             flex-shrink: 0;
         }
         .detailed-view .album-content { flex-grow: 1; }
-        .detailed-view .album-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #222;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-        }
         .detailed-view .tracklist-box {
             background: #111;
             padding: 1rem;
@@ -406,7 +388,6 @@
             border: 1px solid #1a1a1a;
         }
 
-        /* VISTA 3: Lista Comprimida */
         .albums-container.compact-view {
             display: flex;
             flex-direction: column;
@@ -419,6 +400,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: relative;
         }
         .compact-view .album-cover {
             width: 45px;
@@ -427,9 +409,7 @@
             border-radius: 4px;
         }
         .compact-view .tracklist-box { display: none; }
-        .compact-view .album-header { border: none; padding: 0; margin: 0; }
 
-        /* Estilos de Canciones y Reproductor Directo */
         .track-item-row {
             display: flex;
             flex-direction: column;
@@ -438,9 +418,6 @@
             padding-bottom: 0.6rem;
         }
         .track-item-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .track-main-info {
-            margin-bottom: 0.2rem;
-        }
         .track-name-text {
             color: #ddd;
             font-weight: 600;
@@ -463,15 +440,6 @@
             margin-top: 0.2rem;
         }
 
-        /* Ocultar el menú de los tres puntos en el reproductor nativo */
-        audio::-webkit-media-controls-enclosure {
-            overflow: hidden;
-        }
-        audio::-webkit-media-controls-overflow-button {
-            display: none !important;
-        }
-
-        /* Badges & Botones */
         .release-type-badge {
             display: inline-block;
             background: rgba(212, 175, 55, 0.15);
@@ -482,7 +450,6 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-left: 6px;
-            vertical-align: middle;
             border-radius: 3px;
         }
         .btn-terabox {
@@ -501,6 +468,29 @@
         }
         .btn-terabox:hover { background: #222; border-color: #666; color: #fff; }
         .no-terabox { color: #555; font-size: 0.75rem; font-style: italic; }
+
+        /* MINI-REPRODUCTOR FLOTANTE GLOBAL PERSISTENTE */
+        #global-floating-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #0d0d0d;
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            padding: 10px 15px;
+            width: 300px;
+            z-index: 9999;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        #global-floating-player .player-info { overflow: hidden; flex-grow: 1; }
+        #global-floating-player .player-song-title { color: #fff; font-size: 0.75rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #global-floating-player .player-band-name { color: #d4af37; font-size: 0.65rem; text-transform: uppercase; display: block; }
+        #global-floating-player audio { width: 100%; height: 28px; margin-top: 5px; filter: invert(0.9); }
+        .btn-close-player { background: transparent; border: none; color: #888; cursor: pointer; font-size: 0.8rem; }
+        .btn-close-player:hover { color: #fff; }
 
         /* Modales */
         .modal-bg {
@@ -521,11 +511,9 @@
             max-height: 90vh;
             overflow-y: auto;
         }
-        .admin-form-group { margin-bottom: 1rem; }
+        .admin-form-group { margin-bottom: 1rem; text-align: left; }
         .admin-form-group label { display: block; font-size: 0.75rem; color: #888; margin-bottom: 0.3rem; text-transform: uppercase; }
-        .admin-form-group input, 
-        .admin-form-group textarea,
-        .admin-form-group select {
+        .admin-form-group input, .admin-form-group textarea, .admin-form-group select {
             width: 100%; background: #141414; border: 1px solid #2a2a2a; color: #fff; padding: 0.6rem; box-sizing: border-box; font-family: inherit;
         }
         .admin-actions-bar { display: flex; gap: 0.5rem; margin-top: 0.8rem; }
@@ -537,7 +525,7 @@
 <body>
     <header>
         <h1 class="glitch-title">VISUAL KEI VAULT</h1>
-        <p class="header-subtitle">PROYECTO DE ARCHIVO SONORO Y DISCOGRÁFICO 1980–1999</p>
+        <p class="header-subtitle">PROYECTO DE ARCHIVO SONORO Y DISCOGRÁFICO 1980–ACTUALIDAD</p>
         <nav>
             <a href="index.html">INICIO</a>
             <a href="artistas.html">ARTISTAS</a>
@@ -565,12 +553,10 @@
                         </button>
                     </div>
 
-                    <!-- FILAS DE LA CRONOLOGÍA ORDENADAS -->
                     <div id="timeline-chart-rows">
                         <p style="color:#888; font-size:0.75rem;">Generando cronología de integrantes...</p>
                     </div>
 
-                    <!-- EJE DE AÑOS INFERIOR -->
                     <div id="timeline-years-axis" class="timeline-years-header"></div>
                 </div>
             </div>
@@ -591,10 +577,10 @@
                     </button>
 
                     <div class="view-switcher">
-                        <button class="view-btn active" id="btn-view-grid" onclick="setMode('grid')" title="Vista Cuadrícula 5x5">
+                        <button class="view-btn active" id="btn-view-grid" onclick="setMode('grid')" title="Vista Cuadrícula">
                             <i class="fa-solid fa-border-all"></i>
                         </button>
-                        <button class="view-btn" id="btn-view-detailed" onclick="setMode('detailed')" title="Vista Detallada Clásica">
+                        <button class="view-btn" id="btn-view-detailed" onclick="setMode('detailed')" title="Vista Detallada">
                             <i class="fa-solid fa-list"></i>
                         </button>
                         <button class="view-btn" id="btn-view-compact" onclick="setMode('compact')" title="Vista Compacta">
@@ -604,7 +590,7 @@
                 </div>
             </div>
 
-            <!-- FILTROS POR CATEGORÍA CON MINI-ÁLBUM Y OMNIBUS -->
+            <!-- FILTROS POR CATEGORÍA -->
             <div class="category-filter-bar">
                 <button class="filter-tag-btn active" onclick="filterCategory('todos', this)">TODOS</button>
                 <button class="filter-tag-btn" onclick="filterCategory('Álbum', this)">ÁLBUM</button>
@@ -629,12 +615,10 @@
             <h3 id="member-modal-title" class="section-title" style="margin-top:0;">Agregar Integrante</h3>
             <form id="member-form">
                 <input type="hidden" id="edit_member_id">
-
                 <div class="admin-form-group">
                     <label>Nombre del Integrante *</label>
-                    <input type="text" id="member_name" placeholder="Ej: Yukari, Akihiro, Mana" required>
+                    <input type="text" id="member_name" required>
                 </div>
-
                 <div class="admin-form-group">
                     <label>Estado en la Banda *</label>
                     <select id="member_status" required>
@@ -642,10 +626,8 @@
                         <option value="ex">Ex-Integrante</option>
                     </select>
                 </div>
-
-                <!-- SELECCIÓN MÚLTIPLE DE ROLES / INSTRUMENTOS -->
                 <div class="admin-form-group">
-                    <label>Posición / Rol (Puedes seleccionar varios) *</label>
+                    <label>Posición / Rol *</label>
                     <div class="roles-checkbox-group">
                         <label><input type="checkbox" name="member_role_cb" value="Vocalista"> Vocalista</label>
                         <label><input type="checkbox" name="member_role_cb" value="Guitarrista"> Guitarrista</label>
@@ -656,17 +638,14 @@
                         <label><input type="checkbox" name="member_role_cb" value="Miembro de Soporte"> Miembro de Soporte</label>
                     </div>
                 </div>
-
                 <div class="admin-form-group">
-                    <label>Años de Actividad / Período (Ej: 1980 - 1985 / 1994 - Presente) *</label>
+                    <label>Años de Actividad *</label>
                     <input type="text" id="member_years" placeholder="Ej: 1980 - 1985 / 1994 - Presente" required>
                 </div>
-
                 <div class="admin-form-group">
-                    <label>URL de la Foto (Opcional)</label>
-                    <input type="url" id="member_image_url" placeholder="https://i.imgur.com/...">
+                    <label>URL de la Foto</label>
+                    <input type="url" id="member_image_url" placeholder="https://...">
                 </div>
-
                 <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                     <button type="submit" class="btn-action" style="flex:1;">Guardar Integrante</button>
                     <button type="button" onclick="closeMemberModal()" style="flex:1; background:#222; border:1px solid #444; color:#fff; cursor:pointer;">Cancelar</button>
@@ -681,12 +660,10 @@
             <h3 id="modal-title" class="section-title" style="margin-top:0;">Nuevo Lanzamiento</h3>
             <form id="album-form">
                 <input type="hidden" id="edit_album_id">
-                
                 <div class="admin-form-group">
-                    <label>Título del Álbum / Single / Lanzamiento *</label>
-                    <input type="text" id="album_title" placeholder="Ej: Memoire" required>
+                    <label>Título del Álbum / Single *</label>
+                    <input type="text" id="album_title" required>
                 </div>
-
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="admin-form-group">
                         <label>Tipo de Lanzamiento *</label>
@@ -696,8 +673,8 @@
                             <option value="Single">Single / Sencillo</option>
                             <option value="Maxi-Single">Maxi-Single</option>
                             <option value="Demo">Demo / Maqueta</option>
-                            <option value="Omnibus">Omnibus (Recopilatorio de varias bandas)</option>
-                            <option value="Recopilatorio">Recopilatorio (Best Album)</option>
+                            <option value="Omnibus">Omnibus</option>
+                            <option value="Recopilatorio">Recopilatorio</option>
                         </select>
                     </div>
                     <div class="admin-form-group">
@@ -705,29 +682,34 @@
                         <input type="text" id="release_year" placeholder="Ej: 1994">
                     </div>
                 </div>
-
                 <div class="admin-form-group">
                     <label>URL de la Carátula</label>
-                    <input type="url" id="cover_image" placeholder="https://i.imgur.com/...">
+                    <input type="url" id="cover_image" placeholder="https://...">
                 </div>
-
                 <div class="admin-form-group">
-                    <label>Enlace TeraBox (Descargar el Álbum)</label>
+                    <label>Enlace TeraBox</label>
                     <input type="url" id="terabox_link" placeholder="https://terabox.com/s/...">
                 </div>
-
                 <div class="admin-form-group">
-                    <label>Lista de Canciones con Enlace de Reproducción (Formato: Nombre de la canción | URL de audio)</label>
-                    <p style="font-size:0.65rem; color:#888; margin-top:2px; margin-bottom:5px;">💡 Consejo: Para agregar reproductor pon un pipe <code>|</code> seguido del link directo de audio. Si no pones enlace, solo saldrá el texto normal.</p>
-                    <textarea id="tracklist" rows="7" placeholder="1. Misty | https://ia601902.us.archive.org/16/items/canary-misty/CANARY-Misty.mp3&#10;2. Kioku no Iro"></textarea>
+                    <label>Lista de Canciones (Canción | Enlace Audio)</label>
+                    <textarea id="tracklist" rows="7" placeholder="1. Misty | https://...&#10;2. Kioku no Iro"></textarea>
                 </div>
-
                 <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                     <button type="submit" class="btn-action" style="flex:1;">Guardar Cambios</button>
-                    <button type="button" class="btn-secondary" onclick="closeAlbumModal()" style="flex:1; background:#222; border:1px solid #444; color:#fff; cursor:pointer;">Cancelar</button>
+                    <button type="button" onclick="closeAlbumModal()" style="flex:1; background:#222; border:1px solid #444; color:#fff; cursor:pointer;">Cancelar</button>
                 </div>
             </form>
         </div>
+    </div>
+
+    <!-- MINI-REPRODUCTOR FLOTANTE GLOBAL PERSISTENTE -->
+    <div id="global-floating-player">
+        <div class="player-info">
+            <span class="player-band-name" id="float-band">Banda</span>
+            <div class="player-song-title" id="float-title">Canción</div>
+            <audio id="global-audio-element" controls controlsList="nodownload"></audio>
+        </div>
+        <button class="btn-close-player" onclick="closeFloatingPlayer()" title="Cerrar reproductor">✖</button>
     </div>
 
     <footer>
@@ -741,7 +723,7 @@
         let isAdmin = false;
         let currentMode = 'grid';
         let selectedCategory = 'todos';
-        let artistAlbumsCache = [];
+        let currentArtistName = '';
 
         function setMode(mode) {
             currentMode = mode;
@@ -774,23 +756,76 @@
 
             const { data: artist } = await db.from('artists').select('*').eq('id', artistId).single();
             if (artist) {
+                currentArtistName = artist.name;
                 document.getElementById('artist-info').innerHTML = `
                     ${artist.image_url ? `<img src="${artist.image_url}" alt="${artist.name}">` : ''}
                     <h2 class="section-title" style="margin: 0 0 0.5rem 0; border: none; font-size:1.8rem;">${artist.name.toUpperCase()}</h2>
-                    <p style="margin: 0 auto; max-width:650px; color:#aaa; line-height: 1.6;">${artist.description || 'Sin biografía disponible.'}</p>
+                    <p style="margin: 0 auto; max-width:650px; color:#aaa; line-height: 1.6;">${(artist.description || '').replace(/\[Géneros: (.*?)\]/gi, '').trim()}</p>
                 `;
             }
 
             loadMembers();
             loadAlbums();
+            restorePersistentPlayer();
         }
 
-        /* LÓGICA DE CRONOLOGÍA DE INTEGRANTES CON SEGMENTOS DISCONTINUOS (SOPORTE PARA '/') */
-        async function loadMembers() {
-            const { data: members, error } = await db.from('members')
-                .select('*')
-                .eq('artist_id', parseInt(artistId));
+        /* GESTIÓN DE REPRODUCCIÓN GLOBAL CON PERSISTENCIA */
+        function handleGlobalPlay(audioElem, songTitle, bandName, audioUrl) {
+            document.querySelectorAll('audio').forEach(aud => {
+                if (aud !== audioElem && aud.id !== 'global-audio-element') {
+                    aud.pause();
+                }
+            });
 
+            const floatBox = document.getElementById('global-floating-player');
+            const globalAudio = document.getElementById('global-audio-element');
+            
+            document.getElementById('float-band').innerText = bandName;
+            document.getElementById('float-title').innerText = songTitle;
+            
+            if (globalAudio.src !== audioUrl) {
+                globalAudio.src = audioUrl;
+                globalAudio.play();
+            }
+            floatBox.style.display = 'flex';
+
+            // Guardar en la memoria persistente del navegador
+            localStorage.setItem('vk_audio_url', audioUrl);
+            localStorage.setItem('vk_song_title', songTitle);
+            localStorage.setItem('vk_band_name', bandName);
+        }
+
+        function closeFloatingPlayer() {
+            const globalAudio = document.getElementById('global-audio-element');
+            globalAudio.pause();
+            localStorage.removeItem('vk_audio_url');
+            localStorage.removeItem('vk_song_title');
+            localStorage.removeItem('vk_band_name');
+            document.getElementById('global-floating-player').style.display = 'none';
+        }
+
+        function restorePersistentPlayer() {
+            const savedUrl = localStorage.getItem('vk_audio_url');
+            const savedTitle = localStorage.getItem('vk_song_title');
+            const savedBand = localStorage.getItem('vk_band_name');
+
+            if (savedUrl) {
+                const floatBox = document.getElementById('global-floating-player');
+                const globalAudio = document.getElementById('global-audio-element');
+                
+                document.getElementById('float-band').innerText = savedBand || 'Banda';
+                document.getElementById('float-title').innerText = savedTitle || 'Canción';
+                
+                if (globalAudio.src !== savedUrl) {
+                    globalAudio.src = savedUrl;
+                }
+                floatBox.style.display = 'flex';
+            }
+        }
+
+        /* CRONOLOGÍA DE INTEGRANTES */
+        async function loadMembers() {
+            const { data: members, error } = await db.from('members').select('*').eq('artist_id', parseInt(artistId));
             const chartRowsContainer = document.getElementById('timeline-chart-rows');
             const yearsAxisContainer = document.getElementById('timeline-years-axis');
 
@@ -798,118 +833,68 @@
             yearsAxisContainer.innerHTML = '';
 
             if (error || !members || members.length === 0) {
-                chartRowsContainer.innerHTML = '<p style="color:#888; font-size:0.75rem;">No hay integrantes registrados en la cronología.</p>';
+                chartRowsContainer.innerHTML = '<p style="color:#888; font-size:0.75rem;">No hay integrantes registrados.</p>';
                 return;
             }
 
             const currentYear = new Date().getFullYear();
-            let globalMinYear = currentYear;
-            let globalMaxYear = 1980;
+            let globalMinYear = currentYear, globalMaxYear = 1980;
 
             const parsePeriods = (str) => {
                 if (!str) return [{ start: 1991, end: currentYear }];
                 const rawPeriods = str.split('/');
                 const periods = [];
-
                 rawPeriods.forEach(p => {
                     const numbers = p.match(/\d{4}/g);
                     if (numbers && numbers.length > 0) {
                         const start = parseInt(numbers[0]);
                         let end = numbers[1] ? parseInt(numbers[1]) : start;
-
-                        const strLower = p.toLowerCase();
-                        if (strLower.includes('presente') || strLower.includes('actual') || strLower.includes('actividad')) {
-                            end = currentYear;
-                        }
-
+                        if (p.toLowerCase().includes('presente') || p.toLowerCase().includes('actual')) end = currentYear;
                         if (end < start) end = start;
                         periods.push({ start, end });
                     }
                 });
-
                 return periods.length > 0 ? periods : [{ start: 1991, end: currentYear }];
             };
 
             members.forEach(m => {
-                const periods = parsePeriods(m.years_active);
-                periods.forEach(p => {
+                parsePeriods(m.years_active).forEach(p => {
                     if (p.start < globalMinYear) globalMinYear = p.start;
                     if (p.end > globalMaxYear) globalMaxYear = p.end;
                 });
             });
 
-            if (globalMinYear > globalMaxYear) { globalMinYear = 1980; globalMaxYear = currentYear; }
             const totalSpan = (globalMaxYear - globalMinYear) || 1;
-
-            const stepCount = 6;
-            const stepSize = totalSpan / stepCount;
             let yearsAxisHTML = '';
-            for (let i = 0; i <= stepCount; i++) {
-                const y = Math.round(globalMinYear + (stepSize * i));
-                yearsAxisHTML += `<span>${y}</span>`;
+            for (let i = 0; i <= 6; i++) {
+                yearsAxisHTML += `<span>${Math.round(globalMinYear + ((totalSpan / 6) * i))}</span>`;
             }
             yearsAxisContainer.innerHTML = yearsAxisHTML;
 
             const currentMembers = members.filter(m => (m.status || 'actual') === 'actual');
             const formerMembers = members.filter(m => (m.status || 'actual') === 'ex');
 
-            const roleOrder = { 'Vocalista': 1, 'Guitarrista': 2, 'Bajista': 3, 'Baterista': 4, 'Tecladista': 5, 'Miembro de Soporte': 6, 'Líder / Compositor': 7 };
-
-            const sortFunc = (a, b) => {
-                const mainRoleA = (a.role || '').split(',')[0].trim();
-                const mainRoleB = (b.role || '').split(',')[0].trim();
-                const rA = roleOrder[mainRoleA] || 99;
-                const rB = roleOrder[mainRoleB] || 99;
-                if (rA !== rB) return rA - rB;
-                return parsePeriods(a.years_active)[0].start - parsePeriods(b.years_active)[0].start;
-            };
-
-            currentMembers.sort(sortFunc);
-            formerMembers.sort(sortFunc);
-
             let htmlOutput = '';
-
             const renderRows = (list) => {
                 let rowsHTML = '';
                 list.forEach(m => {
                     const periods = parsePeriods(m.years_active);
-
                     let colorClass = 'role-color-soporte';
                     const rLower = (m.role || '').toLowerCase();
                     if (rLower.includes('vocal')) colorClass = 'role-color-vocalista';
                     else if (rLower.includes('guitar')) colorClass = 'role-color-guitarrista';
-                    else if (rLower.includes('bajo') || rLower.includes('baji')) colorClass = 'role-color-bajista';
+                    else if (rLower.includes('bajo')) colorClass = 'role-color-bajista';
                     else if (rLower.includes('bater')) colorClass = 'role-color-baterista';
                     else if (rLower.includes('tecla')) colorClass = 'role-color-tecladista';
 
-                    const avatarHTML = m.image_url 
-                        ? `<img src="${m.image_url}" class="timeline-avatar" alt="${m.name}">`
-                        : `<div class="timeline-avatar-placeholder">Sin Foto</div>`;
-
-                    let adminBtnsHTML = '';
-                    if (isAdmin) {
-                        adminBtnsHTML = `
-                            <div class="timeline-actions">
-                                <button class="btn-timeline-action" title="Editar Integrante" onclick="openEditMemberModal(${m.id})"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn-timeline-action delete" title="Eliminar Integrante" onclick="deleteMember(${m.id})"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        `;
-                    }
+                    const avatarHTML = m.image_url ? `<img src="${m.image_url}" class="timeline-avatar">` : `<div class="timeline-avatar-placeholder">Foto</div>`;
+                    let adminBtnsHTML = isAdmin ? `<div class="timeline-actions"><button class="btn-timeline-action" onclick="openEditMemberModal(${m.id})"><i class="fa-solid fa-pen"></i></button><button class="btn-timeline-action delete" onclick="deleteMember(${m.id})"><i class="fa-solid fa-trash"></i></button></div>` : '';
 
                     let segmentsHTML = '';
                     periods.forEach(p => {
-                        const leftPercent = ((p.start - globalMinYear) / totalSpan) * 100;
-                        const widthPercent = Math.max((( (p.end === p.start ? p.start + 0.8 : p.end) - p.start) / totalSpan) * 100, 3);
-                        
-                        const textPeriod = (p.end === currentYear) ? `${p.start} - Presente` : `${p.start} - ${p.end}`;
-
-                        segmentsHTML += `
-                            <div class="timeline-bar-segment ${colorClass}" 
-                               style="left: ${leftPercent}%; width: ${widthPercent}%;" 
-                               title="${m.name} (${textPeriod})">
-                               ${widthPercent > 8 ? textPeriod : ''}
-                            </div>
-                        `;
+                        const left = ((p.start - globalMinYear) / totalSpan) * 100;
+                        const width = Math.max((((p.end === p.start ? p.start + 0.8 : p.end) - p.start) / totalSpan) * 100, 3);
+                        segmentsHTML += `<div class="timeline-bar-segment ${colorClass}" style="left: ${left}%; width: ${width}%;">${width > 8 ? p.start + ' - ' + (p.end === currentYear ? 'Pres.' : p.end) : ''}</div>`;
                     });
 
                     rowsHTML += `
@@ -917,131 +902,27 @@
                             <div class="timeline-member-info">
                                 ${avatarHTML}
                                 <div class="timeline-member-texts">
-                                    <div class="timeline-member-name" title="${m.name}">${m.name}</div>
+                                    <div class="timeline-member-name">${m.name}</div>
                                     <div class="timeline-member-role">${m.role}</div>
                                 </div>
                             </div>
-                            <div class="timeline-track-area">
-                                ${segmentsHTML}
-                            </div>
+                            <div class="timeline-track-area">${segmentsHTML}</div>
                             ${adminBtnsHTML}
-                        </div>
-                    `;
+                        </div>`;
                 });
                 return rowsHTML;
             };
 
-            if (currentMembers.length > 0) {
-                htmlOutput += `<div class="timeline-group-title">★ MIEMBROS ACTUALES</div>`;
-                htmlOutput += renderRows(currentMembers);
-            }
-
-            if (formerMembers.length > 0) {
-                htmlOutput += `<div class="timeline-group-title" style="margin-top: 1.8rem;">📌 EX-INTEGRANTES</div>`;
-                htmlOutput += renderRows(formerMembers);
-            }
-
+            if (currentMembers.length > 0) htmlOutput += `<div class="timeline-group-title">★ MIEMBROS ACTUALES</div>` + renderRows(currentMembers);
+            if (formerMembers.length > 0) htmlOutput += `<div class="timeline-group-title" style="margin-top:1.8rem;">📌 EX-INTEGRANTES</div>` + renderRows(formerMembers);
             chartRowsContainer.innerHTML = htmlOutput;
         }
 
-        function openCreateMemberModal() {
-            document.getElementById('member-modal-title').innerText = 'Agregar Integrante';
-            document.getElementById('member-form').reset();
-            document.getElementById('edit_member_id').value = '';
-            document.getElementById('member_status').value = 'actual';
-            document.querySelectorAll('input[name="member_role_cb"]').forEach(cb => cb.checked = false);
-            document.getElementById('member-modal').style.display = 'flex';
-        }
-
-        async function openEditMemberModal(memberId) {
-            const { data: member } = await db.from('members').select('*').eq('id', memberId).single();
-            if (!member) return;
-
-            document.getElementById('member-modal-title').innerText = 'Editar Integrante';
-            document.getElementById('edit_member_id').value = member.id;
-            document.getElementById('member_name').value = member.name;
-            document.getElementById('member_status').value = member.status || 'actual';
-            document.getElementById('member_years').value = member.years_active || '';
-            document.getElementById('member_image_url').value = member.image_url || '';
-
-            const savedRoles = (member.role || '').split(',').map(r => r.trim());
-            document.querySelectorAll('input[name="member_role_cb"]').forEach(cb => {
-                cb.checked = savedRoles.includes(cb.value);
-            });
-
-            document.getElementById('member-modal').style.display = 'flex';
-        }
-
-        function closeMemberModal() {
-            document.getElementById('member-modal').style.display = 'none';
-        }
-
-        /* GUARDAR INTEGRANTE MULTI-ROL CON AVISO DE CONFIRMACIÓN */
-        document.getElementById('member-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const memberId = document.getElementById('edit_member_id').value;
-
-            const selectedRoles = Array.from(document.querySelectorAll('input[name="member_role_cb"]:checked'))
-                .map(cb => cb.value);
-
-            if (selectedRoles.length === 0) {
-                alert('Por favor, selecciona al menos un rol o instrumento.');
-                return;
-            }
-
-            const memberData = {
-                artist_id: parseInt(artistId),
-                name: document.getElementById('member_name').value.trim(),
-                status: document.getElementById('member_status').value,
-                role: selectedRoles.join(', '),
-                years_active: document.getElementById('member_years').value.trim() || null,
-                image_url: document.getElementById('member_image_url').value.trim() || null
-            };
-
-            let error;
-            if (memberId) {
-                const res = await db.from('members').update(memberData).eq('id', parseInt(memberId));
-                error = res.error;
-            } else {
-                const res = await db.from('members').insert([memberData]);
-                error = res.error;
-            }
-
-            if (error) {
-                alert('Error al guardar integrante: ' + error.message);
-            } else {
-                alert('Integrante guardado correctamente.');
-                closeMemberModal();
-                loadMembers();
-            }
-        });
-
-        async function deleteMember(memberId) {
-            if (confirm('¿Estás seguro de eliminar este integrante de la cronología?')) {
-                const { error } = await db.from('members').delete().eq('id', memberId);
-                if (error) alert('Error: ' + error.message);
-                else loadMembers();
-            }
-        }
-
-        /* RENDERIZAR TRACKLIST CON REPRODUCTOR DIRECTO Y ETIQUETA SUPERIOR */
         function formatTracklistHTML(tracklistData) {
-            let lines = [];
-            if (Array.isArray(tracklistData)) {
-                lines = tracklistData;
-            } else if (typeof tracklistData === 'string') {
-                try {
-                    const parsed = JSON.parse(tracklistData);
-                    lines = Array.isArray(parsed) ? parsed : tracklistData.split('\n');
-                } catch (e) {
-                    lines = tracklistData.split('\n');
-                }
-            }
-
+            let lines = Array.isArray(tracklistData) ? tracklistData : (typeof tracklistData === 'string' ? tracklistData.split('\n') : []);
             let htmlOutput = '';
             lines.forEach((line) => {
                 if (!line.trim()) return;
-
                 let parts = line.split('|');
                 let songTitle = parts[0].trim();
                 let audioLink = parts[1] ? parts[1].trim() : '';
@@ -1049,212 +930,151 @@
                 if (audioLink) {
                     htmlOutput += `
                         <div class="track-item-row">
-                            <div class="track-main-info">
-                                <span class="track-name-text">${songTitle}</span>
-                            </div>
+                            <div class="track-main-info"><span class="track-name-text">${songTitle}</span></div>
                             <div>
                                 <span class="audio-label">Escúchalo</span>
-                                <audio controls controlsList="nodownload" preload="none">
+                                <audio controls controlsList="nodownload" preload="none" onplay="handleGlobalPlay(this, '${songTitle}', '${currentArtistName}', '${audioLink}')">
                                     <source src="${audioLink}" type="audio/mpeg">
-                                    Tu navegador no soporta el elemento de audio.
                                 </audio>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 } else {
-                    htmlOutput += `
-                        <div class="track-item-row">
-                            <div class="track-main-info">
-                                <span class="track-name-text">${songTitle}</span>
-                            </div>
-                        </div>
-                    `;
+                    htmlOutput += `<div class="track-item-row"><div class="track-main-info"><span class="track-name-text">${songTitle}</span></div></div>`;
                 }
             });
-
-            return htmlOutput || 'Lista de canciones no disponible.';
+            return htmlOutput || 'Lista no disponible.';
         }
 
-        /* CARGA Y GESTIÓN DE DISCOGRAFÍA */
         async function loadAlbums() {
-            const sortVal = document.getElementById('sort-select').value;
             let query = db.from('discography').select('*').eq('artist_id', parseInt(artistId));
+            if (selectedCategory !== 'todos') query = query.eq('release_type', selectedCategory);
 
-            if (selectedCategory !== 'todos') {
-                query = query.eq('release_type', selectedCategory);
-            }
+            const sortVal = document.getElementById('sort-select').value;
+            if (sortVal === 'year-desc-release') query = query.order('release_year', { ascending: false });
+            else if (sortVal === 'title-asc') query = query.order('album_title', { ascending: true });
+            else query = query.order('release_year', { ascending: true });
 
-            if (sortVal === 'year-desc-release') {
-                query = query.order('release_year', { ascending: false });
-            } else if (sortVal === 'title-asc') {
-                query = query.order('album_title', { ascending: true });
-            } else {
-                query = query.order('release_year', { ascending: true });
-            }
-
-            const { data: albums, error } = await query;
-            if (albums) {
-                artistAlbumsCache = albums;
-            }
-
+            const { data: albums } = await query;
             const container = document.getElementById('albums-list');
             container.innerHTML = '';
 
-            if (error || !albums || albums.length === 0) {
-                container.innerHTML = '<p style="color:#888; text-align:center; grid-column:1/-1;">No hay lanzamientos registrados para esta categoría.</p>';
+            if (!albums || albums.length === 0) {
+                container.innerHTML = '<p style="color:#888; text-align:center; grid-column:1/-1;">No hay lanzamientos.</p>';
                 return;
             }
 
             albums.forEach(album => {
                 let tracksHtml = formatTracklistHTML(album.tracklist);
-                
-                const teraboxBtn = album.terabox_link 
-                    ? `<a href="${album.terabox_link}" target="_blank" class="btn-terabox"><i class="fa-solid fa-download"></i> Descargar álbum</a>`
-                    : '<span class="no-terabox">Sin enlace de álbum</span>';
-
-                const coverImg = album.cover_image 
-                    ? `<img src="${album.cover_image}" class="album-cover" alt="${album.album_title}">` 
-                    : `<img src="https://via.placeholder.com/140?text=No+Cover" class="album-cover" alt="Sin carátula">`;
-
+                const teraboxBtn = album.terabox_link ? `<a href="${album.terabox_link}" target="_blank" class="btn-terabox"><i class="fa-solid fa-download"></i> Descargar</a>` : '<span class="no-terabox">Sin enlace</span>';
+                const coverImg = album.cover_image ? `<img src="${album.cover_image}" class="album-cover">` : `<img src="https://via.placeholder.com/140?text=No+Cover" class="album-cover">`;
                 const typeTag = album.release_type ? `<span class="release-type-badge">${album.release_type}</span>` : '';
-
-                let adminControlsHTML = '';
-                if (isAdmin) {
-                    adminControlsHTML = `
-                        <div class="admin-actions-bar">
-                            <button class="btn-edit" onclick="openEditModal(${album.id})">✏️ Editar</button>
-                            <button class="btn-delete" onclick="deleteAlbum(${album.id})">🗑️</button>
-                        </div>
-                    `;
-                }
+                let adminActions = isAdmin ? `<div class="admin-actions-bar"><button class="btn-edit" onclick="openEditModal(${album.id})">✏️ Editar</button><button class="btn-delete" onclick="deleteAlbum(${album.id})">🗑️</button></div>` : '';
 
                 if (currentMode === 'compact') {
                     container.innerHTML += `
-                        <div class="album-card">
-                            <div style="display:flex; align-items:center; gap:1rem;">
-                                ${coverImg}
-                                <div>
-                                    <strong style="color:#fff;">${album.album_title}</strong> ${typeTag}
-                                    <span style="color:#888; font-size:0.8rem; margin-left:8px;">(${album.release_year || 'N/A'})</span>
-                                </div>
-                            </div>
-                            <div style="display:flex; align-items:center; gap:1rem;">
-                                ${teraboxBtn}
-                                ${adminControlsHTML}
-                            </div>
-                        </div>
-                    `;
+                        <div class="album-card" style="display:flex; align-items:center; justify-content:space-between;">
+                            <div style="display:flex; align-items:center; gap:1rem;">${coverImg}<div><strong style="color:#fff;">${album.album_title}</strong> ${typeTag} <span style="color:#888; font-size:0.8rem;">(${album.release_year || 'N/A'})</span></div></div>
+                            <div style="display:flex; align-items:center; gap:1rem;">${teraboxBtn} ${adminActions}</div>
+                        </div>`;
                 } else {
                     container.innerHTML += `
                         <div class="album-card">
                             ${coverImg}
-                            <div class="album-content">
+                            <div class="album-content" style="width:100%;">
                                 <div class="album-header">
-                                    <h3 style="color:#fff; margin:0 0 0.3rem 0; font-size:1rem;">
-                                        ${album.album_title} 
-                                        ${typeTag}
-                                        <span style="color:#888; font-size:0.85rem;">(${album.release_year || 'Año desconocido'})</span>
-                                    </h3>
+                                    <h3 style="color:#fff; margin:0 0 0.3rem 0; font-size:1rem;">${album.album_title} ${typeTag} <span style="color:#888; font-size:0.85rem;">(${album.release_year || 'N/A'})</span></h3>
                                     ${teraboxBtn}
                                 </div>
                                 <div class="tracklist-box">${tracksHtml}</div>
-                                ${adminControlsHTML}
+                                ${adminActions}
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 }
             });
         }
 
-        function openCreateModal() {
-            document.getElementById('modal-title').innerText = 'Nuevo Lanzamiento';
-            document.getElementById('album-form').reset();
-            document.getElementById('edit_album_id').value = '';
-            document.getElementById('album-modal').style.display = 'flex';
-        }
-
-        async function openEditModal(albumId) {
-            const { data: album, error } = await db.from('discography').select('*').eq('id', albumId).single();
-            if (error || !album) {
-                alert('No se pudo cargar la información del álbum.');
-                return;
-            }
-
+        /* MODALES Y CRUD DE ÁLBUMES */
+        function openCreateModal() { document.getElementById('modal-title').innerText = 'Nuevo Lanzamiento'; document.getElementById('album-form').reset(); document.getElementById('edit_album_id').value = ''; document.getElementById('album-modal').style.display = 'flex'; }
+        async function openEditModal(id) {
+            const { data: album } = await db.from('discography').select('*').eq('id', id).single();
+            if (!album) return;
             document.getElementById('modal-title').innerText = 'Editar Lanzamiento';
             document.getElementById('edit_album_id').value = album.id;
-            document.getElementById('album_title').value = album.album_title || '';
+            document.getElementById('album_title').value = album.album_title;
             document.getElementById('release_type').value = album.release_type || 'Álbum';
             document.getElementById('release_year').value = album.release_year || '';
             document.getElementById('cover_image').value = album.cover_image || '';
             document.getElementById('terabox_link').value = album.terabox_link || '';
-
-            let rawTracks = '';
-            if (Array.isArray(album.tracklist)) {
-                rawTracks = album.tracklist.join('\n');
-            } else if (typeof album.tracklist === 'string') {
-                try {
-                    const parsed = JSON.parse(album.tracklist);
-                    rawTracks = Array.isArray(parsed) ? parsed.join('\n') : album.tracklist;
-                } catch (e) {
-                    rawTracks = album.tracklist;
-                }
-            }
-
-            document.getElementById('tracklist').value = rawTracks;
+            document.getElementById('tracklist').value = Array.isArray(album.tracklist) ? album.tracklist.join('\n') : (album.tracklist || '');
             document.getElementById('album-modal').style.display = 'flex';
         }
+        function closeAlbumModal() { document.getElementById('album-modal').style.display = 'none'; }
 
-        function closeAlbumModal() {
-            document.getElementById('album-modal').style.display = 'none';
-        }
-
-        /* GUARDAR EN SUPABASE CONSERVANDO LAS LÍNEAS CON PIPES Y ENLACES */
         document.getElementById('album-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const albumId = document.getElementById('edit_album_id').value;
-            
-            const tracklistRaw = document.getElementById('tracklist').value;
-            const tracklistArray = tracklistRaw
-                .split('\n')
-                .map(t => t.trim())
-                .filter(t => t.length > 0);
-
-            const albumData = {
+            const id = document.getElementById('edit_album_id').value;
+            const data = {
                 artist_id: parseInt(artistId),
                 album_title: document.getElementById('album_title').value.trim(),
                 release_type: document.getElementById('release_type').value,
                 release_year: document.getElementById('release_year').value.trim() || null,
                 cover_image: document.getElementById('cover_image').value.trim() || null,
                 terabox_link: document.getElementById('terabox_link').value.trim() || null,
-                tracklist: tracklistArray
+                tracklist: document.getElementById('tracklist').value.split('\n').map(t => t.trim()).filter(t => t.length > 0)
             };
-
-            let error;
-            if (albumId) {
-                const res = await db.from('discography').update(albumData).eq('id', parseInt(albumId));
-                error = res.error;
-            } else {
-                const res = await db.from('discography').insert([albumData]);
-                error = res.error;
-            }
-
-            if (error) {
-                alert('Error al guardar: ' + error.message);
-            } else {
-                closeAlbumModal();
-                location.reload();
-            }
+            const res = id ? await db.from('discography').update(data).eq('id', id) : await db.from('discography').insert([data]);
+            if (res.error) alert('Error: ' + res.error.message);
+            else { closeAlbumModal(); loadAlbums(); }
         });
 
-        async function deleteAlbum(albumId) {
-            if (confirm('¿Estás seguro de eliminar este álbum de la base de datos?')) {
-                const { error } = await db.from('discography').delete().eq('id', parseInt(albumId));
-                if (error) {
-                    alert('Error al eliminar: ' + error.message);
-                } else {
-                    alert('Álbum eliminado correctamente.');
-                    loadAlbums();
-                }
+        async function deleteAlbum(id) {
+            if (confirm('¿Eliminar disco?')) {
+                const { error } = await db.from('discography').delete().eq('id', id);
+                if (error) alert('Error: ' + error.message);
+                else loadAlbums();
+            }
+        }
+
+        /* MODALES Y CRUD DE INTEGRANTES */
+        function openCreateMemberModal() { document.getElementById('member-modal-title').innerText = 'Agregar Integrante'; document.getElementById('member-form').reset(); document.getElementById('edit_member_id').value = ''; document.querySelectorAll('input[name="member_role_cb"]').forEach(cb => cb.checked = false); document.getElementById('member-modal').style.display = 'flex'; }
+        async function openEditMemberModal(id) {
+            const { data: m } = await db.from('members').select('*').eq('id', id).single();
+            if (!m) return;
+            document.getElementById('member-modal-title').innerText = 'Editar Integrante';
+            document.getElementById('edit_member_id').value = m.id;
+            document.getElementById('member_name').value = m.name;
+            document.getElementById('member_status').value = m.status || 'actual';
+            document.getElementById('member_years').value = m.years_active || '';
+            document.getElementById('member_image_url').value = m.image_url || '';
+            const roles = (m.role || '').split(',').map(r => r.trim());
+            document.querySelectorAll('input[name="member_role_cb"]').forEach(cb => cb.checked = roles.includes(cb.value));
+            document.getElementById('member-modal').style.display = 'flex';
+        }
+        function closeMemberModal() { document.getElementById('member-modal').style.display = 'none'; }
+
+        document.getElementById('member-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('edit_member_id').value;
+            const roles = Array.from(document.querySelectorAll('input[name="member_role_cb"]:checked')).map(cb => cb.value);
+            if (roles.length === 0) { alert('Selecciona al menos un rol.'); return; }
+            const data = {
+                artist_id: parseInt(artistId),
+                name: document.getElementById('member_name').value.trim(),
+                status: document.getElementById('member_status').value,
+                role: roles.join(', '),
+                years_active: document.getElementById('member_years').value.trim() || null,
+                image_url: document.getElementById('member_image_url').value.trim() || null
+            };
+            const res = id ? await db.from('members').update(data).eq('id', id) : await db.from('members').insert([data]);
+            if (res.error) alert('Error: ' + res.error.message);
+            else { closeMemberModal(); loadMembers(); }
+        });
+
+        async function deleteMember(id) {
+            if (confirm('¿Eliminar integrante?')) {
+                const { error } = await db.from('members').delete().eq('id', id);
+                if (error) alert('Error: ' + error.message);
+                else loadMembers();
             }
         }
 
