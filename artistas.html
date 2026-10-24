@@ -3,313 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VISUAL KEI VAULT // ARTISTAS</title>
+    <title>VISUAL KEI VAULT // DISCOGRÁFÍA</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .controls-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            background: #0d0d0d;
-            padding: 0.8rem 1.2rem;
-            border: 1px solid #222;
-            border-radius: 8px;
-        }
-        .select-sort {
-            background: #141824;
-            border: 1px solid #2a2f3f;
-            color: #fff;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            outline: none;
-        }
-        .view-switcher {
-            display: flex;
-            gap: 0.5rem;
-        }
-        .view-btn {
-            background: #141824;
-            border: 1px solid #2a2f3f;
-            color: #8a99ad;
-            width: 38px;
-            height: 38px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .view-btn:hover {
-            color: #fff;
-            background: #1e2538;
-        }
-        .view-btn.active {
-            background: #38daf6;
-            color: #0b0f19;
-            border-color: #38daf6;
-            font-weight: bold;
-        }
-
-        /* Barra de Filtros por Subgéneros y Épocas */
-        .genre-filter-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-            margin-bottom: 2rem;
-            justify-content: center;
-        }
-        .filter-tag-btn {
-            background: #101010;
-            border: 1px solid #2a2a2a;
-            color: #aaa;
-            padding: 0.35rem 0.8rem;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.25s ease;
-            font-family: inherit;
-        }
-        .filter-tag-btn:hover {
-            background: #1a1a1a;
-            border-color: #555;
-            color: #fff;
-        }
-        .filter-tag-btn.active {
-            background: rgba(212, 175, 55, 0.15);
-            border-color: #d4af37;
-            color: #d4af37;
-            font-weight: bold;
-        }
-
-        .artists-container.grid-view {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 1.2rem;
-        }
-        @media (max-width: 1100px) {
-            .artists-container.grid-view { grid-template-columns: repeat(3, 1fr); }
-        }
-        @media (max-width: 600px) {
-            .artists-container.grid-view { grid-template-columns: repeat(1, 1fr); }
-        }
-
-        .grid-view .artist-card {
-            background: #0d0d0d;
-            border: 1px solid #222;
-            border-radius: 8px;
-            padding: 1.2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            transition: transform 0.2s, border-color 0.2s;
-            position: relative;
-        }
-        .grid-view .artist-card:hover {
-            border-color: #d4af37;
-            transform: translateY(-4px);
-        }
-        .grid-view .artist-cover {
-            width: 100%;
-            aspect-ratio: 1/1;
-            height: auto;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 1px solid #222;
-            margin-bottom: 0.8rem;
-        }
-        .grid-view .artist-content p { display: none; }
-
-        .artists-container.detailed-view {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        .detailed-view .artist-card {
-            background: #0d0d0d;
-            border: 1px solid #222;
-            padding: 1.5rem;
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-            position: relative;
-        }
-        .detailed-view .artist-cover {
-            width: 140px;
-            height: 140px;
-            object-fit: cover;
-            border: 1px solid #222;
-            flex-shrink: 0;
-        }
-        .detailed-view .artist-content { flex-grow: 1; }
-
-        .artists-container.compact-view {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .compact-view .artist-card {
-            background: #0d0d0d;
-            border: 1px solid #222;
-            padding: 0.8rem 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-        }
-        .compact-view .artist-cover {
-            width: 45px;
-            height: 45px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-        .compact-view .artist-content p { display: none; }
-
-        .btn-ver-discografia {
-            display: inline-block;
-            background: #141414;
-            border: 1px solid #333;
-            color: #d4af37;
-            padding: 0.5rem 1rem;
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            margin-top: 0.8rem;
-            font-family: inherit;
-            width: 100%;
-            box-sizing: border-box;
-            text-align: center;
-        }
-        .btn-ver-discografia:hover {
-            background: #1a1a1a;
-            border-color: #d4af37;
-            color: #fff;
-        }
-
-        .detected-genre-badge {
-            display: inline-block;
-            background: rgba(56, 218, 246, 0.12);
-            border: 1px solid #38daf6;
-            color: #38daf6;
-            font-size: 0.65rem;
-            padding: 2px 8px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 4px;
-            font-weight: bold;
-        }
-
-        /* Botones de Admin sobre la Tarjeta */
-        .admin-card-actions {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            display: flex;
-            gap: 4px;
-            z-index: 10;
-        }
-        .btn-card-admin {
-            background: #181124;
-            border: 1px solid #333;
-            color: #ccc;
-            width: 26px;
-            height: 26px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 0.7rem;
-            transition: all 0.2s;
-        }
-        .btn-card-admin:hover {
-            background: #241936;
-            color: #fff;
-            border-color: #d4af37;
-        }
-        .btn-card-admin.delete:hover {
-            border-color: #721c24;
-            color: #f8d7da;
-        }
-
-        /* Estilos de Modales y Formularios */
-        .modal-bg {
-            display: none;
+        /* (Tus estilos anteriores se mantienen intactos, añadimos los del reproductor flotante) */
+        .artist-header-center { text-align: center; background: #080808; border: 1px solid #1a1a1a; padding: 2rem; margin-bottom: 2rem; }
+        .artist-header-center img { width: 150px; height: 150px; object-fit: cover; border-radius: 50%; border: 2px solid #333; margin-bottom: 1rem; }
+        
+        /* MINI-REPRODUCTOR FLOTANTE GLOBAL (FIJO EN UNA ESQUINA) */
+        #global-floating-player {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
+            bottom: 20px;
+            right: 20px;
             background: #0d0d0d;
-            border: 1px solid #333;
-            padding: 2rem;
-            max-width: 520px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            padding: 10px 15px;
+            width: 300px;
+            z-index: 9999;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+            display: none; /* Se muestra al reproducir algo */
+            align-items: center;
+            gap: 10px;
         }
-        .admin-form-group {
-            margin-bottom: 1rem;
-            text-align: left;
+        #global-floating-player .player-info {
+            overflow: hidden;
+            flex-grow: 1;
         }
-        .admin-form-group label {
-            display: block;
+        #global-floating-player .player-song-title {
+            color: #fff;
             font-size: 0.75rem;
-            color: #888;
-            margin-bottom: 0.3rem;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #global-floating-player .player-band-name {
+            color: #d4af37;
+            font-size: 0.65rem;
             text-transform: uppercase;
         }
-        .admin-form-group input, 
-        .admin-form-group textarea, 
-        .admin-form-group select {
+        #global-floating-player audio {
             width: 100%;
-            background: #141414;
-            border: 1px solid #2a2a2a;
-            color: #fff;
-            padding: 0.6rem;
-            box-sizing: border-box;
-            font-family: inherit;
+            height: 28px;
+            margin-top: 5px;
+            filter: invert(0.9);
         }
-        .genres-checkbox-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
-            background: #141414;
-            padding: 0.8rem;
-            border: 1px solid #2a2a2a;
-            border-radius: 4px;
-            max-height: 180px;
-            overflow-y: auto;
-        }
-        .genres-checkbox-grid label {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            color: #ccc;
-            font-size: 0.75rem;
+        .btn-close-player {
+            background: transparent;
+            border: none;
+            color: #888;
             cursor: pointer;
-            text-transform: none;
-            margin-bottom: 0;
+            font-size: 0.8rem;
         }
-        .genres-checkbox-grid input[type="checkbox"] {
-            width: auto;
-            cursor: pointer;
-            accent-color: #d4af37;
-        }
+        .btn-close-player:hover { color: #fff; }
+
+        /* Resto de estilos igual que antes... */
+        .controls-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; background: #0d0d0d; padding: 0.8rem 1.2rem; border: 1px solid #222; border-radius: 8px; }
+        .select-sort { background: #141824; border: 1px solid #2a2f3f; color: #fff; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer; outline: none; }
+        .view-switcher { display: flex; gap: 0.5rem; }
+        .view-btn { background: #141824; border: 1px solid #2a2f3f; color: #8a99ad; width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .view-btn.active { background: #38daf6; color: #0b0f19; border-color: #38daf6; font-weight: bold; }
+        .category-filter-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem; justify-content: center; }
+        .filter-tag-btn { background: #101010; border: 1px solid #2a2a2a; color: #aaa; padding: 0.4rem 1rem; font-size: 0.78rem; text-transform: uppercase; cursor: pointer; border-radius: 4px; }
+        .filter-tag-btn.active { background: rgba(212, 175, 55, 0.15); border-color: #d4af37; color: #d4af37; font-weight: bold; }
+        .albums-container.grid-view { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.2rem; }
+        @media (max-width: 1100px) { .albums-container.grid-view { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 600px) { .albums-container.grid-view { grid-template-columns: repeat(1, 1fr); } }
+        .grid-view .album-card { background: #0d0d0d; border: 1px solid #222; border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .grid-view .album-cover { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 6px; border: 1px solid #222; margin-bottom: 0.8rem; }
+        .grid-view .tracklist-box { display: none; }
+        .detailed-view .album-card { background: #0d0d0d; border: 1px solid #222; padding: 1.5rem; display: flex; gap: 1.5rem; align-items: flex-start; margin-bottom: 1.5rem; }
+        .detailed-view .album-cover { width: 140px; height: 140px; object-fit: cover; border: 1px solid #222; flex-shrink: 0; }
+        .detailed-view .tracklist-box { background: #111; padding: 1rem; font-family: monospace; font-size: 0.85rem; color: #ccc; margin: 1rem 0; border: 1px solid #1a1a1a; }
+        .track-item-row { display: flex; flex-direction: column; margin-bottom: 0.8rem; border-bottom: 1px dashed #222; padding-bottom: 0.6rem; }
+        .track-name-text { color: #ddd; font-weight: 600; }
+        .audio-label { font-size: 0.65rem; color: #d4af37; text-transform: uppercase; display: block; margin-bottom: 0.2rem; font-weight: bold; }
+        .track-item-row audio { width: 100%; height: 30px; filter: invert(0.9); background: #141414; border-radius: 4px; margin-top: 0.2rem; }
+        .release-type-badge { display: inline-block; background: rgba(212, 175, 55, 0.15); border: 1px solid rgba(212, 175, 55, 0.4); color: #d4af37; font-size: 0.65rem; padding: 2px 6px; text-transform: uppercase; border-radius: 3px; margin-left: 6px; }
+        .btn-terabox { display: inline-flex; align-items: center; gap: 0.5rem; background: #141414; border: 1px solid #333; color: #e0e0e0; padding: 0.4rem 0.8rem; font-size: 0.72rem; text-transform: uppercase; text-decoration: none; }
+        .modal-bg { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: #0d0d0d; border: 1px solid #333; padding: 2rem; max-width: 580px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .admin-form-group { margin-bottom: 1rem; }
+        .admin-form-group label { display: block; font-size: 0.75rem; color: #888; margin-bottom: 0.3rem; text-transform: uppercase; }
+        .admin-form-group input, .admin-form-group textarea, .admin-form-group select { width: 100%; background: #141414; border: 1px solid #2a2a2a; color: #fff; padding: 0.6rem; box-sizing: border-box; font-family: inherit; }
     </style>
 </head>
 <body>
@@ -318,128 +97,55 @@
         <p class="header-subtitle">PROYECTO DE ARCHIVO SONORO Y DISCOGRÁFICO 1980–1999</p>
         <nav>
             <a href="index.html">INICIO</a>
-            <a href="artistas.html" class="active">ARTISTAS</a>
+            <a href="artistas.html">ARTISTAS</a>
             <a href="nosotros.html">EL PROYECTO</a>
         </nav>
     </header>
 
     <main>
         <section class="panel" style="max-width: 1100px; margin: 2rem auto;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #222; padding-bottom: 0.5rem;">
-                <h2 class="section-title" style="margin: 0; border: none;">CATÁLOGO DE ARTISTAS</h2>
-                <button id="admin-add-artist-btn" class="btn-action" style="display:none; font-size:0.75rem; padding:0.5rem 1rem;" onclick="openCreateArtistModal()">
-                    + Agregar Artista
-                </button>
+            <div id="artist-info" class="artist-header-center">
+                <h2 id="artist-name" class="section-title" style="margin: 0; border: none;">DISCOGRAFÍA</h2>
             </div>
 
+            <!-- Resto de controles y contenedores... -->
             <div class="controls-bar">
-                <select id="sort-select" class="select-sort" onchange="loadArtists()">
-                    <option value="name-asc">Alfabético (A - Z)</option>
-                    <option value="name-desc">Alfabético (Z - A)</option>
+                <select id="sort-select" class="select-sort" onchange="loadAlbums()">
+                    <option value="year-asc-release">Año de Lanzamiento (Antiguos primero)</option>
+                    <option value="year-desc-release">Año de Lanzamiento (Recientes primero)</option>
+                    <option value="title-asc">Alfabético (A - Z)</option>
                 </select>
-
-                <div class="view-switcher">
-                    <button class="view-btn active" id="btn-view-grid" onclick="setMode('grid')" title="Vista Cuadrícula">
-                        <i class="fa-solid fa-border-all"></i>
-                    </button>
-                    <button class="view-btn" id="btn-view-detailed" onclick="setMode('detailed')" title="Vista Detallada">
-                        <i class="fa-solid fa-list"></i>
-                    </button>
-                    <button class="view-btn" id="btn-view-compact" onclick="setMode('compact')" title="Vista Compacta">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <button id="admin-add-album-btn" class="btn-action" style="display: none; font-size: 0.75rem; padding: 0.5rem 1rem;" onclick="openCreateModal()">+ Agregar Discografía</button>
+                    <div class="view-switcher">
+                        <button class="view-btn active" id="btn-view-grid" onclick="setMode('grid')"><i class="fa-solid fa-border-all"></i></button>
+                        <button class="view-btn" id="btn-view-detailed" onclick="setMode('detailed')"><i class="fa-solid fa-list"></i></button>
+                    </div>
                 </div>
             </div>
 
-            <!-- FILTROS DE SUBGÉNEROS (SIN 80'S Y 90'S, CON 2000'S Y NO VISUAL KEI) -->
-            <div class="genre-filter-bar">
-                <button class="filter-tag-btn active" onclick="filterGenre('todos', this)">TODOS</button>
-                <button class="filter-tag-btn" onclick="filterGenre('2000s', this)">2000'S</button>
-                <button class="filter-tag-btn" onclick="filterGenre('no visual kei', this)">No Visual Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('art kei', this)">Art Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('cosplay kei', this)">Cosplay Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('iryou kei', this)">Iryou Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('kirakira kei', this)">Kirakira Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('kote kei', this)">Kote Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('koteosa kei', this)">Koteosa Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('kurofuku kei', this)">Kurofuku Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('loud kei', this)">Loud Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('menhera kei', this)">Menhera Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('misshitsu kei', this)">Misshitsu Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('nagoya kei', this)">Nagoya Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('okeshou kei', this)">Okeshou Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('osare kei', this)">Osare Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('pikopiko kei', this)">Pikopiko Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('shiro kei', this)">Shiro Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('shironuri kei', this)">Shironuri Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('showa kayou kei', this)">Showa Kayou Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('soft visual', this)">Soft Visual</button>
-                <button class="filter-tag-btn" onclick="filterGenre('tanbi kei', this)">Tanbi Kei</button>
-                <button class="filter-tag-btn" onclick="filterGenre('wafuu kei', this)">Wafuu Kei</button>
+            <div class="category-filter-bar">
+                <button class="filter-tag-btn active" onclick="filterCategory('todos', this)">TODOS</button>
+                <button class="filter-tag-btn" onclick="filterCategory('Álbum', this)">ÁLBUM</button>
+                <button class="filter-tag-btn" onclick="filterCategory('Mini-Álbum', this)">MINI-ÁLBUM</button>
+                <button class="filter-tag-btn" onclick="filterCategory('Single', this)">SINGLE</button>
+                <button class="filter-tag-btn" onclick="filterCategory('Demo', this)">DEMO</button>
             </div>
 
-            <div id="artists-list" class="artists-container grid-view">
-                <p style="color: #888; text-align: center; grid-column: 1/-1;">Cargando artistas...</p>
+            <div id="albums-list" class="albums-container grid-view">
+                <p style="color: #888; text-align: center; grid-column: 1/-1;">Cargando discografía...</p>
             </div>
         </section>
     </main>
 
-    <!-- MODAL PARA CREAR / EDITAR ARTISTA -->
-    <div id="artist-modal" class="modal-bg">
-        <div class="modal-content">
-            <h3 id="artist-modal-title" class="section-title" style="margin-top:0;">Nuevo Artista / Banda</h3>
-            <form id="artist-form">
-                <input type="hidden" id="edit_artist_id">
-
-                <div class="admin-form-group">
-                    <label>Nombre de la Banda *</label>
-                    <input type="text" id="new_artist_name" placeholder="Ej: Dir En Grey" required>
-                </div>
-
-                <div class="admin-form-group">
-                    <label>¿A qué género(s) o época(s) pertenece? *</label>
-                    <div class="genres-checkbox-grid">
-                        <label><input type="checkbox" name="artist_genre_cb" value="2000'S"> 2000'S</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="No Visual Kei"> No Visual Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Art Kei"> Art Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Cosplay Kei"> Cosplay Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Iryou Kei"> Iryou Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Kirakira Kei"> Kirakira Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Kote Kei"> Kote Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Koteosa Kei"> Koteosa Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Kurofuku Kei"> Kurofuku Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Loud Kei"> Loud Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Menhera Kei"> Menhera Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Misshitsu Kei"> Misshitsu Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Nagoya Kei"> Nagoya Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Okeshou Kei"> Okeshou Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Osare Kei"> Osare Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Pikopiko Kei"> Pikopiko Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Shiro Kei"> Shiro Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Shironuri Kei"> Shironuri Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Showa Kayou Kei"> Showa Kayou Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Soft Visual"> Soft Visual</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Tanbi Kei"> Tanbi Kei</label>
-                        <label><input type="checkbox" name="artist_genre_cb" value="Wafuu Kei"> Wafuu Kei</label>
-                    </div>
-                </div>
-
-                <div class="admin-form-group">
-                    <label>Breve Descripción / Biografía</label>
-                    <textarea id="new_artist_desc" rows="3" placeholder="Banda pionera formada en Osaka..."></textarea>
-                </div>
-
-                <div class="admin-form-group">
-                    <label>URL de Foto del Artista</label>
-                    <input type="url" id="new_artist_image" placeholder="https://i.imgur.com/...">
-                </div>
-
-                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                    <button type="submit" class="btn-action" style="flex:1;">Guardar Artista</button>
-                    <button type="button" onclick="closeArtistModal()" style="flex:1; background:#222; border:1px solid #444; color:#fff; cursor:pointer;">Cancelar</button>
-                </div>
-            </form>
+    <!-- MINI-REPRODUCTOR FLOTANTE PERSISTENTE EN LA ESQUINA -->
+    <div id="global-floating-player">
+        <div class="player-info">
+            <span class="player-band-name" id="float-band">Banda</span>
+            <div class="player-song-title" id="float-title">Canción</div>
+            <audio id="global-audio-element" controls controlsList="nodownload"></audio>
         </div>
+        <button class="btn-close-player" onclick="closeFloatingPlayer()" title="Cerrar reproductor">✖</button>
     </div>
 
     <footer>
@@ -448,218 +154,114 @@
 
     <script src="js/config.js"></script>
     <script>
+        let artistId = new URLSearchParams(window.location.search).get('banda');
         let currentMode = 'grid';
-        let selectedFilter = 'todos';
-        let isAdmin = false;
+        let selectedCategory = 'todos';
+        let currentArtistName = '';
 
-        function setMode(mode) {
-            currentMode = mode;
-            const container = document.getElementById('artists-list');
-            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`btn-view-${mode}`).classList.add('active');
-            container.className = `artists-container ${mode}-view`;
-            loadArtists();
+        async function init() {
+            if (!artistId) return;
+            const { data: artist } = await db.from('artists').select('*').eq('id', artistId).single();
+            if (artist) {
+                currentArtistName = artist.name;
+                document.getElementById('artist-info').innerHTML = `
+                    ${artist.image_url ? `<img src="${artist.image_url}" alt="${artist.name}">` : ''}
+                    <h2 class="section-title" style="margin: 0 0 0.5rem 0; border: none; font-size:1.8rem;">${artist.name.toUpperCase()}</h2>
+                    <p style="margin: 0 auto; max-width:650px; color:#aaa; line-height: 1.6;">${artist.description || ''}</p>
+                `;
+            }
+            loadAlbums();
         }
 
-        function filterGenre(filterKey, btnElement) {
-            selectedFilter = filterKey;
-            document.querySelectorAll('.filter-tag-btn').forEach(b => b.classList.remove('active'));
-            btnElement.classList.add('active');
-            loadArtists();
-        }
-
-        function getBandGenre(artist) {
-            const desc = (artist.description || '');
-            const tagMatch = desc.match(/\[Géneros: (.*?)\]/i);
+        function formatTracklistHTML(tracklistData) {
+            let lines = Array.isArray(tracklistData) ? tracklistData : (typeof tracklistData === 'string' ? tracklistData.split('\n') : []);
+            let htmlOutput = '';
             
-            if (tagMatch) {
-                return tagMatch[1];
-            }
+            lines.forEach((line) => {
+                if (!line.trim()) return;
+                let parts = line.split('|');
+                let songTitle = parts[0].trim();
+                let audioLink = parts[1] ? parts[1].trim() : '';
 
-            return 'Visual Kei';
+                if (audioLink) {
+                    htmlOutput += `
+                        <div class="track-item-row">
+                            <span class="track-name-text">${songTitle}</span>
+                            <span class="audio-label">Escúchalo</span>
+                            <audio controls controlsList="nodownload" preload="none" 
+                                   onplay="handleGlobalPlay(this, '${songTitle}', '${currentArtistName}', '${audioLink}')">
+                                <source src="${audioLink}" type="audio/mpeg">
+                            </audio>
+                        </div>
+                    `;
+                } else {
+                    htmlOutput += `<div class="track-item-row"><span class="track-name-text">${songTitle}</span></div>`;
+                }
+            });
+            return htmlOutput;
         }
 
-        async function loadArtists() {
-            const { data: { session } } = await db.auth.getSession();
-            isAdmin = !!session;
+        /* GESTIÓN DE REPRODUCCIÓN GLOBAL (DETiene anteriores y activa el reproductor flotante) */
+        function handleGlobalPlay(audioElem, songTitle, bandName, audioUrl) {
+            // Detener cualquier otro reproductor en la página actual
+            document.querySelectorAll('audio').forEach(aud => {
+                if (aud !== audioElem && aud.id !== 'global-audio-element') {
+                    aud.pause();
+                }
+            });
 
-            if (isAdmin) {
-                document.getElementById('admin-add-artist-btn').style.display = 'inline-block';
+            // Configurar el reproductor flotante persistente
+            const floatBox = document.getElementById('global-floating-player');
+            const globalAudio = document.getElementById('global-audio-element');
+            
+            document.getElementById('float-band').innerText = bandName;
+            document.getElementById('float-title').innerText = songTitle;
+            
+            if (globalAudio.src !== audioUrl) {
+                globalAudio.src = audioUrl;
+                globalAudio.play();
             }
+            
+            floatBox.style.display = 'flex';
+        }
 
-            const sortVal = document.getElementById('sort-select').value;
-            let query = db.from('artists').select('*');
+        function closeFloatingPlayer() {
+            const globalAudio = document.getElementById('global-audio-element');
+            globalAudio.pause();
+            document.getElementById('global-floating-player').style.display = 'none';
+        }
 
-            if (sortVal === 'name-desc') {
-                query = query.order('name', { ascending: false });
-            } else {
-                query = query.order('name', { ascending: true });
-            }
+        async function loadAlbums() {
+            let query = db.from('discography').select('*').eq('artist_id', parseInt(artistId));
+            if (selectedCategory !== 'todos') query = query.eq('release_type', selectedCategory);
+            const { data: albums } = await query.order('release_year', { ascending: true });
 
-            const { data: artists, error } = await query;
-            const container = document.getElementById('artists-list');
+            const container = document.getElementById('albums-list');
             container.innerHTML = '';
-
-            if (error || !artists || artists.length === 0) {
-                container.innerHTML = '<p style="color:#888; text-align:center; grid-column: 1/-1;">No hay artistas registrados en el archivo.</p>';
+            if (!albums || albums.length === 0) {
+                container.innerHTML = '<p style="color:#888; text-align:center; grid-column:1/-1;">No hay lanzamientos.</p>';
                 return;
             }
 
-            const filteredArtists = artists.filter(artist => {
-                if (selectedFilter === 'todos') return true;
-                
-                const detectedGenre = getBandGenre(artist).toLowerCase();
-                const desc = (artist.description || '').toLowerCase();
+            albums.forEach(album => {
+                let tracksHtml = formatTracklistHTML(album.tracklist);
+                const teraboxBtn = album.terabox_link ? `<a href="${album.terabox_link}" target="_blank" class="btn-terabox"><i class="fa-solid fa-download"></i> Descargar</a>` : '';
+                const coverImg = album.cover_image ? `<img src="${album.cover_image}" class="album-cover">` : `<img src="https://via.placeholder.com/140?text=No+Cover" class="album-cover">`;
 
-                return detectedGenre.includes(selectedFilter.toLowerCase()) || desc.includes(selectedFilter.toLowerCase());
-            });
-
-            if (filteredArtists.length === 0) {
-                container.innerHTML = '<p style="color:#888; text-align:center; grid-column: 1/-1;">No se encontraron artistas para esta categoría.</p>';
-                return;
-            }
-
-            filteredArtists.forEach(artist => {
-                const coverImg = artist.image_url 
-                    ? `<img src="${artist.image_url}" class="artist-cover" alt="${artist.name}">` 
-                    : `<img src="https://via.placeholder.com/140?text=No+Image" class="artist-cover" alt="Sin imagen">`;
-
-                const buttonText = isAdmin ? 'Ver / Gestionar Discografía' : 'Ver Discografía';
-                const autoGenre = getBandGenre(artist);
-
-                let adminActionsHTML = '';
-                if (isAdmin) {
-                    adminActionsHTML = `
-                        <div class="admin-card-actions">
-                            <button class="btn-card-admin" title="Editar Artista" onclick="openEditArtistModal(${artist.id})"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn-card-admin delete" title="Eliminar Artista" onclick="deleteArtist(${artist.id})"><i class="fa-solid fa-trash"></i></button>
+                container.innerHTML += `
+                    <div class="album-card">
+                        ${coverImg}
+                        <div style="width:100%;">
+                            <h3 style="color:#fff; font-size:0.95rem; margin-bottom:0.5rem;">${album.album_title} (${album.release_year || 'N/A'})</h3>
+                            ${teraboxBtn}
+                            <div class="tracklist-box">${tracksHtml}</div>
                         </div>
-                    `;
-                }
-
-                const displayDesc = (artist.description || '').replace(/\[Géneros: (.*?)\]/gi, '').trim() || 'Sin biografía disponible.';
-
-                if (currentMode === 'compact') {
-                    container.innerHTML += `
-                        <div class="artist-card">
-                            ${adminActionsHTML}
-                            <div style="display:flex; align-items:center; gap:1rem;">
-                                ${coverImg}
-                                <div>
-                                    <h3 style="color:#fff; margin:0; font-size:1.05rem;">${artist.name}</h3>
-                                    <span class="detected-genre-badge">${autoGenre}</span>
-                                </div>
-                            </div>
-                            <a href="discografia.html?banda=${artist.id}" class="btn-ver-discografia" style="width:auto; margin:0;">${buttonText}</a>
-                        </div>
-                    `;
-                } else {
-                    container.innerHTML += `
-                        <div class="artist-card">
-                            ${adminActionsHTML}
-                            ${coverImg}
-                            <div class="artist-content">
-                                <h3 style="color:#fff; margin:0 0 0.2rem 0; font-size:1.1rem;">${artist.name}</h3>
-                                <span class="detected-genre-badge">${autoGenre}</span>
-                                <p style="color:#aaa; font-size:0.88rem; margin:0.5rem 0 0.8rem 0; line-height:1.5;">${displayDesc}</p>
-                                <a href="discografia.html?banda=${artist.id}" class="btn-ver-discografia">${buttonText}</a>
-                            </div>
-                        </div>
-                    `;
-                }
+                    </div>
+                `;
             });
         }
 
-        function openCreateArtistModal() {
-            document.getElementById('artist-modal-title').innerText = 'Nuevo Artista / Banda';
-            document.getElementById('artist-form').reset();
-            document.getElementById('edit_artist_id').value = '';
-            document.querySelectorAll('input[name="artist_genre_cb"]').forEach(cb => cb.checked = false);
-            document.getElementById('artist-modal').style.display = 'flex';
-        }
-
-        async function openEditArtistModal(artistId) {
-            const { data: artist, error } = await db.from('artists').select('*').eq('id', artistId).single();
-            if (error || !artist) {
-                alert('No se pudo cargar la información del artista.');
-                return;
-            }
-
-            document.getElementById('artist-modal-title').innerText = 'Editar Artista / Banda';
-            document.getElementById('edit_artist_id').value = artist.id;
-            document.getElementById('new_artist_name').value = artist.name || '';
-            document.getElementById('new_artist_image').value = artist.image_url || '';
-
-            const activeGenreStr = getBandGenre(artist).toLowerCase();
-
-            document.querySelectorAll('input[name="artist_genre_cb"]').forEach(cb => {
-                const cbVal = cb.value.toLowerCase();
-                cb.checked = activeGenreStr.includes(cbVal);
-            });
-
-            let cleanDesc = (artist.description || '').replace(/\[Géneros: (.*?)\]/gi, '').trim();
-            document.getElementById('new_artist_desc').value = cleanDesc;
-
-            document.getElementById('artist-modal').style.display = 'flex';
-        }
-
-        function closeArtistModal() {
-            document.getElementById('artist-modal').style.display = 'none';
-        }
-
-        document.getElementById('artist-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const artistId = document.getElementById('edit_artist_id').value;
-
-            const selectedGenres = Array.from(document.querySelectorAll('input[name="artist_genre_cb"]:checked'))
-                .map(cb => cb.value);
-
-            if (selectedGenres.length === 0) {
-                alert('Por favor, selecciona al menos un género o época para la banda.');
-                return;
-            }
-
-            const rawDesc = document.getElementById('new_artist_desc').value.trim();
-            const genreTagText = `[Géneros: ${selectedGenres.join(', ')}]`;
-            const finalDescription = rawDesc ? `${rawDesc} ${genreTagText}` : genreTagText;
-
-            const artistData = {
-                name: document.getElementById('new_artist_name').value.trim(),
-                description: finalDescription,
-                image_url: document.getElementById('new_artist_image').value.trim() || null
-            };
-
-            let error;
-            if (artistId) {
-                const res = await db.from('artists').update(artistData).eq('id', parseInt(artistId));
-                error = res.error;
-            } else {
-                const res = await db.from('artists').insert([artistData]);
-                error = res.error;
-            }
-
-            if (error) {
-                alert('Error al guardar artista: ' + error.message);
-            } else {
-                alert('¡Artista guardado con éxito!');
-                closeArtistModal();
-                loadArtists();
-            }
-        });
-
-        async function deleteArtist(artistId) {
-            if (confirm('¿Estás seguro de eliminar este artista y toda su información asociada?')) {
-                const { error } = await db.from('artists').delete().eq('id', parseInt(artistId));
-                if (error) {
-                    alert('Error al eliminar: ' + error.message);
-                } else {
-                    alert('Artista eliminado correctamente.');
-                    loadArtists();
-                }
-            }
-        }
-
-        window.onload = loadArtists;
+        window.onload = init;
     </script>
 </body>
 </html>
