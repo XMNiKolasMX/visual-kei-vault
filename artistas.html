@@ -454,20 +454,6 @@
         let selectedFilter = 'todos';
         let isAdmin = false;
 
-        const bandGenreMap = {
-            'AUTO-MOD': 'gothic / post-punk',
-            'BAISER': 'kote kei',
-            'CANARY': 'kote kei',
-            'CANARY (カナリヤ)': 'kote kei',
-            'DIR EN GREY': 'nagoya kei / kote kei',
-            'NIGHTMARE': 'koteosa kei',
-            'MALICE MIZER': 'tanbi kei',
-            'LAPUTA': 'nagoya kei',
-            'ROUAGE': 'nagoya kei',
-            'LUNA SEA': '90s / kurofuku kei',
-            'X JAPAN': '80s / 90s / heavy metal'
-        };
-
         function setMode(mode) {
             currentMode = mode;
             const container = document.getElementById('artists-list');
@@ -484,19 +470,16 @@
             loadArtists();
         }
 
-        // PRIORIZAR LO QUE ESTÁ GUARDADO EN SUPABASE (CASILLAS), LUEGO DICCIONARIO
+        // LEER ÚNICAMENTE DE LA BASE DE DATOS SUPABASE (CAMPO DESCRIPTION)
         function getBandGenre(artist) {
             const desc = (artist.description || '').toLowerCase();
             const tagMatch = desc.match(/\[géneros: (.*?)\]/i);
+            
             if (tagMatch) {
                 return tagMatch[1];
             }
 
-            const nameKey = (artist.name || '').trim();
-            if (bandGenreMap[nameKey]) {
-                return bandGenreMap[nameKey];
-            }
-            
+            // Si no tiene la etiqueta guardada de casillas, busca palabras dentro del texto biográfico
             const knownSubgenres = [
                 '80s', '90s', '2000s', 'koteosa kei', 'art kei', 'cosplay kei', 'iryou kei', 'kirakira kei',
                 'kote kei', 'kurofuku kei', 'loud kei', 'menhera kei', 'misshitsu kei',
@@ -504,11 +487,12 @@
                 'shironuri kei', 'showa kayou kei', 'soft visual', 'tanbi kei', 'wafuu kei'
             ];
 
+            const found = [];
             for (const sub of knownSubgenres) {
-                if (desc.includes(sub)) return sub;
+                if (desc.includes(sub)) found.push(sub);
             }
 
-            return 'Visual Kei';
+            return found.length > 0 ? found.join(' / ') : 'Visual Kei';
         }
 
         async function loadArtists() {
