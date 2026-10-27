@@ -272,7 +272,7 @@
             <div class="player-song-title" id="float-title">Canción</div>
             <audio id="global-audio-element" controls controlsList="nodownload"></audio>
         </div>
-        <button class="btn-close-player" onclick="closeFloatingPlayer()" title="Cerrar reproductor">✖</button>
+        <button class="btn-close-player" onclick="closeFloatingPlayer()" title="Cerrar">✖</button>
     </div>
 
     <footer>
@@ -331,7 +331,7 @@
 
         /* CONTROLADOR UNIFICADO DE AUDIO Y REPRODUCTOR FLOTANTE */
         function handleGlobalPlay(cardAudioElem, songTitle, bandName, audioUrl) {
-            // Pausar todos los demás reproductores locales en las tarjetas
+            // Pausar todos los reproductores de las tarjetas
             document.querySelectorAll('audio').forEach(aud => {
                 if (aud !== cardAudioElem && aud.id !== 'global-audio-element') {
                     aud.pause();
@@ -344,9 +344,9 @@
             document.getElementById('float-band').innerText = bandName;
             document.getElementById('float-title').innerText = songTitle;
             
-            // Si es una canción nueva o diferente, actualizar fuente
+            // Cargar y reproducir en el reproductor flotante principal
+            cardAudioElem.pause();
             if (globalAudio.src !== audioUrl && globalAudio.currentSrc !== audioUrl) {
-                cardAudioElem.pause(); // Evitar doble reproducción simultánea
                 globalAudio.src = audioUrl;
                 const savedTime = localStorage.getItem('vk_audio_time');
                 if (savedTime && localStorage.getItem('vk_audio_url') === audioUrl) {
@@ -354,23 +354,15 @@
                 } else {
                     globalAudio.currentTime = 0;
                 }
-                globalAudio.play().catch(e => console.log("Autoplay bloqueado:", e));
-            } else {
-                // Si es la misma fuente, asegurar sincronía
-                if (globalAudio.paused) {
-                    globalAudio.play();
-                }
             }
-
+            globalAudio.play().catch(e => console.log("Reproducción bloqueada:", e));
             floatBox.style.display = 'flex';
 
-            // Guardar memoria persistente
             localStorage.setItem('vk_audio_url', audioUrl);
             localStorage.setItem('vk_song_title', songTitle);
             localStorage.setItem('vk_band_name', bandName);
         }
 
-        // Sincronizar el almacenamiento del segundo actual constantemente
         document.addEventListener('DOMContentLoaded', () => {
             const globalAudio = document.getElementById('global-audio-element');
             if (globalAudio) {
@@ -411,7 +403,6 @@
                         if (savedTime) globalAudio.currentTime = parseFloat(savedTime);
                     }, { once: true });
                 }
-                // NO se hace play automático al recargar para respetar políticas de los navegadores, pero el reproductor se muestra listo con su tiempo guardado
                 floatBox.style.display = 'flex';
             } else {
                 document.getElementById('global-floating-player').style.display = 'none';
@@ -624,7 +615,6 @@
                                 ${adminActions}
                             </div>
                         </div>`;
-衝突          </div>`;
                 }
             });
         }
@@ -693,7 +683,7 @@
             if (roles.length === 0) { alert('Selecciona al menos un rol.'); return; }
             const data = {
                 artist_id: parseInt(artistId),
-                name: document.getElementById('member_name5'].value.trim(),
+                name: document.getElementById('member_name').value.trim(),
                 status: document.getElementById('member_status').value,
                 role: roles.join(', '),
                 years_active: document.getElementById('member_years').value.trim() || null,
