@@ -80,13 +80,7 @@
         .audio-label { font-size: 0.65rem; color: #d4af37; text-transform: uppercase; display: block; margin-bottom: 0.2rem; letter-spacing: 1px; font-weight: bold; }
         .track-item-row audio { width: 100%; height: 30px; filter: invert(0.9); background: #141414; border-radius: 4px; margin-top: 0.2rem; }
 
-        .track-special-note {
-            display: block;
-            font-size: 0.78rem;
-            color: #d4af37;
-            margin-top: 3px;
-            font-style: normal;
-        }
+        .track-special-note { display: block; font-size: 0.78rem; color: #d4af37; margin-top: 3px; }
 
         .release-type-badge { display: inline-block; background: rgba(212, 175, 55, 0.15); border: 1px solid rgba(212, 175, 55, 0.4); color: #d4af37; font-size: 0.65rem; padding: 2px 6px; text-transform: uppercase; letter-spacing: 1px; margin-left: 6px; border-radius: 3px; }
         .btn-terabox { display: inline-flex; align-items: center; gap: 0.5rem; background: #141414; border: 1px solid #333; color: #e0e0e0; padding: 0.4rem 0.8rem; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; transition: all 0.3s ease; }
@@ -212,7 +206,7 @@
         </div>
     </div>
 
-    <!-- MODAL ÁLBUM (CON CONSTRUCTOR VISUAL DE CANCIONES Y OPCIONES) -->
+    <!-- MODAL ÁLBUM -->
     <div id="album-modal" class="modal-bg">
         <div class="modal-content">
             <h3 id="modal-title" class="section-title" style="margin-top:0;">Nuevo Lanzamiento</h3>
@@ -237,7 +231,6 @@
                 <div class="admin-form-group"><label>URL de la Carátula</label><input type="url" id="cover_image" placeholder="https://..."></div>
                 <div class="admin-form-group"><label>Enlace TeraBox</label><input type="url" id="terabox_link" placeholder="https://terabox.com/s/..."></div>
                 
-                <!-- CONSTRUCTOR VISUAL DE CANCIONES CON MENÚ DESPLEGABLE -->
                 <div class="admin-form-group" style="background: #111; padding: 1rem; border: 1px solid #222; border-radius: 6px;">
                     <label style="color: #d4af37; margin-bottom: 0.5rem; font-weight: bold;">Constructor de Lista de Canciones</label>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem;">
@@ -279,7 +272,7 @@
             <div class="player-song-title" id="float-title">Canción</div>
             <audio id="global-audio-element" controls controlsList="nodownload"></audio>
         </div>
-        <button class="btn-close-player" onclick="closeFloatingPlayer()" title="Cerrar">✖</button>
+        <button class="btn-close-player" onclick="closeFloatingPlayer()" title="Cerrar reproductor">✖</button>
     </div>
 
     <footer>
@@ -336,39 +329,13 @@
             restorePersistentPlayer();
         }
 
-        /* FUNCIÓN DEL CONSTRUCTOR VISUAL PARA AÑADIR AL TEXTAREA */
-        function appendSongFromBuilder() {
-            const name = document.getElementById('builder_song_name').value.trim();
-            const audio = document.getElementById('builder_audio_link').value.trim();
-            const note = document.getElementById('builder_note_option').value;
-
-            if (!name) {
-                alert('Por favor ingresa al menos el nombre o número de la canción.');
-                return;
-            }
-
-            let formattedLine = `${name} | ${audio}`;
-            if (note) {
-                formattedLine += ` | ${note}`;
-            }
-
-            const textarea = document.getElementById('tracklist');
-            if (textarea.value.trim() !== '') {
-                textarea.value += '\n' + formattedLine;
-            } else {
-                textarea.value = formattedLine;
-            }
-
-            // Limpiar inputs del constructor
-            document.getElementById('builder_song_name').value = '';
-            document.getElementById('builder_audio_link').value = '';
-            document.getElementById('builder_note_option').value = '';
-        }
-
-        /* GESTIÓN DE REPRODUCCIÓN GLOBAL CON PERSISTENCIA */
-        function handleGlobalPlay(audioElem, songTitle, bandName, audioUrl) {
+        /* CONTROLADOR UNIFICADO DE AUDIO Y REPRODUCTOR FLOTANTE */
+        function handleGlobalPlay(cardAudioElem, songTitle, bandName, audioUrl) {
+            // Pausar todos los demás reproductores locales en las tarjetas
             document.querySelectorAll('audio').forEach(aud => {
-                if (aud !== audioElem && aud.id !== 'global-audio-element') aud.pause();
+                if (aud !== cardAudioElem && aud.id !== 'global-audio-element') {
+                    aud.pause();
+                }
             });
 
             const floatBox = document.getElementById('global-floating-player');
@@ -377,21 +344,33 @@
             document.getElementById('float-band').innerText = bandName;
             document.getElementById('float-title').innerText = songTitle;
             
-            if (globalAudio.src !== audioUrl) {
+            // Si es una canción nueva o diferente, actualizar fuente
+            if (globalAudio.src !== audioUrl && globalAudio.currentSrc !== audioUrl) {
+                cardAudioElem.pause(); // Evitar doble reproducción simultánea
                 globalAudio.src = audioUrl;
                 const savedTime = localStorage.getItem('vk_audio_time');
                 if (savedTime && localStorage.getItem('vk_audio_url') === audioUrl) {
                     globalAudio.currentTime = parseFloat(savedTime);
+                } else {
+                    globalAudio.currentTime = 0;
                 }
-                globalAudio.play();
+                globalAudio.play().catch(e => console.log("Autoplay bloqueado:", e));
+            } else {
+                // Si es la misma fuente, asegurar sincronía
+                if (globalAudio.paused) {
+                    globalAudio.play();
+                }
             }
+
             floatBox.style.display = 'flex';
 
+            // Guardar memoria persistente
             localStorage.setItem('vk_audio_url', audioUrl);
             localStorage.setItem('vk_song_title', songTitle);
             localStorage.setItem('vk_band_name', bandName);
         }
 
+        // Sincronizar el almacenamiento del segundo actual constantemente
         document.addEventListener('DOMContentLoaded', () => {
             const globalAudio = document.getElementById('global-audio-element');
             if (globalAudio) {
@@ -430,11 +409,38 @@
                     globalAudio.src = savedUrl;
                     globalAudio.addEventListener('loadedmetadata', () => {
                         if (savedTime) globalAudio.currentTime = parseFloat(savedTime);
-                        globalAudio.play().catch(e => console.log("Autoplay prevenido"));
                     }, { once: true });
                 }
+                // NO se hace play automático al recargar para respetar políticas de los navegadores, pero el reproductor se muestra listo con su tiempo guardado
                 floatBox.style.display = 'flex';
+            } else {
+                document.getElementById('global-floating-player').style.display = 'none';
             }
+        }
+
+        function appendSongFromBuilder() {
+            const name = document.getElementById('builder_song_name').value.trim();
+            const audio = document.getElementById('builder_audio_link').value.trim();
+            const note = document.getElementById('builder_note_option').value;
+
+            if (!name) {
+                alert('Por favor ingresa el nombre de la canción.');
+                return;
+            }
+
+            let formattedLine = `${name} | ${audio}`;
+            if (note) formattedLine += ` | ${note}`;
+
+            const textarea = document.getElementById('tracklist');
+            if (textarea.value.trim() !== '') {
+                textarea.value += '\n' + formattedLine;
+            } else {
+                textarea.value = formattedLine;
+            }
+
+            document.getElementById('builder_song_name').value = '';
+            document.getElementById('builder_audio_link').value = '';
+            document.getElementById('builder_note_option').value = '';
         }
 
         async function loadMembers() {
@@ -531,7 +537,6 @@
             chartRowsContainer.innerHTML = htmlOutput;
         }
 
-        /* RENDERIZADO DE TRACKLIST CON FORMATO DE NOTA */
         function formatTracklistHTML(tracklistData) {
             let lines = Array.isArray(tracklistData) ? tracklistData : (typeof tracklistData === 'string' ? tracklistData.split('\n') : []);
             let htmlOutput = '';
@@ -557,7 +562,7 @@
                             </div>
                             <div>
                                 <span class="audio-label">Escúchalo</span>
-                                <audio controls controlsList="nodownload" preload="none" onplay="handleGlobalPlay(this, '${songTitle}', '${currentArtistName}', '${audioLink}')">
+                                <audio controls controlsList="nodownload" preload="none" onplay="handleGlobalPlay(this, '${songTitle.replace(/'/g, "\\'")}', '${currentArtistName.replace(/'/g, "\\'")}', '${audioLink}')">
                                     <source src="${audioLink}" type="audio/mpeg">
                                 </audio>
                             </div>
@@ -619,6 +624,7 @@
                                 ${adminActions}
                             </div>
                         </div>`;
+衝突          </div>`;
                 }
             });
         }
@@ -687,7 +693,7 @@
             if (roles.length === 0) { alert('Selecciona al menos un rol.'); return; }
             const data = {
                 artist_id: parseInt(artistId),
-                name: document.getElementById('member_name').value.trim(),
+                name: document.getElementById('member_name5'].value.trim(),
                 status: document.getElementById('member_status').value,
                 role: roles.join(', '),
                 years_active: document.getElementById('member_years').value.trim() || null,
